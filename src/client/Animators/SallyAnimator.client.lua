@@ -1,5 +1,6 @@
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local workspaceHelper = require(replicatedStorage.Common.WorkspaceHelper);
+local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 
 local sally = workspaceHelper.GetDescendantByName(game, "Lab Tech Sally");
 local animation = sally:WaitForChild("Animation");
@@ -13,10 +14,13 @@ run.Looped = true;
 run:Play();
 
 while wait() do
+    local mainGui = uiManager.GetUi("Main GUI");
+    local billboard = mainGui.Interact;
+
     local characterPosition = character:GetPrimaryPartCFrame().p;
-	if (characterPosition - sallyRoot.Position).Magnitude <= 10 then
-		sally.BillboardGui.Enabled = true;
+	if (characterPosition - sallyRoot.Position).Magnitude <= 20 then
+		billboard.Enabled = true;
     else
-        sally.BillboardGui.Enabled = false;
+        billboard.Enabled = false;
     end
 end
