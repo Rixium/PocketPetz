@@ -36,7 +36,6 @@ function PlayerInteractor.SetInteractable(obj)
 end
 
 function PlayerInteractor.Interact()
-    print("INTREACT")
     if(interactable == nil) then
         return;
     end
@@ -51,7 +50,7 @@ function PlayerInteractor.Interact()
             runService:UnbindFromRenderStep("CameraUpdate")
             locked = false;
             
-            uiManager.HideAllExcept({"Main GUI"});
+            uiManager.HideAllExcept({"Main GUI", "Interact GUI"});
             
             local dialogMenu = game.Players.LocalPlayer.PlayerGui["Dialog GUI"];
             dialogMenu.Enabled = false;

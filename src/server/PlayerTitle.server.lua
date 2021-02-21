@@ -2,7 +2,7 @@ local Billboard = game.ServerStorage.AboveHeadGUI;
 
 local function OnCharacterAdded(character)
 	local board = Billboard:Clone()
-	board.Parent = character:WaitForChild("Head")
+	board.Parent = character:WaitForChild("HumanoidRootPart")
 end
 
 local function OnPlayerAdded(player)
