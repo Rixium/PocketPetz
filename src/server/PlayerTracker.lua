@@ -32,9 +32,8 @@ PlayerTrackSet.LocalStatistics = {
 
 -- Uses the players local statistics, figures out if a player has logged in before, otherwise sets it to now.
 local function GetLastLogin(player)
-	local playerStatistics = PlayerTrackSet.ActivePlayersStatistics[player.UserId];
-	local lastLogin = playerStatistics:GetAsync(lastLoginData) or os.time();
-	return lastLogin;
+	local playerLocalStatistics = PlayerTrackSet.LocalStatistics[player.UserId];
+	return playerLocalStatistics[lastLoginData];
 end
 
 -- Run on player login, to make sure all the statistics are ready in for the player.
@@ -49,6 +48,7 @@ function PlayerTrackSet.Login(player)
 	
 	-- Set the first login time of the locals to whatever is stored, or nil.
 	playersLocals[firstLoginTime] = playerStatisticStore:GetAsync(firstLoginTime) or nil;
+	playersLocals[lastLoginData] = playerStatisticStore:GetAsync(lastLoginData) or os.time();
 
 	-- Finally save all players locals in to local statistics
 	PlayerTrackSet.LocalStatistics[player.UserId] = playersLocals;
@@ -63,11 +63,14 @@ function PlayerTrackSet.Logout(player)
 
 	-- We're gonna iterate over every statistic stored locally, and set it in the data store.
 	for index, value in pairs(playersLocals) do
+		print(index,value);
 		playerStatisticsDataStore:UpdateAsync(index, function(oldValue)
-			return value;
+			if(value ~= oldValue) then
+				return value;
+			end
 		end);
 	end 
-	
+
 end
 
 function AddPlayerMoneyBasedOnLastLogin(player)
