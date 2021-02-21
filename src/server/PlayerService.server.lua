@@ -4,6 +4,7 @@ local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager)
 
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
+	moneyManager.PlayerJoined(player);
 
 	local isFirstTime = playerTracker.FirstTime(player);
 
