@@ -1,16 +1,11 @@
 local adminSet = require(game.ServerScriptService.Server.Data.AdminList);
 
-function IsAdmin(player) 
-    for index, adminName in ipairs(adminSet) do
-        if player.Name:lower() == adminName:lower() then 
-            return true;
-        end
-    end
-
-    return false;
+function IsAdmin(player)
+    return adminSet.Contains(player);
 end
 
 Game.Players.PlayerAdded:connect(function(player)
+    repeat wait() until adminSet.Initialized();
     if (IsAdmin(player)) then
         player.Chatted:connect(function(message)
             local splitMessage = string.split(message, ' ');
