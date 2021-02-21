@@ -1,25 +1,46 @@
 local TitleList = { };
 
 TitleList.Titles = {
-    Noob = {
-        Name = "Noob",
-        Requirements = nil
+    {
+        Name = "Noob"
     },
-    Pro = {
+    {
         Name = "Pro"
     },
-    Collector = {
+    {
         Name = "Collector"
     },
-    Millionaire = {
+    {
         Name = "Millionaire"
     }
 };
 
-function TitleList.Print()
+function TitleList.GetTitleDataByName(titleName)
     for index, title in pairs(TitleList.Titles) do
-        print(title["Name"]);
+        if(title["Name"] == titleName) then
+            return 
+            { 
+                Index = index, 
+                Title = title 
+            };
+        end
     end
+
+    return nil;
+end
+
+function TitleList.GetTitleDataByIndex(titleIndex)
+    for index, title in pairs(TitleList.Titles) do
+        if(index == titleIndex) then
+            return 
+            {
+                Index = index,
+                Title = title
+            };
+        end
+    end
+
+    return nil;
 end
 
 return TitleList;

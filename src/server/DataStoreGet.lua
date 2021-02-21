@@ -3,11 +3,12 @@ local DataStoreGet = {};
 local firstLoginTime = "FirstLogin";
 local lastLoginData = "LastLogin";
 local goldData = "Gold";
+local titleData = "Titles";
 
 local serverScriptService = game:GetService("ServerScriptService");
 local DataStore2 = require(serverScriptService.DataStore2);
 
-DataStore2.Combine("DATA", firstLoginTime, lastLoginData, goldData);
+DataStore2.Combine("DATA1", firstLoginTime, lastLoginData, goldData, titleData);
 
 DataStoreGet.DataStore = DataStore2;
 

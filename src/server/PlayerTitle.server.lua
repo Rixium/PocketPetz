@@ -1,21 +1,21 @@
 local Billboard = game.ServerStorage.AboveHeadGUI;
 local adminList = require(game.ServerScriptService.Server.Data.AdminList);
+local titleService = require(game.ServerScriptService.Server.Services.TitleService);
+local titleList = require(game.ServerScriptService.Server.Data.TitleList);
 
-local function OnCharacterAdded(character)
+local function OnPlayerAdded(player)
+	local character = player.Character or player.CharacterAdded:wait();
+
 	local board = Billboard:Clone()
 	board.Parent = character:WaitForChild("Head")
 
 	character:WaitForChild("Humanoid").NameDisplayDistance = 0
+	local playersTitles = titleService.GetPlayerTitles(player);
+	local first = playersTitles[1];
+	local chosenTitle = titleList.GetTitleDataByIndex(first);
 
-	if(adminList.Contains(character)) then
-		board.Title.Text = "Admin " .. character.Name;
-	else
-		board.Title.Text = "Noob " .. character.Name;
-	end
-end
-
-local function OnPlayerAdded(player)
-	player.CharacterAdded:Connect(OnCharacterAdded)
+	board.NameField.Text = player.Name;
+	board.TitleField.Text = chosenTitle.Title.Name;
 end
 
 game.Players.PlayerAdded:Connect(OnPlayerAdded)
