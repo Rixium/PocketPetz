@@ -1,12 +1,11 @@
 local MoneyManager = {};
 
 local serverScriptService = game:GetService("ServerScriptService");
-local dataStore2 = require(serverScriptService.DataStore2)
+local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
+local dataStore2 = dataStoreGet.DataStore;
 
 local moneyPouchName = "Gold";
 local STARTING_COINS = 100;
-
-dataStore2.Combine(moneyPouchName)
 
 -- Adds money to the dictionary, this will not persist, until the user leaves.
 function MoneyManager.AddMoney(player, money)

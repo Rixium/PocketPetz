@@ -3,7 +3,8 @@ local PlayerTrackSet = {};
 local serverScriptService = game:GetService("ServerScriptService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 
-local dataStore2 = require(serverScriptService.DataStore2)
+local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
+local dataStore2 = dataStoreGet.DataStore;
 
 local playerJoinedEvent = replicatedStorage.Common.Events.PlayerJoinedEvent;
 local playerLeftEvent = replicatedStorage.Common.Events.PlayerJoinedEvent;
@@ -15,8 +16,6 @@ local lastLoginData = "LastLogin";
 
 local secondsToPassForLoginMoney = 60;
 local loginRewardMoney = 100;
-
-dataStore2.Combine(firstLoginTime, lastLoginData);
 
 -- Store all of the current logged in players.
 PlayerTrackSet.ActivePlayers = {
