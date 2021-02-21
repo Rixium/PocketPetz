@@ -1,3 +1,5 @@
+local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+
 local onBuyZone = false;
 local locked = false;
 
@@ -44,21 +46,6 @@ end
 
 local ContextActionService = game:GetService("ContextActionService")
 
-local function HideAllGUIExcept(guis)
-	for index, value in ipairs(game.Players.LocalPlayer.PlayerGui:GetChildren()) do
-		if(value.ClassName ~= "ScreenGui") then
-			continue;
-		end
-		
-		if table.find(guis, value.Name) then
-			game.Players.LocalPlayer.PlayerGui[value.Name].Enabled = true;
-			continue;
-		end
-		
-		game.Players.LocalPlayer.PlayerGui[value.Name].Enabled = false;
-	end
-end
-
 local function handleAction(actionName, inputState, inputObject)
 	if inputState == Enum.UserInputState.Begin then
 		if(onBuyZone) then
@@ -72,12 +59,12 @@ local function handleAction(actionName, inputState, inputObject)
 					RunService:UnbindFromRenderStep("CameraUpdate")
 					locked = false;
 					
-					HideAllGUIExcept({"Main GUI"});
+					uiManager.HideAllExcept({"Main GUI"});
 					
 					local dialogMenu = game.Players.LocalPlayer.PlayerGui["Dialog GUI"];
 					dialogMenu.Enabled = false;
 				else
-					HideAllGUIExcept({"Dialog GUI"});
+					uiManager.HideAllExcept({"Dialog GUI"});
 					
 					if(dialogScript.Ready()) then
 						local next = dialog.GetNext();
