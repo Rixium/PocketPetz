@@ -1,7 +1,10 @@
-local adminList = require(game.ServerScriptService.Server.Data.AdminList);
-local dataPersistence = require(game.ServerScriptService.Server.DataPersistence.DataPersistence);
+local serverScriptService = game:GetService("ServerScriptService");
+local adminList = require(serverScriptService.Server.Data.AdminList);
+local dataStoreService = game:GetService("DataStoreService");
 
-local serverProperties = dataPersistence.GetDataStore("ServerProperties");
+local serverPropertiesDataStore = "ServerProperties";
 
+local serverProperties = dataStoreService:GetDataStore(serverPropertiesDataStore);
 local admins = serverProperties:GetAsync("Admins") or { "iRixium" };
+
 adminList.SetAdmins(admins);

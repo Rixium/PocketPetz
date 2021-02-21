@@ -1,75 +1,48 @@
 local PlayerTrackSet = {};
 
+local serverScriptService = game:GetService("ServerScriptService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+
+local dataStore2 = require(serverScriptService.DataStore2)
 
 local playerJoinedEvent = replicatedStorage.Common.Events.PlayerJoinedEvent;
 local playerLeftEvent = replicatedStorage.Common.Events.PlayerJoinedEvent;
 
-local dataPersistence = require(game.ServerScriptService.Server.DataPersistence.DataPersistence);
-local moneyManager = require(game.ServerScriptService.Server.Statistics.MoneyManager);
-
-local playerStatisticsDataStore = "PlayerStatistics";
+local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 
 local firstLoginTime = "FirstLogin";
 local lastLoginData = "LastLogin";
+
 local secondsToPassForLoginMoney = 60;
 local loginRewardMoney = 100;
+
+dataStore2.Combine(firstLoginTime, lastLoginData);
 
 -- Store all of the current logged in players.
 PlayerTrackSet.ActivePlayers = {
 	
 };
 
--- Store a reference to the players statistics data store.
-PlayerTrackSet.ActivePlayersStatistics = {
-	
-};
-
--- Store all players local statistics, to be read on login, and saved on logout.
-PlayerTrackSet.LocalStatistics = {
-	
-};
-
--- Uses the players local statistics, figures out if a player has logged in before, otherwise sets it to now.
 local function GetLastLogin(player)
-	local playerLocalStatistics = PlayerTrackSet.LocalStatistics[player.UserId];
-	return playerLocalStatistics[lastLoginData];
+	local lastLoginStore = dataStore2(lastLoginData, player);
+	return lastLoginStore:Get(os.time());
 end
 
--- Run on player login, to make sure all the statistics are ready in for the player.
-function PlayerTrackSet.Login(player)
-	local playerStatisticStore = dataPersistence:GetDataStoreForPlayer(player, playerStatisticsDataStore);
+local function SetLastLogin(player, time)
+	local lastLoginStore = dataStore2(lastLoginData, player);
+	lastLoginStore:Set(time);
+end
 
-	PlayerTrackSet.ActivePlayersStatistics[player.UserId] = playerStatisticStore;
+function PlayerTrackSet.Login(player)
 	PlayerTrackSet.ActivePlayers[player.UserId] = player;
 
-	-- Create an empty table for the players locals.
-	local playersLocals = {};
-	
-	-- Set the first login time of the locals to whatever is stored, or nil.
-	playersLocals[firstLoginTime] = playerStatisticStore:GetAsync(firstLoginTime) or nil;
-	playersLocals[lastLoginData] = playerStatisticStore:GetAsync(lastLoginData) or os.time();
+	playerJoinedEvent:Fire(player);
+	AddPlayerMoneyBasedOnLastLogin(player);
 
-	-- Finally save all players locals in to local statistics
-	PlayerTrackSet.LocalStatistics[player.UserId] = playersLocals;
+	SetLastLogin(player, os.time());
 end
 
--- Run on player logout, so that we can be sure we save all players statistics to the datastore.
 function PlayerTrackSet.Logout(player)
-	-- Get the persistant data store for statistics.
-	local playerStatisticsDataStore = PlayerTrackSet.ActivePlayersStatistics[player.UserId];
-	-- Get the players local statistic set.
-	local playersLocals = PlayerTrackSet.LocalStatistics[player.UserId];
-
-	-- We're gonna iterate over every statistic stored locally, and set it in the data store.
-	for index, value in pairs(playersLocals) do
-		print(index,value);
-		playerStatisticsDataStore:UpdateAsync(index, function(oldValue)
-			if(value ~= oldValue) then
-				return value;
-			end
-		end);
-	end 
 
 end
 
@@ -83,30 +56,18 @@ function AddPlayerMoneyBasedOnLastLogin(player)
 	end
 end
 
-function PlayerTrackSet.AddPlayer(player)
-	playerJoinedEvent:Fire(player);
-	AddPlayerMoneyBasedOnLastLogin(player);
-end
-
 function PlayerTrackSet.RemovePlayer(player)
 	playerLeftEvent:Fire(player);
-	
-	local playerStatistics = PlayerTrackSet.ActivePlayersStatistics[player.UserId];
-	
-	playerStatistics:UpdateAsync(lastLoginData, function(oldTime)
-		return os.time();
-	end);
-	
 	PlayerTrackSet.ActivePlayers[player.UserId] = nil;
-	PlayerTrackSet.ActivePlayersStatistics[player.UserId] = nil;
 end
 
 function PlayerTrackSet.FirstTime(player)
-	local playerStatistics = PlayerTrackSet.ActivePlayersStatistics[player.UserId];
-	local isFirstTime = PlayerTrackSet.LocalStatistics[player.UserId][firstLoginTime] == nil;
+	local playerLoginDataStore = dataStore2(firstLoginTime, player);
+
+	local isFirstTime = playerLoginDataStore:Get(nil) == nil;
 
 	if(isFirstTime) then
-		PlayerTrackSet.LocalStatistics[player.UserId][firstLoginTime] = os.time();
+		playerLoginDataStore:Set(os.time());
 	end
 
 	return isFirstTime;

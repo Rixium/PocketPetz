@@ -1,10 +1,9 @@
-local playerTracker = require(game.ServerScriptService.Server.PlayerTracker);
-local moneyManager = require(game.ServerScriptService.Server.Statistics.MoneyManager);
+local serverScriptService = game:GetService("ServerScriptService");
+local playerTracker = require(serverScriptService.Server.PlayerTracker);
+local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
-	moneyManager.AddPlayer(player);
-	playerTracker.AddPlayer(player);
 
 	local isFirstTime = playerTracker.FirstTime(player);
 
@@ -15,7 +14,6 @@ end
 
 function OnPlayerLeaving(player)
 	playerTracker.Logout(player);
-	moneyManager.RemovePlayer(player);
 	playerTracker.RemovePlayer(player);
 end
 
