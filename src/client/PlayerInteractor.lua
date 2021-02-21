@@ -24,11 +24,19 @@ function disableControls()
 	);
 end
 
+function Speak(dialog)
+    if(dialogUi.Ready()) then
+        local next = dialog.GetNext();
+        dialogUi.DoDialog(next);
+    end
+end
+
 function PlayerInteractor.SetInteractable(obj)
     interactable = obj;
 end
 
 function PlayerInteractor.Interact()
+    print("INTREACT")
     if(interactable == nil) then
         return;
     end
@@ -50,11 +58,7 @@ function PlayerInteractor.Interact()
 
             dialog.Reset();
         else
-            uiManager.HideAllExcept({"Dialog GUI"});
-            if(dialogUi.Ready()) then
-                local next = dialog.GetNext();
-                dialogUi.DoDialog(next);
-            end
+            Speak(dialog);
         end
     else
         local camera = workspace.CurrentCamera;
@@ -67,6 +71,10 @@ function PlayerInteractor.Interact()
 
         disableControls();
         locked = true;
+        
+        uiManager.HideAllExcept({"Dialog GUI"});
+
+        Speak(dialog);
     end
 end
 
