@@ -28,4 +28,4 @@ If you need clarification, don't hesitate to ask the team!
 ## Administration
 
 As a Developer, you should have access to the top-tier of PocketPetz administration.
-You should have been added as an admin by now, but if not, check with the team!
+You should have been added as an admin by now, but if not, check with the team! 
