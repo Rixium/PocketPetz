@@ -12,6 +12,7 @@ for index, placement in pairs(npcPlacements:GetChildren()) do
     local npcObject = replicatedStorage.NPCs[placement.Name];
     local npcData = npcs[placement.Name];
     local cloned = npcObject:Clone();
+    local cooldown = false;
     cloned.Parent = placement;
     cloned.Name = npcData.Name;
     
@@ -24,13 +25,15 @@ for index, placement in pairs(npcPlacements:GetChildren()) do
         local characterPosition = character:GetPrimaryPartCFrame().p;
         local clonedPosition = cloned:GetPrimaryPartCFrame().p;
 
-        if (characterPosition - clonedPosition).Magnitude <= 20 then
+        if (characterPosition - clonedPosition).Magnitude <= 20 and not cooldown then
+            cooldown = true;
             animation.Animate(507770239, cloned.Humanoid);
-
             interactGUI.Enabled = true;
             interactGUI.Adornee = cloned.HumanoidRootPart;
-
-            gameStep:disconnect();
+            spawn(function()
+                wait(2.5);
+                cooldown = false;
+            end);
         end
 
     end)
