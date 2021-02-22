@@ -9,6 +9,7 @@ local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
 local dataStore2 = dataStoreGet.DataStore;
 
 local titleData = "Titles";
+local activeTitleData = "ActiveTitle";
 
 function IsInTable(tableValue, toFind)
 	local found = false
@@ -63,6 +64,10 @@ function TitleService.SetActiveTitle(player, titleName)
         local character = player.Character or player.CharacterAdded:wait();
         local head = character:WaitForChild("Head");
         local board = head.AboveHeadGUI;
+
+        local activeTitleStore = dataStore2(activeTitleData, player);
+        activeTitleStore:Set(title.Title.Name);
+        
         board.TitleField.Text = title.Title.Name;
     end
 end

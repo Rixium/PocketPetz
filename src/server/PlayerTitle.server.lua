@@ -1,7 +1,14 @@
 local Billboard = game.ServerStorage.AboveHeadGUI;
-local adminList = require(game.ServerScriptService.Server.Data.AdminList);
-local titleService = require(game.ServerScriptService.Server.Services.TitleService);
-local titleList = require(game.ServerScriptService.Server.Data.TitleList);
+
+local serverScriptService = game:GetService("ServerScriptService");
+local adminList = require(serverScriptService.Server.Data.AdminList);
+local titleService = require(serverScriptService.Server.Services.TitleService);
+local titleList = require(serverScriptService.Server.Data.TitleList);
+
+local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
+local dataStore2 = dataStoreGet.DataStore;
+
+local activeTitleData = "ActiveTitle";
 
 local function OnPlayerAdded(player)
 	local character = player.Character or player.CharacterAdded:wait();
@@ -14,8 +21,11 @@ local function OnPlayerAdded(player)
 
 	local chosenTitle = playersTitles[1];
 	
+    local activeTitleStore = dataStore2(activeTitleData, player);
+    local activeTitle = activeTitleStore:Get(chosenTitle.Name);
+	
 	board.NameField.Text = player.Name;
-	-- board.TitleField.Text = chosenTitle.Name;
+	board.TitleField.Text = activeTitle;
 end
 
 game.Players.PlayerAdded:Connect(OnPlayerAdded)
