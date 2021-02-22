@@ -1,4 +1,4 @@
-leanlocal moneyManager = require(game.ServerScriptService.Server.Statistics.MoneyManager);
+local moneyManager = require(game.ServerScriptService.Server.Statistics.MoneyManager);
 
 local AdminCommands = { };
 
