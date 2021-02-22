@@ -15,7 +15,7 @@ local function OnPlayerAdded(player)
 	local chosenTitle = playersTitles[1];
 	
 	board.NameField.Text = player.Name;
-	board.TitleField.Text = chosenTitle.Name;
+	-- board.TitleField.Text = chosenTitle.Name;
 end
 
 game.Players.PlayerAdded:Connect(OnPlayerAdded)

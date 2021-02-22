@@ -27,3 +27,6 @@ getCoinCountRequest.OnServerInvoke = moneyManager.GetMoney;
 
 local getTitlesRequest = replicatedStorage.Common.Events.GetTitlesRequest;
 getTitlesRequest.OnServerInvoke = titleService.GetPlayerTitles;
+
+local setActiveTitle = replicatedStorage.Common.Events.SetActiveTitle;
+setActiveTitle.OnServerInvoke = titleService.SetActiveTitle;

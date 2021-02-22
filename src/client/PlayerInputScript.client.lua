@@ -8,7 +8,10 @@ function onInteractKeyPressed(actionName, inputState, inputObject)
 end
 
 local replicatedStorage = game:GetService("ReplicatedStorage")
+
 local getTitlesRequest = replicatedStorage.Common.Events.GetTitlesRequest;
+local setActiveTitle = replicatedStorage.Common.Events.SetActiveTitle;
+
 local startMenu = game.Players.LocalPlayer.PlayerGui["Titles GUI"];
 
 contextActionService:BindAction("Interact", onInteractKeyPressed, true, Enum.KeyCode.E);
@@ -21,5 +24,10 @@ for index, value in pairs(titles) do
     local newButton = titleButton:Clone();
     newButton.Text = value.Name;
     newButton.Parent = ScreenGui;
+
+    newButton.MouseButton1Click:Connect(function ()
+        setActiveTitle:InvokeServer(value.Name);
+    end)
+
 end 
 		
