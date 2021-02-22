@@ -1,7 +1,6 @@
 local Billboard = game.ServerStorage.AboveHeadGUI;
 
 local serverScriptService = game:GetService("ServerScriptService");
-local adminList = require(serverScriptService.Server.Data.AdminList);
 local titleService = require(serverScriptService.Server.Services.TitleService);
 local titleList = require(serverScriptService.Server.Data.TitleList);
 
@@ -20,9 +19,7 @@ local function OnPlayerAdded(player)
 	local playersTitles = titleService.GetPlayerTitles(player);
 
 	local chosenTitle = playersTitles[1];
-	
-	print(chosenTitle);
-	
+
     local activeTitleStore = dataStore2(activeTitleData, player);
     local activeTitle = activeTitleStore:Get(chosenTitle.Name);
 	
