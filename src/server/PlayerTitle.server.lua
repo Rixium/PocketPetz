@@ -11,11 +11,11 @@ local function OnPlayerAdded(player)
 
 	character:WaitForChild("Humanoid").NameDisplayDistance = 0
 	local playersTitles = titleService.GetPlayerTitles(player);
-	local first = playersTitles[1];
-	local chosenTitle = titleList.GetTitleDataByIndex(first);
 
+	local chosenTitle = playersTitles[1];
+	
 	board.NameField.Text = player.Name;
-	board.TitleField.Text = chosenTitle.Title.Name;
+	board.TitleField.Text = chosenTitle.Name;
 end
 
 game.Players.PlayerAdded:Connect(OnPlayerAdded)

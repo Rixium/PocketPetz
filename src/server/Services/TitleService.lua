@@ -38,7 +38,8 @@ end
 
 function TitleService.GetPlayerTitles(player)
     local titleStore = dataStore2(titleData, player);
-    return titleStore:Get({});
+    local titleIndexes = titleStore:Get({});
+    return titleList.GetAll(titleIndexes);
 end
 
 return TitleService;

@@ -43,4 +43,14 @@ function TitleList.GetTitleDataByIndex(titleIndex)
     return nil;
 end
 
+function TitleList.GetAll(titleIndexes)
+    local titlesToReturn = {};
+
+    for index, title in pairs(titleIndexes) do
+        table.insert(titlesToReturn, TitleList.Titles[index]);
+    end
+
+    return titlesToReturn;
+end
+
 return TitleList;

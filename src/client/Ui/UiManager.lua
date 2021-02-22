@@ -5,7 +5,8 @@ UiManager.Uis = {
     "Inventory GUI",
     "Dialog GUI",
     "Start Menu GUI",
-    "Interact GUI"
+    "Interact GUI",
+    "Titles GUI"
 }
 
 function UiManager.GetUi(name)

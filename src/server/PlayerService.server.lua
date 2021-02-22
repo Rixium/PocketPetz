@@ -24,3 +24,6 @@ game.Players.PlayerRemoving:Connect(OnPlayerLeaving);
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local getCoinCountRequest = replicatedStorage.Common.Events.GetCoinCountRequest;
 getCoinCountRequest.OnServerInvoke = moneyManager.GetMoney;
+
+local getTitlesRequest = replicatedStorage.Common.Events.GetTitlesRequest;
+getTitlesRequest.OnServerInvoke = titleService.GetPlayerTitles;
