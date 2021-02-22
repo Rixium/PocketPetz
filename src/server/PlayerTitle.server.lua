@@ -21,6 +21,8 @@ local function OnPlayerAdded(player)
 
 	local chosenTitle = playersTitles[1];
 	
+	print(chosenTitle);
+	
     local activeTitleStore = dataStore2(activeTitleData, player);
     local activeTitle = activeTitleStore:Get(chosenTitle.Name);
 	

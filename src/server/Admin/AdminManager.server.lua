@@ -1,16 +1,26 @@
 local adminSet = require(game.ServerScriptService.Server.Data.AdminList);
-local moneyManager = require(game.ServerScriptService.Server.Statistics.MoneyManager);
+local adminCommands = require(game.ServerScriptService.Server.Data.AdminCommands);
+
+local prefix = ':';
 
 function IsAdmin(player)
     return adminSet.Contains(player);
 end
 
-local function GetPlayer(playerName)
-    for index, value in pairs(game.Players:GetChildren()) do
-        if(string.lower(value.Name) == string.lower(playerName)) then
-            return value;
-        end
-    end
+local function ParseMessage(message)
+	message = string.lower(message)
+	local prefixMatch = string.match(message,"^"..prefix)
+	
+	if prefixMatch then
+		message = string.gsub(message, prefixMatch,"",1)
+		local arguments = {}
+		
+		for argument in string.gmatch(message,"[^%s]+") do
+			table.insert(arguments, argument)
+		end
+
+        return arguments;
+	end
 
     return nil;
 end
@@ -19,28 +29,22 @@ game.Players.PlayerAdded:connect(function(player)
     repeat wait() until adminSet.Initialized();
     if (IsAdmin(player)) then
         player.Chatted:connect(function(message)
-            local splitMessage = string.split(message, ' ');
-            if(splitMessage[1] == '!tp') then
-                local to = splitMessage[2];
-                local toPlayer = GetPlayer(to);
 
-                if(toPlayer == nil) then
-                    return;
-                end
-
-                local toPosition = toPlayer.Character:GetPrimaryPartCFrame().p;
-                player.Character:MoveTo(toPosition)
-            elseif(splitMessage[1] == '!money') then
-                local to = splitMessage[2];
-                local toPlayer = GetPlayer(to);
-
-                if(toPlayer == nil) then
-                    return;
-                end
-
-                local amount = splitMessage[3];
-                moneyManager.AddMoney(toPlayer, amount);
+            local parsed = ParseMessage(message);
+            
+            if(parsed == nil) then
+                return;
             end
+
+            local commandName = parsed[1];
+            table.remove(parsed, 1);
+            local commandFunction = adminCommands[commandName]
+            
+            if commandFunction == nil then
+                return;
+            end
+            
+            commandFunction(player, parsed);
         end)
     end
 end)
