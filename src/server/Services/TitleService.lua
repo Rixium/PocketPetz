@@ -11,10 +11,9 @@ local dataStore2 = dataStoreGet.DataStore;
 local titleData = "Titles";
 
 function IsInTable(tableValue, toFind)
-    print(tableValue);
 	local found = false
-	for index, value in pairs(tableValue) do
-		if index==toFind then
+	for _, value in pairs(tableValue) do
+		if value == toFind then
 			return true;
 		end
 	end
@@ -24,18 +23,24 @@ end
 function TitleService.UnlockTitle(player, titleName)
     local titleStore = dataStore2(titleData, player);
     local titles = titleStore:Get({});
+
     local titleToUnlock = titleList.GetTitleDataByName(titleName);
 
     if(titleToUnlock == nil) then
         return;
     end
-    
+
     if(IsInTable(titles, titleToUnlock.Index)) then
         return;
     end
-    
+
     table.insert(titles, titleToUnlock.Index);
     titleStore:Set(titles);
+end
+
+function TitleService.GetPlayerTitleIndexes(player)
+    local titleStore = dataStore2(titleData, player);
+    return titleStore:Get({});
 end
 
 function TitleService.GetPlayerTitles(player)
@@ -45,7 +50,7 @@ function TitleService.GetPlayerTitles(player)
 end
 
 function TitleService.PlayerHasTitle(player, titleName)
-    local playerTitles = TitleService.GetPlayerTitles(player);
+    local playerTitles = TitleService.GetPlayerTitleIndexes(player);
     local title = titleList.GetTitleDataByName(titleName);
     return IsInTable(playerTitles, title.Index);
 end

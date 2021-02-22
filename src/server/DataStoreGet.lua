@@ -8,7 +8,7 @@ local titleData = "Titles";
 local serverScriptService = game:GetService("ServerScriptService");
 local DataStore2 = require(serverScriptService.DataStore2);
 
-DataStore2.Combine("DATA2", firstLoginTime, lastLoginData, goldData, titleData);
+DataStore2.Combine("DATA6", firstLoginTime, lastLoginData, goldData, titleData);
 
 DataStoreGet.DataStore = DataStore2;
 

@@ -3,12 +3,15 @@ local playerTracker = require(serverScriptService.Server.PlayerTracker);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local titleService = require(serverScriptService.Server.Services.TitleService);
 
+local currentEventTitle = "AlphaStar";
+
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
 	moneyManager.PlayerJoined(player);
 
 	local isFirstTime = playerTracker.FirstTime(player);
 	titleService.UnlockTitle(player, "Noob");
+	titleService.UnlockTitle(player, currentEventTitle);
 end
 
 function OnPlayerLeaving(player)

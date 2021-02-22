@@ -12,6 +12,9 @@ TitleList.Titles = {
     },
     {
         Name = "Millionaire"
+    },
+    {
+        Name = "AlphaStar"
     }
 };
 
@@ -46,8 +49,8 @@ end
 function TitleList.GetAll(titleIndexes)
     local titlesToReturn = {};
 
-    for index, title in pairs(titleIndexes) do
-        table.insert(titlesToReturn, TitleList.Titles[index]);
+    for _, titleIndex in pairs(titleIndexes) do
+        table.insert(titlesToReturn, TitleList.Titles[titleIndex]);
     end
 
     return titlesToReturn;
