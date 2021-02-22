@@ -22,7 +22,7 @@ local titles = getTitlesRequest:InvokeServer();
 for index, value in pairs(titles) do
     local ScreenGui = startMenu.BagFrame.ScrollingFrame;
     local newButton = titleButton:Clone();
-    newButton.Text = value.Name;
+    newButton.TextLabel.Text = value.Name;
     newButton.Parent = ScreenGui;
 
     newButton.MouseButton1Click:Connect(function ()
