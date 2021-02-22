@@ -7,21 +7,34 @@ local dialogMenu = game.Players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI")
 local dialogUi = require(dialogMenu.Frame.DialogLabel.Dialog);
 local runService = game:GetService("RunService");
 local contextActionService = game:GetService("ContextActionService");
+local npcs = require(replicatedStorage.Common.Data.NPCs);
 
 local locked = false;
 local interactable = nil;
-local FROZEN_ACTION_KEY = "freezeMovement"
 
-function disableControls() 
-	contextActionService:BindActionAtPriority(
-		FROZEN_ACTION_KEY,
-		function() 
-			return Enum.ContextActionResult.Sink
-		end,
-		false,
-		Enum. ContextActionPriority.High.Value,
-		unpack(Enum.PlayerActions:GetEnumItems())
-	);
+local KeeperDialog = {};
+local lastDialog = 1;
+
+local playerWalkSpeed;
+local playerJumpHeight;
+
+KeeperDialog.Dialog = {
+	
+};
+
+function KeeperDialog.GetNext()
+	local next = KeeperDialog.Dialog[lastDialog];
+	lastDialog = lastDialog + 1;
+
+	return next;
+end
+
+function KeeperDialog.PeekNext()
+	return KeeperDialog.Dialog[lastDialog];
+end
+
+function KeeperDialog.Reset()
+	lastDialog = 1;
 end
 
 function Speak(dialog)
@@ -40,24 +53,28 @@ function PlayerInteractor.Interact()
         return;
     end
 
-    local dialog = require(interactable.Parent.DialogScript);
+    local dialog = npcs[interactable.Name].Dialog;
+    KeeperDialog.Dialog = dialog;
 
     if(locked) then
-        if(dialog.PeekNext() == nil) then
+        if(KeeperDialog.PeekNext() == nil) then
             local camera = workspace.CurrentCamera;
             camera.CameraType = Enum.CameraType.Custom;
-            contextActionService:UnbindAction(FROZEN_ACTION_KEY)
+
             runService:UnbindFromRenderStep("CameraUpdate")
             locked = false;
             
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerWalkSpeed;
+            game.Players.LocalPlayer.Character.Humanoid.JumpHeight = playerJumpHeight;
+
             uiManager.HideAllExcept({"Main GUI", "Interact GUI"});
             
             local dialogMenu = game.Players.LocalPlayer.PlayerGui["Dialog GUI"];
             dialogMenu.Enabled = false;
 
-            dialog.Reset();
+            KeeperDialog.Reset();
         else
-            Speak(dialog);
+            Speak(KeeperDialog);
         end
     else
         local camera = workspace.CurrentCamera;
@@ -68,12 +85,16 @@ function PlayerInteractor.Interact()
             camera.CFrame = camera.CFrame:Lerp(target.CFrame, .05)
         end)
 
-        disableControls();
+        playerWalkSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed;
+        playerJumpHeight = game.Players.LocalPlayer.Character.Humanoid.JumpHeight;
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 0;
+        game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 0;
+
         locked = true;
         
         uiManager.HideAllExcept({"Dialog GUI"});
 
-        Speak(dialog);
+        Speak(KeeperDialog);
     end
 end
 
