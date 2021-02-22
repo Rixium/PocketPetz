@@ -18,7 +18,7 @@ It's gonna be tough getting started, as there's lots to learn, but we've got the
 
 You should now be able to develop any code using Visual Studio Code, that will be automatically synced over to the Roblox level.
 
-The best way to developer would be to create scripts and assets in a separate level, and bring them over to PocketPetz once you're done. It will help avoid any conflicts with other Developers!
+The best way to devel would be to create scripts and assets in a separate level, and bring them over to PocketPetz once you're done. It will help avoid any conflicts with other Developers!
 
 ### Working with ROJO
 
