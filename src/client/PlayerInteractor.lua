@@ -4,7 +4,7 @@ local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiMan
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local workspaceHelper = require(replicatedStorage.Common.WorkspaceHelper);
 local dialogMenu = game.Players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI");
-local dialogUi = require(dialogMenu.Frame.DialogLabel.Dialog);
+local dialogUi = require(dialogMenu.DialogBackground.DialogLabel.Dialog);
 local runService = game:GetService("RunService");
 local contextActionService = game:GetService("ContextActionService");
 local npcs = require(replicatedStorage.Common.Data.NPCs);
@@ -73,6 +73,7 @@ function PlayerInteractor.Interact()
             dialogMenu.Enabled = false;
 
             KeeperDialog.Reset();
+            PlayerInteractor.SetInteractable(nil);
         else
             Speak(KeeperDialog);
         end
