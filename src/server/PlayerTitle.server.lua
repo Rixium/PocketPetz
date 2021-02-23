@@ -1,4 +1,5 @@
-local Billboard = game.ServerStorage.AboveHeadGUI;
+local replicatedStorage = game:GetService("ReplicatedStorage");
+local Billboard = replicatedStorage.AboveHeadGUI;
 
 local serverScriptService = game:GetService("ServerScriptService");
 local titleService = require(serverScriptService.Server.Services.TitleService);
