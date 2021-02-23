@@ -15,11 +15,12 @@ function NpcCreator.New(placement)
     cloned.Parent = placement;
     cloned.Name = npcData.Name;
 
-    local interactGUI = replicatedStorage.Common["Interact GUI"]:Clone();
+    local interactGUI = replicatedStorage["Interact GUI"]:Clone();
     interactGUI.Adornee = cloned.HumanoidRootPart;
     interactGUI.Parent = game.Players.LocalPlayer.PlayerGui;
 
     interactGUI.ImageButton.MouseButton1Click:Connect(function ()
+        interactGUI.Enabled = false;
         playerInteractor.SetInteractable(cloned);
         playerInteractor.Interact();
     end)
@@ -36,22 +37,28 @@ function NpcCreator.New(placement)
         local characterPosition = character:GetPrimaryPartCFrame().Position;
         local clonedPosition = cloned:GetPrimaryPartCFrame().Position;
 
+        interactGUI.Enabled = false;
+        
         if (characterPosition - clonedPosition).Magnitude <= 10 then
-            if not cooldown then
-                local npcToCharacter = (characterPosition - clonedPosition).Unit;
-                local dotProduct = npcToCharacter:Dot(cloned:GetPrimaryPartCFrame().LookVector);
-                if (dotProduct > .5) then
+            -- Check the player is in front of the NPC
+            local npcToCharacter = (characterPosition - clonedPosition).Unit;
+            local dotProduct = npcToCharacter:Dot(cloned:GetPrimaryPartCFrame().LookVector);
+            if (dotProduct > .5) then
+
+                -- Only enable the GUI if the player interactor has no interactable
+                if playerInteractor.GetInteractable() == nil then
+                    interactGUI.Enabled = true;
+                end
+
+                if not cooldown then
                     cooldown = true;
                     animation.Animate(npcData.SeeAnimation, cloned.Humanoid);
-                    interactGUI.Enabled = true;
                     spawn(function()
                         wait(2.5);
                         cooldown = false;
                     end);
                 end
             end
-        else
-            interactGUI.Enabled = false;
         end
 
     end);

@@ -48,6 +48,10 @@ function PlayerInteractor.SetInteractable(obj)
     interactable = obj;
 end
 
+function PlayerInteractor.GetInteractable()
+    return interactable;
+end
+
 function PlayerInteractor.Interact()
     if(interactable == nil) then
         return;
