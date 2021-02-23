@@ -32,12 +32,19 @@ local camera = workspace.CurrentCamera;
 UserInputService.InputBegan:connect(function(input)
 	local pos = input.Position
 
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		local mouseLocation = pos;
         local unscaled_ray = camera:ViewportPointToRay(mouseLocation.X,mouseLocation.Y)
         local result = workspace:Raycast(unscaled_ray.Origin, unscaled_ray.Direction*1000)
         if result.Instance.Parent:FindFirstChild("Humanoid") then
-            profileGUI.Visible = true;
+            player.PlayerGui.UserMenu.Enabled = true;
+            player.PlayerGui.UserMenu.Adornee = result.Instance.Parent.HumanoidRootPart;
         end
 	end
+end)
+
+player.PlayerGui.UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
+    profileGUI.Visible = true;
+    player.PlayerGui.UserMenu.Enabled = false;
+    player.PlayerGui.UserMenu.Adornee = nil;
 end)
