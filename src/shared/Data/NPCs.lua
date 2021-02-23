@@ -69,11 +69,11 @@ NPCs.Melody = {
     },
     SeeAnimation = 507770239,
     ShirtId = 1110657393,
-    PantsId = 5095866736,
+    PantsId = 4454568025,
     SkinColor = Color3.fromRGB(86, 66, 54),
     Body = Templates.Woman,
-    Hair = 5197263386,
-    Face = 416846300
+    Hair = 4876397180,
+    Face = 12145366
 };
 
 return NPCs;
