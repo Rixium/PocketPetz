@@ -22,9 +22,9 @@ end
 
 function UserProfile.Toggle(character)
     if(profileGUI.Visible) then
-        UserProfile.Show(character);
-    else
         profileGUI.Visible = false;
+    else
+        UserProfile.Show(character);
     end
 end
 

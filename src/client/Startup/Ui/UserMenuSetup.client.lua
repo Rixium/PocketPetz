@@ -49,6 +49,6 @@ userInputService.InputEnded:Connect(function(input, gameProcessed)
     end
 end);
 
-mainGui.ProfileButton.MouseButton1Click:Connect(function()
+mainGui.Buttons.ProfileButton.MouseButton1Click:Connect(function()
     userProfile.Toggle(players.LocalPlayer.Character);
 end)
