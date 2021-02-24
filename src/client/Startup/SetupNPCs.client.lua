@@ -29,6 +29,10 @@ local player = players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local camera = workspace.CurrentCamera;
 
+function ResetUserMenu() 
+    player.PlayerGui.UserMenu.Enabled = false;
+    player.PlayerGui.UserMenu.Adornee = nil;
+end
 
 function DoInput(pos)
     local unitRay = camera:ScreenPointToRay(pos.X, pos.Y);
@@ -36,14 +40,14 @@ function DoInput(pos)
 
     local result = game.Workspace:FindPartOnRay(ray);
     if(result == nil or result.Parent == nil) then
-        player.PlayerGui.UserMenu.Enabled = false;
-        player.PlayerGui.UserMenu.Adornee = nil;
+        ResetUserMenu();
         return;
     end
 
     local ancestor = result:FindFirstAncestorOfClass("Model");
 
     if(ancestor == nil) then
+        ResetUserMenu();
         return;
     end
 
@@ -55,13 +59,13 @@ function DoInput(pos)
             clickedPlayer = character;
             player.PlayerGui.UserMenu.Enabled = true;
             player.PlayerGui.UserMenu.Adornee = ancestor.HumanoidRootPart;
-        else
-            clickedPlayer = nil;
+            return;
         end
-    else
-        player.PlayerGui.UserMenu.Enabled = false;
-        player.PlayerGui.UserMenu.Adornee = nil;
     end
+    
+    clickedPlayer = nil;
+    ResetUserMenu();
+    
 end
 
 local UserInputService = game:GetService("UserInputService")
