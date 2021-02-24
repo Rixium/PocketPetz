@@ -2,10 +2,13 @@
 local players = game:GetService("Players")
 local userInputService = game:GetService("UserInputService")
 local userMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserMenu);
+local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProfile);
 
 -- Variables
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera;
+local mainGui = uiManager.GetUi("Main GUI");
 
 -- Functions
 function DoInput(pos)
@@ -45,3 +48,7 @@ userInputService.InputEnded:Connect(function(input, gameProcessed)
 		DoInput(input.Position);
     end
 end);
+
+mainGui.ProfileButton.MouseButton1Click:Connect(function()
+    userProfile.Toggle(players.LocalPlayer.Character);
+end)

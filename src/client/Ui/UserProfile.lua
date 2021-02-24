@@ -20,4 +20,12 @@ function UserProfile.Show(character)
     profileGUI.Visible = true;
 end
 
+function UserProfile.Toggle(character)
+    if(profileGUI.Visible) then
+        UserProfile.Show(character);
+    else
+        profileGUI.Visible = false;
+    end
+end
+
 return UserProfile;
