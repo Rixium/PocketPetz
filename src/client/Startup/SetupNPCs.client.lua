@@ -29,31 +29,66 @@ local player = players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local camera = workspace.CurrentCamera;
 
-UserInputService.InputBegan:connect(function(input)
-	local pos = input.Position
 
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-		local mouseLocation = pos;
-        local unscaled_ray = camera:ViewportPointToRay(mouseLocation.X,mouseLocation.Y)
-        local result = workspace:Raycast(unscaled_ray.Origin, unscaled_ray.Direction*1000)
+function DoInput(pos)
+    local unitRay = camera:ScreenPointToRay(pos.X, pos.Y);
+    local ray = Ray.new(unitRay.Origin, unitRay.Direction * 1000)
 
-        if(result == nil or result.Instance == nil) then
-            return;
+    local result = game.Workspace:FindPartOnRay(ray);
+    if(result == nil or result.Parent == nil) then
+        player.PlayerGui.UserMenu.Enabled = false;
+        player.PlayerGui.UserMenu.Adornee = nil;
+        return;
+    end
+
+    local ancestor = result:FindFirstAncestorOfClass("Model");
+
+    if(ancestor == nil) then
+        return;
+    end
+
+    local humanoid = ancestor:FindFirstChild("Humanoid");
+
+    if humanoid then
+        local character = humanoid.Parent;
+        if character ~= nil and players:FindFirstChild(character.Name) then
+            clickedPlayer = character;
+            player.PlayerGui.UserMenu.Enabled = true;
+            player.PlayerGui.UserMenu.Adornee = ancestor.HumanoidRootPart;
+        else
+            clickedPlayer = nil;
         end
+    else
+        player.PlayerGui.UserMenu.Enabled = false;
+        player.PlayerGui.UserMenu.Adornee = nil;
+    end
+end
 
-        if result.Instance.Parent:FindFirstChild("Humanoid") then
-            local humanoid = result.Instance.Parent:FindFirstChild("Humanoid");
-            local character = humanoid.Parent;
-            if(players[character.Name] ~= nil) then
-                player.PlayerGui.UserMenu.Enabled = true;
-                player.PlayerGui.UserMenu.Adornee = result.Instance.Parent.HumanoidRootPart;
-            end
-        end
-	end
-end)
+local UserInputService = game:GetService("UserInputService")
+ 
+-- A sample function providing multiple usage cases for various types of user input
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		DoInput(input.Position);
+	elseif input.UserInputType == Enum.UserInputType.Touch then
+		DoInput(input.Position);
+    end
+end);
+
+function SetUserProfile(playerCharacter)
+    local profilePlayer = game.Players:GetPlayerFromCharacter(playerCharacter);
+    profileGUI.HeaderFrame.NameLabel.Text = profilePlayer.Name;
+
+    local userId = profilePlayer.UserId
+    local thumbType = Enum.ThumbnailType.HeadShot
+    local thumbSize = Enum.ThumbnailSize.Size420x420
+    profileGUI.ProfileFrame.ProfilePicture.Image = Players:GetUserThumbnailAsync(userId, thumbType, thumbSize);
+end
 
 player.PlayerGui.UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
+    SetUserProfile(clickedPlayer);
     profileGUI.Visible = true;
     player.PlayerGui.UserMenu.Enabled = false;
     player.PlayerGui.UserMenu.Adornee = nil;
+    clickedPlayer = nil;
 end)
