@@ -36,6 +36,11 @@ UserInputService.InputBegan:connect(function(input)
 		local mouseLocation = pos;
         local unscaled_ray = camera:ViewportPointToRay(mouseLocation.X,mouseLocation.Y)
         local result = workspace:Raycast(unscaled_ray.Origin, unscaled_ray.Direction*1000)
+
+        if(result == nil or result.Instance == nil) then
+            return;
+        end
+
         if result.Instance.Parent:FindFirstChild("Humanoid") then
             player.PlayerGui.UserMenu.Enabled = true;
             player.PlayerGui.UserMenu.Adornee = result.Instance.Parent.HumanoidRootPart;
