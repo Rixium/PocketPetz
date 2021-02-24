@@ -42,8 +42,12 @@ UserInputService.InputBegan:connect(function(input)
         end
 
         if result.Instance.Parent:FindFirstChild("Humanoid") then
-            player.PlayerGui.UserMenu.Enabled = true;
-            player.PlayerGui.UserMenu.Adornee = result.Instance.Parent.HumanoidRootPart;
+            local humanoid = result.Instance.Parent:FindFirstChild("Humanoid");
+            local character = humanoid.Parent;
+            if(players[character.Name] ~= nil) then
+                player.PlayerGui.UserMenu.Enabled = true;
+                player.PlayerGui.UserMenu.Adornee = result.Instance.Parent.HumanoidRootPart;
+            end
         end
 	end
 end)
