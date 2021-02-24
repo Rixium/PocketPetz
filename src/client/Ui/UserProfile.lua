@@ -16,6 +16,11 @@ function UserProfile.Show(character)
     local thumbType = Enum.ThumbnailType.HeadShot
     local thumbSize = Enum.ThumbnailSize.Size420x420
 
+    
+    local userTitle = character.Head.AboveHeadGUI.TitleField.Text;
+    profileGUI.ProfileBack.HeaderFrame.ImageLabel.TitleLabel.Text = userTitle;
+
+
     spawn(function () 
         profileGUI.ProfileBack.ProfileFrame.ImageLabel.ProfilePicture.Image = players:GetUserThumbnailAsync(userId, thumbType, thumbSize);
     end)
