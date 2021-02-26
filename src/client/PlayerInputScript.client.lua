@@ -12,7 +12,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage")
 local getTitlesRequest = replicatedStorage.Common.Events.GetTitlesRequest;
 local setActiveTitle = replicatedStorage.Common.Events.SetActiveTitle;
 
-local startMenu = game.Players.LocalPlayer.PlayerGui["Titles GUI"];
+local startMenu = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
 
 contextActionService:BindAction("Interact", onInteractKeyPressed, true, Enum.KeyCode.E);
 

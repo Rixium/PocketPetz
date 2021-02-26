@@ -16,11 +16,11 @@ end
 function UiManager.HideAllExcept(guiTable)
     for index, value in ipairs(UiManager.Uis) do
 		if table.find(guiTable, value) then
-			game.Players.LocalPlayer.PlayerGui[value].Enabled = true;
+			game.Players.LocalPlayer.PlayerGui:WaitForChild(value).Enabled = true;
 			continue;
 		end
 		
-		game.Players.LocalPlayer.PlayerGui[value].Enabled = false;
+		game.Players.LocalPlayer.PlayerGui:WaitForChild(value).Enabled = false;
 	end 
 end
 

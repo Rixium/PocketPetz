@@ -73,7 +73,7 @@ function PlayerInteractor.Interact()
 
             uiManager.HideAllExcept({"Main GUI", "Interact GUI"});
             
-            local dialogMenu = game.Players.LocalPlayer.PlayerGui["Dialog GUI"];
+            local dialogMenu = game.Players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI");
             dialogMenu.Enabled = false;
 
             KeeperDialog.Reset();
