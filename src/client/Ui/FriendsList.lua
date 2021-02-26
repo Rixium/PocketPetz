@@ -31,7 +31,13 @@ local function ResetScroll()
     scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
 
-local function AddFriendItem(player, userId, isOnline, userName, gameId)
+local function PlayerInThisServer(userId)
+    return players:GetPlayerByUserId(userId) ~= nil;
+end
+
+-- Place is the game
+-- Job is the server
+local function AddFriendItem(player, userId, isOnline, userName, playerPlaceId)
     local scrollingFrame = friendsListGUI.FriendsFrame.FriendsBack.InternalFriendsFrame.ScrollingFrame;
 
     local item = friendsListItem:clone();
@@ -43,46 +49,55 @@ local function AddFriendItem(player, userId, isOnline, userName, gameId)
     item.Parent = scrollingFrame;
     item.FriendOffline.Visible = not isOnline;
 
-    local playersPlaceId = gameId;
-    local gamePlaceId = game.GameId;
+    local gamePlaceId = game.PlaceId;
+
+    item.Menu.WhisperFriendBack.Visible = false;
+
+    local playerInServer = PlayerInThisServer(userId);
 
     if not isOnline then
         item.Frame.Frame.PlaceLabel.Text = "Offline";
-    elseif (playersPlaceId == gamePlaceId) then
+    elseif (playerInServer) then
+        item.Menu.WhisperFriendBack.Visible = true;
         item.Frame.Frame.PlaceLabel.Text = "The Spawn";
+    elseif (playerPlaceId == gamePlaceId) then
+        item.Frame.Frame.PlaceLabel.Text = "Another server";
     else
-        item.Frame.Frame.PlaceLabel.Text = "Somewhere Else..";
+        item.Frame.Frame.ImageLabel.Visible = false;
+        item.Frame.Frame.PlaceLabel.Text = "";
     end
 
-    local whisperClick;
-    whisperClick = item.Menu.WhisperFriendBack.WhisperButton.MouseButton1Click:Connect(function() 
-        friendsListGUI.Enabled = false;
-        messageGUI.Visible = true;
+    if(playerInServer) then
+        local whisperClick;
+        whisperClick = item.Menu.WhisperFriendBack.WhisperButton.MouseButton1Click:Connect(function() 
+            friendsListGUI.Enabled = false;
+            messageGUI.Visible = true;
 
-        local messageSendClick;
-        local cancelSendClick;
+            local messageSendClick;
+            local cancelSendClick;
 
-        messageSendClick = messageGUI.Frame.SendFrame.SendMessageButton.MouseButton1Click:Connect(function()
-            local messageToSend = messageGUI.MessageFrame.MessageBack.MessageTextBox.Text;
+            messageSendClick = messageGUI.Frame.SendFrame.SendMessageButton.MouseButton1Click:Connect(function()
+                local messageToSend = messageGUI.MessageFrame.MessageBack.MessageTextBox.Text;
 
-            if(messageToSend ~= "") then
-                messagePlayerEvent:Fire(userId, messageToSend);
-                messageGUI.MessageFrame.MessageBack.MessageTextBox.Text = "";
+                if(messageToSend ~= "") then
+                    messagePlayerEvent:FireServer(userId, messageToSend);
+                    messageGUI.MessageFrame.MessageBack.MessageTextBox.Text = "";
 
+                    messageSendClick:Disconnect();
+                    cancelSendClick:Disconnect();
+
+                    messageGUI.Visible = false;
+                end
+            end)
+
+            cancelSendClick = messageGUI.Frame.CancelFrame.CancelMessageButton.MouseButton1Click:Connect(function()
                 messageSendClick:Disconnect();
                 cancelSendClick:Disconnect();
-
-                messageGUI.Visible = false;
-            end
+            end)
+            
+            whisperClick:Disconnect();
         end)
-
-        cancelSendClick = messageGUI.Frame.CancelFrame.CancelMessageButton.MouseButton1Click:Connect(function()
-            messageSendClick:Disconnect();
-            cancelSendClick:Disconnect();
-        end)
-        
-        whisperClick:Disconnect();
-    end)
+    end
 
     table.insert(FriendsList.Items, item);
 end
@@ -111,7 +126,7 @@ function FriendsList.ShowFriends()
     spawn(function ()
         -- Online player friends go first.
         for _, player in ipairs(playerFriends) do
-            AddFriendItem(player, player.VisitorId, true, player.UserName, player.GameId);
+            AddFriendItem(player, player.VisitorId, true, player.UserName, player.PlaceId, player.GameId);
             ResetScroll();
         end
     end);
