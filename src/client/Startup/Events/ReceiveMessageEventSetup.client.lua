@@ -16,7 +16,7 @@ local function ReceiveMessage(otherPlayerId, message)
 
     local otherPlayer = players:GetPlayerByUserId(otherPlayerId);
 
-    messageUi.MessageBack.Frame.Frame.MessageText.Text = message;
+    messageUi.MessageBack.Frame.Frame.MessageText.Text = "New message received!";
     messageUi.MessageBack.Frame.NameLabel.Text = otherPlayer.Name;
     messageUi.MessageBack.FaceBack.FaceImage.Image = players:GetUserThumbnailAsync(otherPlayerId, thumbType, thumbSize);
 
