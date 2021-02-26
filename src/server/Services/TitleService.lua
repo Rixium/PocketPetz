@@ -72,4 +72,10 @@ function TitleService.SetActiveTitle(player, titleName)
     end
 end
 
+function TitleService.GetActiveTitle(player)
+    local activeTitleStore = dataStore2(activeTitleData, player);
+    local activeTitle = activeTitleStore:Get("Noob");
+    return titleList.GetTitleDataByName(activeTitle);
+end
+
 return TitleService;

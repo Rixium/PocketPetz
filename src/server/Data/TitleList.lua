@@ -2,19 +2,29 @@ local TitleList = { };
 
 TitleList.Titles = {
     {
-        Name = "Noob"
+        Index = 1,
+        Name = "Noob",
+        Description = "We all start off somewhere"
     },
     {
-        Name = "Pro"
+        Index = 2,
+        Name = "Pro",
+        Description = "You raised a pet to its final form"
     },
     {
-        Name = "Collector"
+        Index = 3,
+        Name = "Collector",
+        Description = "You have one of each pet"
     },
     {
-        Name = "Millionaire"
+        Index = 4,
+        Name = "Millionaire",
+        Description = "You made a million coins"
     },
     {
-        Name = "AlphaStar"
+        Index = 5,
+        Name = "AlphaStar",
+        Description = "Awarded for participating in the alpha"
     }
 };
 
@@ -24,7 +34,7 @@ function TitleList.GetTitleDataByName(titleName)
             return 
             { 
                 Index = index, 
-                Title = title 
+                Title = title
             };
         end
     end
