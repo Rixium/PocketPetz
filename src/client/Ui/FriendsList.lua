@@ -21,7 +21,9 @@ local function iterPageItems(pages)
 		local pagenum = 1
 		while true do
 			for _, item in ipairs(pages:GetCurrentPage()) do
-				coroutine.yield(item, pagenum)
+                if not item.IsOnline then
+				    coroutine.yield(item, pagenum)
+                end
 			end
 			if pages.IsFinished then
 				break
@@ -43,14 +45,40 @@ local function ResetScroll()
     scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
 
-function pred(a, b)
-    return a.IsOnline;
+local function AddFriendItem(userId, isOnline, userName, gameId)
+    local scrollingFrame = friendsListGUI.FriendsFrame.FriendsBack.InternalFriendsFrame.ScrollingFrame;
+
+    local item = friendsListItem:clone();
+
+    spawn(function ()
+        item:WaitForChild("FaceBack").FaceImage.Image = players:GetUserThumbnailAsync(userId, thumbType, thumbSize);
+    end)
+    
+    item.Frame.NameLabel.Text = userName;
+
+    item.Parent = scrollingFrame;
+    item.FriendOffline.Visible = not isOnline;
+
+    local playersPlaceId = gameId;
+    local gamePlaceId = game.GameId;
+
+    print(playersPlaceId);
+    print(gamePlaceId);
+
+    if not isOnline then
+        item.Frame.Frame.PlaceLabel.Text = "Offline";
+    elseif (playersPlaceId == gamePlaceId) then
+        item.Frame.Frame.PlaceLabel.Text = "The Spawn";
+    else
+        item.Frame.Frame.PlaceLabel.Text = "Somewhere Else..";
+    end
+
+    table.insert(FriendsList.Items, item);
 end
 
 function FriendsList.ShowFriends()
-    local playerFriends = players:GetFriendsAsync(players.LocalPlayer.UserId);
-
-    local scrollingFrame = friendsListGUI.FriendsFrame.FriendsBack.InternalFriendsFrame.ScrollingFrame;
+    local playerFriends = players.LocalPlayer:GetFriendsOnline();
+    local playerOfflineFriends = players:GetFriendsAsync(players.LocalPlayer.UserId);
 
     for index, oldItem in ipairs(FriendsList.Items) do
         oldItem:Destroy();
@@ -60,32 +88,12 @@ function FriendsList.ShowFriends()
         table.remove(FriendsList.Items, index);
     end
 
-    local all = {};
-    for player, pageNumber in iterPageItems(playerFriends) do
-        table.insert(all, player);
+    for _, player in ipairs(playerFriends) do
+        AddFriendItem(player.VisitorId, true, player.UserName, player.GameId);
     end
 
-    table.sort(all, pred)
-
-    for _, player in ipairs(all) do
-        local item = friendsListItem:clone();
-
-        spawn(function () 
-            item:WaitForChild("FaceBack").FaceImage.Image = players:GetUserThumbnailAsync(player.Id, thumbType, thumbSize);
-        end)
-        
-        item.Frame.NameLabel.Text = player.Username;
-
-        item.Parent = scrollingFrame;
-        item.FriendOffline.Visible = not player.IsOnline;
-
-        if not player.IsOnline then
-            item.Frame.Frame.PlaceLabel.Text = "Offline";
-        else
-            item.Frame.Frame.PlaceLabel.Text = "The Spawn";
-        end
-
-        table.insert(FriendsList.Items, item);
+    for player, pageNumber in iterPageItems(playerOfflineFriends) do
+        AddFriendItem(player.Id, false, player.Username, -1);
     end
 
     ResetScroll();
