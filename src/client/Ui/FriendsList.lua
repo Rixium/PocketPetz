@@ -62,9 +62,6 @@ local function AddFriendItem(userId, isOnline, userName, gameId)
     local playersPlaceId = gameId;
     local gamePlaceId = game.GameId;
 
-    print(playersPlaceId);
-    print(gamePlaceId);
-
     if not isOnline then
         item.Frame.Frame.PlaceLabel.Text = "Offline";
     elseif (playersPlaceId == gamePlaceId) then
