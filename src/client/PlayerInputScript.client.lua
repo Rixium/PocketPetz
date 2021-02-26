@@ -22,7 +22,6 @@ local currentActive = nil;
 contextActionService:BindAction("Interact", onInteractKeyPressed, true, Enum.KeyCode.E);
 
 local activeTitle = getActiveTitleRequest:InvokeServer();
-print(activeTitle);
 
 local titles = getTitlesRequest:InvokeServer();
 local titlesScrollingFrame = titlesGUI:WaitForChild("TitlesFrame").TitlesBack.InternalTitlesFrame.ScrollingFrame;
@@ -32,9 +31,7 @@ for index, value in pairs(titles) do
     newTitleLayout.Frame.TitleName.Text = value.Name;
     newTitleLayout.Frame.Frame.TitleDescription.Text = value.Description;
     newTitleLayout.Parent = titlesScrollingFrame;
-
-    print(value);
-
+    
     if(value.Index == activeTitle.Index) then
         currentActive = newTitleLayout;
         newTitleLayout.RadioSelect.Visible = true;
