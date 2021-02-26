@@ -40,7 +40,7 @@ local function ResetScroll()
     local NewSize = SIZE * scrollingFrame.AbsoluteSize;
     uiGridLayout.CellSize = UDim2.new(0, NewSize.X, 0, NewSize.Y);
     
-    scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y  + 10);
+    scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
 
 function FriendsList.ShowFriends()
@@ -57,11 +57,6 @@ function FriendsList.ShowFriends()
     end
 
     for player, pageNumber in iterPageItems(playerFriends) do
-        print(player);
-        if not player.IsOnline then
-            continue;
-        end
-
         local item = friendsListItem:clone();
 
         spawn(function () 
