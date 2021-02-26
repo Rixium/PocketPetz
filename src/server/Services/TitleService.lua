@@ -50,6 +50,28 @@ function TitleService.GetPlayerTitles(player)
     return titleList.GetAll(titleIndexes);
 end
 
+function TitleService.GetAllTitles(player)
+    local titles = {};
+    local allTitles = titleList.GetAll();
+
+    for _, title in ipairs(allTitles) do
+        local playerHasTitle = TitleService.PlayerHasTitle(player, title.Name);
+
+        local transformed = {
+            Index = title.Index,
+            Name = title.Name,
+            Description = title.Description,
+            CanPurchase = title.PurchasePrice ~= nil,
+            PurchasePrice = title.PurchasePrice or 0,
+            Owned = playerHasTitle
+        }
+
+        table.insert(titles, transformed);
+    end
+
+    return titles;
+end
+
 function TitleService.PlayerHasTitle(player, titleName)
     local playerTitles = TitleService.GetPlayerTitleIndexes(player);
     local title = titleList.GetTitleDataByName(titleName);

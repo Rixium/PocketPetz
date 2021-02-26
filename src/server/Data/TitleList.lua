@@ -25,6 +25,12 @@ TitleList.Titles = {
         Index = 5,
         Name = "AlphaStar",
         Description = "Awarded for participating in the alpha"
+    },
+    {
+        Index = 6,
+        Name = "Team Grey",
+        Description = "Show your support for Legend Grey",
+        PurchasePrice = 50
     }
 };
 
@@ -59,6 +65,10 @@ end
 function TitleList.GetAll(titleIndexes)
     local titlesToReturn = {};
 
+    if(titlesIndexes == nil) then
+        return TitleList.Titles;
+    end
+    
     for _, titleIndex in pairs(titleIndexes) do
         table.insert(titlesToReturn, TitleList.Titles[titleIndex]);
     end

@@ -29,7 +29,7 @@ local getCoinCountRequest = replicatedStorage.Common.Events.GetCoinCountRequest;
 getCoinCountRequest.OnServerInvoke = moneyManager.GetMoney;
 
 local getTitlesRequest = replicatedStorage.Common.Events.GetTitlesRequest;
-getTitlesRequest.OnServerInvoke = titleService.GetPlayerTitles;
+getTitlesRequest.OnServerInvoke = titleService.GetAllTitles;
 
 local getActiveTitleRequest = replicatedStorage.Common.Events.GetActiveTitleRequest;
 getActiveTitleRequest.OnServerInvoke = titleService.GetActiveTitle;

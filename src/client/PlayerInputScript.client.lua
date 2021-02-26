@@ -15,9 +15,11 @@ local setActiveTitle = replicatedStorage.Common.Events.SetActiveTitle;
 
 local gotTitleTemplate = replicatedStorage.GotTitleTemplate;
 local buyTitleTemplate = replicatedStorage.BuyTitleTemplate;
+local lockedTitleTemplate = replicatedStorage.LockedTitleTemplate;
 
 local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
 local currentActive = nil;
+local SIZE = Vector2.new(0.87, 1);
 
 contextActionService:BindAction("Interact", onInteractKeyPressed, true, Enum.KeyCode.E);
 
@@ -26,25 +28,59 @@ local activeTitle = getActiveTitleRequest:InvokeServer();
 local titles = getTitlesRequest:InvokeServer();
 local titlesScrollingFrame = titlesGUI:WaitForChild("TitlesFrame").TitlesBack.InternalTitlesFrame.ScrollingFrame;
 
-for index, value in pairs(titles) do
-    local newTitleLayout = gotTitleTemplate:Clone();
-    newTitleLayout.Frame.TitleName.Text = value.Name;
-    newTitleLayout.Frame.Frame.TitleDescription.Text = value.Description;
-    newTitleLayout.Parent = titlesScrollingFrame;
+local function ResetScroll()
+    local uiGridLayout = titlesScrollingFrame.UIGridLayout;
     
+    local NewSize = SIZE * titlesScrollingFrame.AbsoluteSize;
+    uiGridLayout.CellSize = UDim2.new(0, NewSize.X, 0, NewSize.Y);
+    
+    titlesScrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
+end
+
+table.sort(titles, function(a, b) 
+    return a.Owned;
+end)
+
+for index, value in pairs(titles) do
+    local newTitleLayout;
+
+    local purchasable = false;
+
+    if(value.CanPurchase and not value.Owned) then
+        purchasable = true;
+        newTitleLayout = buyTitleTemplate:Clone();
+    elseif not value.Owned then
+        newTitleLayout = lockedTitleTemplate:Clone();
+    else
+        newTitleLayout = gotTitleTemplate:Clone();
+    end
+
+    print(value);
+
     if(value.Index == activeTitle.Index) then
         currentActive = newTitleLayout;
         newTitleLayout.RadioSelect.Visible = true;
     end
 
-    newTitleLayout.MouseButton1Click:Connect(function ()
-        setActiveTitle:InvokeServer(value.Name);
+    newTitleLayout.Frame.TitleName.Text = value.Name;
+    newTitleLayout.Frame.Frame.TitleDescription.Text = value.Description;
+    newTitleLayout.Parent = titlesScrollingFrame;
 
-        if(currentActive ~= nil) then
-            currentActive.RadioSelect.Visible = false;
-        end
+    if not purchasable then
+        newTitleLayout.MouseButton1Click:Connect(function ()
+            setActiveTitle:InvokeServer(value.Name);
 
-        currentActive = newTitleLayout;
-        currentActive.RadioSelect.Visible = true;
-    end)
+            if(currentActive ~= nil) then
+                currentActive.RadioSelect.Visible = false;
+            end
+
+            currentActive = newTitleLayout;
+            currentActive.RadioSelect.Visible = true;
+        end)
+    else
+
+    end
+
 end 
+
+ResetScroll();
