@@ -104,6 +104,7 @@ end
 
 function FriendsList.ShowFriends()
     scrollingFrame.Visible = false;
+    scrollingFrame.FriendsOffline.Visible = false;
     
     local playerFriends = players.LocalPlayer:GetFriendsOnline();
 
@@ -120,8 +121,14 @@ function FriendsList.ShowFriends()
     for index, oldItem in ipairs(FriendsList.Items) do
         table.remove(FriendsList.Items, index);
     end
+    
 
     scrollingFrame.Visible = true;
+
+    if(#playerFriends == 0) then
+        scrollingFrame.FriendsOffline.Visible = true;
+        return;
+    end
 
     spawn(function ()
         -- Online player friends go first.
