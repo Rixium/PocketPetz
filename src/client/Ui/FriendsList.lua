@@ -11,7 +11,7 @@ local friendsListGUI = uiManager.GetUi("Friends GUI");
 local thumbType = Enum.ThumbnailType.HeadShot
 local thumbSize = Enum.ThumbnailSize.Size420x420
 
-local SIZE = Vector2.new(0.9, 1);
+local SIZE = Vector2.new(0.87, 1);
 
 FriendsList.Items = {};
 
