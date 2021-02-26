@@ -43,6 +43,10 @@ local function ResetScroll()
     scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
 
+function pred(a, b)
+    return a.IsOnline;
+end
+
 function FriendsList.ShowFriends()
     local playerFriends = players:GetFriendsAsync(players.LocalPlayer.UserId);
 
@@ -56,7 +60,14 @@ function FriendsList.ShowFriends()
         table.remove(FriendsList.Items, index);
     end
 
+    local all = {};
     for player, pageNumber in iterPageItems(playerFriends) do
+        table.insert(all, player);
+    end
+
+    table.sort(all, pred)
+
+    for _, player in ipairs(all) do
         local item = friendsListItem:clone();
 
         spawn(function () 
@@ -64,9 +75,15 @@ function FriendsList.ShowFriends()
         end)
         
         item.Frame.NameLabel.Text = player.Username;
-        item.Frame.Frame.PlaceLabel.Text = "???";
 
         item.Parent = scrollingFrame;
+        item.FriendOffline.Visible = not player.IsOnline;
+
+        if not player.IsOnline then
+            item.Frame.Frame.PlaceLabel.Text = "Offline";
+        else
+            item.Frame.Frame.PlaceLabel.Text = "The Spawn";
+        end
 
         table.insert(FriendsList.Items, item);
     end
