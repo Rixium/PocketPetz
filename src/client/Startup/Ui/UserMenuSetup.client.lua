@@ -4,11 +4,13 @@ local userInputService = game:GetService("UserInputService")
 local userMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserMenu);
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProfile);
+local friendsList = require(players.LocalPlayer.PlayerScripts.Client.Ui.FriendsList);
 
 -- Variables
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera;
 local mainGui = uiManager.GetUi("Main GUI");
+local friendsListGUI = uiManager.GetUi("Friends GUI");
 
 -- Functions
 function DoInput(pos)
@@ -52,3 +54,8 @@ end);
 mainGui.Buttons.ProfileButton.MouseButton1Click:Connect(function()
     userProfile.Toggle(players.LocalPlayer.Character);
 end)
+
+mainGui.Buttons.FriendsButton.MouseButton1Click:Connect(function()
+    friendsListGUI.Enabled = not friendsListGUI.Enabled;
+    friendsList.ShowFriends();
+end);
