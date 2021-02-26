@@ -5,18 +5,23 @@ local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local friendsListItem = replicatedStorage.FriendBack;
+local seeMoreButton = replicatedStorage.SeeMore;
 
 -- Variables
 local friendsListGUI = uiManager.GetUi("Friends GUI");
 local thumbType = Enum.ThumbnailType.HeadShot
 local thumbSize = Enum.ThumbnailSize.Size420x420
+local numberOfPages = 1;
+local pageCount = 2;
+
+local seeMore = nil;
 
 local SIZE = Vector2.new(0.87, 1);
 
 FriendsList.Items = {};
 
 -- Functions
-local function iterPageItems(pages)
+local function iterPageItems(pages, numberOfPages)
 	return coroutine.wrap(function()
 		local pagenum = 1
 		while true do
@@ -26,10 +31,16 @@ local function iterPageItems(pages)
                 end
 			end
 			if pages.IsFinished then
+                pageCount = pagenum;
 				break
 			end
+            
 			pages:AdvanceToNextPageAsync()
 			pagenum = pagenum + 1
+
+            if(pagenum == numberOfPages) then
+                return;
+            end
 		end
 	end)
 end
@@ -50,9 +61,7 @@ local function AddFriendItem(userId, isOnline, userName, gameId)
 
     local item = friendsListItem:clone();
 
-    spawn(function ()
-        item:WaitForChild("FaceBack").FaceImage.Image = players:GetUserThumbnailAsync(userId, thumbType, thumbSize);
-    end)
+    item:WaitForChild("FaceBack").FaceImage.Image = players:GetUserThumbnailAsync(userId, thumbType, thumbSize);
     
     item.Frame.NameLabel.Text = userName;
 
@@ -74,9 +83,17 @@ local function AddFriendItem(userId, isOnline, userName, gameId)
 end
 
 function FriendsList.ShowFriends()
+    scrollingFrame.Visible = false;
+    
     local playerFriends = players.LocalPlayer:GetFriendsOnline();
     local playerOfflineFriends = players:GetFriendsAsync(players.LocalPlayer.UserId);
 
+    -- Sort the list depending on whether they're playing PocketPetz
+    table.sort(playerFriends, function(a, b) 
+        return a.GameId == game.GameId;
+    end);
+
+    -- Remove the old stuff from the friends list.
     for index, oldItem in ipairs(FriendsList.Items) do
         oldItem:Destroy();
     end
@@ -85,15 +102,45 @@ function FriendsList.ShowFriends()
         table.remove(FriendsList.Items, index);
     end
 
-    for _, player in ipairs(playerFriends) do
-        AddFriendItem(player.VisitorId, true, player.UserName, player.GameId);
+    if(seeMore ~= nil) then
+        seeMore:Destroy();
+        seeMore.Parent = nil;
+        seeMore = nil;
     end
 
-    for player, pageNumber in iterPageItems(playerOfflineFriends) do
-        AddFriendItem(player.Id, false, player.Username, -1);
-    end
+    scrollingFrame.Visible = true;
 
-    ResetScroll();
+    spawn(function ()
+
+        -- Online player friends go first.
+        for _, player in ipairs(playerFriends) do
+            AddFriendItem(player.VisitorId, true, player.UserName, player.GameId);
+            ResetScroll();
+        end
+        
+        -- Then we iterate the offline friends, and add them.
+        for player, pageNumber in iterPageItems(playerOfflineFriends, numberOfPages) do
+            AddFriendItem(player.Id, false, player.Username, -1);
+            ResetScroll();
+        end
+
+        -- Dont show button if we've already reached max player count for player.
+        if(numberOfPages < pageCount) then
+            local scrollingFrame = friendsListGUI.FriendsFrame.FriendsBack.InternalFriendsFrame.ScrollingFrame;
+
+            seeMore = seeMoreButton:clone();
+            seeMore.Parent = scrollingFrame;
+
+            seeMore.SeeMore.SeeMoreButton.MouseButton1Click:Connect(function()
+                numberOfPages = numberOfPages + 1;
+                FriendsList.ShowFriends();
+            end);
+
+            ResetScroll();
+        end
+
+    end);
+
 end
 
 return FriendsList;
