@@ -15,6 +15,8 @@ function OnPlayerJoined(player)
 	titleService.UnlockTitle(player, currentEventTitle);
 
 	itemService.GiveItem(player, 1);
+	itemService.GiveItem(player, 2);
+	itemService.GiveItem(player, 3);
 end
 
 function OnPlayerLeaving(player)

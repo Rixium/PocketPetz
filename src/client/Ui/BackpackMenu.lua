@@ -13,6 +13,7 @@ local messageGUI = uiManager.GetUi("Main GUI"):WaitForChild("Message GUI");
 
 local SIZE = Vector2.new(0.21, 0.25);
 local PADDING = Vector2.new(0.03, 0.03);
+local activeTab = "Seed";
 
 BackpackMenu.Items = {};
 
@@ -33,11 +34,10 @@ local function ResetScroll()
 end
 
 local function AddItem(itemToAdd)
-    print(itemToAdd);
-
     local item = itemBack:clone();
     item.Parent = scrollingFrame;
 
+    item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=150&h=150";
     table.insert(BackpackMenu.Items, item);
 end
 
@@ -57,8 +57,10 @@ function BackpackMenu.ShowInventory()
     
     spawn(function ()
         for _, item in pairs(items) do
-            AddItem(item);
-            ResetScroll();
+            if(item.ItemData.ItemType == activeTab) then
+                AddItem(item);
+                ResetScroll();
+            end
         end
     end);
 
@@ -85,21 +87,27 @@ function BackpackMenu.SetupNavigationBar()
     local chestSelector = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Selectors.ChestSelector;
 
     seedNavigationButton.MouseButton1Click:Connect(function()
+        activeTab = "Seed";
         seedSelector.ImageTransparency = 0;
         foodSelector.ImageTransparency = 1;
         chestSelector.ImageTransparency = 1;
+        BackpackMenu.ShowInventory();
     end)
 
     foodNavigationButton.MouseButton1Click:Connect(function()
+        activeTab = "Food";
         foodSelector.ImageTransparency = 0;
         seedSelector.ImageTransparency = 1;
         chestSelector.ImageTransparency = 1;
+        BackpackMenu.ShowInventory();
     end)
 
     chestNavigationButton.MouseButton1Click:Connect(function()
+        activeTab = "Treasure";
         chestSelector.ImageTransparency = 0;
         foodSelector.ImageTransparency = 1;
         seedSelector.ImageTransparency = 1;
+        BackpackMenu.ShowInventory();
     end)
 end
 

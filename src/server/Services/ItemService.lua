@@ -25,7 +25,7 @@ end
 function ItemService.GiveItem(player, itemId)
     local itemStore = dataStore2(itemsData, player);
     -- TODO REMOVE THIS WHEN READY TO RECEIVE ITEMS FOR REALS
-    itemStore:Set(nil);
+    -- itemStore:Set(nil);
     local items = itemStore:Get({});
 
     table.insert(items, {
