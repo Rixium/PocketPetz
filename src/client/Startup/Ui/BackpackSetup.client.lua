@@ -6,3 +6,5 @@ local mainGui = uiManager.GetUi("Main GUI");
 mainGui.Buttons.BagButton.MouseButton1Click:Connect(function()
     backpackMenu.Toggle();
 end)
+
+backpackMenu.SetupNavigationBar();

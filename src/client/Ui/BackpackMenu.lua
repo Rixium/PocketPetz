@@ -69,4 +69,33 @@ function BackpackMenu.Toggle()
     end
 end
 
+function BackpackMenu.SetupNavigationBar()
+    local seedNavigationButton = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Internal.SeedButton;
+    local seedSelector = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Selectors.SeedSelector;
+
+    local foodNavigationButton = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Internal.FoodButton;
+    local foodSelector = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Selectors.FoodSelector;
+    
+    local chestNavigationButton = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Internal.ChestButton;
+    local chestSelector = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Selectors.ChestSelector;
+
+    seedNavigationButton.MouseButton1Click:Connect(function()
+        seedSelector.ImageTransparency = 0;
+        foodSelector.ImageTransparency = 1;
+        chestSelector.ImageTransparency = 1;
+    end)
+
+    foodNavigationButton.MouseButton1Click:Connect(function()
+        foodSelector.ImageTransparency = 0;
+        seedSelector.ImageTransparency = 1;
+        chestSelector.ImageTransparency = 1;
+    end)
+
+    chestNavigationButton.MouseButton1Click:Connect(function()
+        chestSelector.ImageTransparency = 0;
+        foodSelector.ImageTransparency = 1;
+        seedSelector.ImageTransparency = 1;
+    end)
+end
+
 return BackpackMenu;
