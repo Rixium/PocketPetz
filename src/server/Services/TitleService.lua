@@ -1,6 +1,7 @@
 local TitleService = {};
 
 local serverScriptService = game:GetService("ServerScriptService");
+local replicatedStorage = game:GetService("ReplicatedStorage");
 local titleList = require(serverScriptService.Server.Data.TitleList);
 local players = game:GetService("Players");
 
@@ -37,6 +38,7 @@ function TitleService.UnlockTitle(player, titleName)
 
     table.insert(titles, titleToUnlock.Index);
     titleStore:Set(titles);
+    replicatedStorage.Common.Events.TitleUnlocked:FireClient(player);
 end
 
 function TitleService.GetPlayerTitleIndexes(player)
