@@ -21,6 +21,6 @@ contextActionService:BindAction("Interact", onInteractKeyPressed, true, Enum.Key
 local titleUnlocked = replicatedStorage.Common.Events.TitleUnlocked;
 titleUnlocked.OnClientEvent:Connect(titlesMenu.SetupTitles);
 
-local titlesButton = mainGUI.Buttons.TitleButton.MouseButton1Click:Connect(function() 
+local titlesButton = mainGUI.Buttons.TitleButton.TitleButton.MouseButton1Click:Connect(function() 
     titlesMenu.Toggle();
 end)

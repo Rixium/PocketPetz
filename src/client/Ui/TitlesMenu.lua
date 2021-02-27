@@ -1,6 +1,8 @@
 local TitlesMenu = {};
 
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local players = game:GetService("Players");
+local marketplaceService = game:GetService("MarketplaceService");
 local getTitlesRequest = replicatedStorage.Common.Events:WaitForChild("GetTitlesRequest");
 local getActiveTitleRequest = replicatedStorage.Common.Events:WaitForChild("GetActiveTitleRequest");
 local setActiveTitle = replicatedStorage.Common.Events:WaitForChild("SetActiveTitle");
