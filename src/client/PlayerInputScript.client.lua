@@ -24,7 +24,7 @@ local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
 local mainGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
 
 local currentActive = nil;
-local SIZE = Vector2.new(0.97, 1);
+local SIZE = Vector2.new(0.96, 1);
 local PADDING = Vector2.new(0.03, 0);
 
 local isRunning = false;
@@ -114,7 +114,9 @@ local function SetupTitles()
     
         table.insert(currentElements, newTitleLayout);
     end 
-    
+            
+    ResetScroll();
+
     isRunning = false;
 end
 
@@ -123,5 +125,3 @@ SetupTitles();
 
 local titleUnlocked = replicatedStorage.Common.Events.TitleUnlocked;
 titleUnlocked.OnClientEvent:Connect(SetupTitles);
-
-mainGUI.Buttons.TitleButton.MouseButton1Click:Connect(ResetScroll);
