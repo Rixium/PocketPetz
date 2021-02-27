@@ -10,7 +10,7 @@ local itemBack = replicatedStorage.ItemBack;
 local inventoryGUI = uiManager.GetUi("Inventory GUI");
 local messageGUI = uiManager.GetUi("Main GUI"):WaitForChild("Message GUI");
 
-local SIZE = Vector2.new(0.22, 0.25);
+local SIZE = Vector2.new(0.21, 0.25);
 local PADDING = Vector2.new(0.03, 0.03);
 
 BackpackMenu.Items = {};
