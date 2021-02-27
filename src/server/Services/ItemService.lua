@@ -14,12 +14,24 @@ local itemsData = "Items";
 
 -- Functions 
 function ItemService.GetPlayerItems(player)
-    local itemStore = dataStore2(titleData, player);
+    local itemStore = dataStore2(itemsData, player);
     local items = itemStore:Get({});
 
     local items = itemList.GetAllById(items);
 
     return items;
+end
+
+function ItemService.GiveItem(player, itemId)
+    local itemStore = dataStore2(itemsData, player);
+    -- TODO REMOVE THIS WHEN READY TO RECEIVE ITEMS FOR REALS
+    itemStore:Set(nil);
+    local items = itemStore:Get({});
+
+    table.insert(items, {
+        ItemId = itemId
+    });
+    itemStore:Set(items);
 end
 
 return ItemService;

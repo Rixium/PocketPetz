@@ -5,6 +5,7 @@ local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local itemBack = replicatedStorage.ItemBack;
+local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 
 -- Variables
 local inventoryGUI = uiManager.GetUi("Inventory GUI");
@@ -32,6 +33,8 @@ local function ResetScroll()
 end
 
 local function AddItem(itemToAdd)
+    print(itemToAdd);
+
     local item = itemBack:clone();
     item.Parent = scrollingFrame;
 
@@ -40,6 +43,8 @@ end
 
 function BackpackMenu.ShowInventory()
     scrollingFrame.Visible = false;
+
+    local items = getItemsRequest:InvokeServer();
 
     -- Remove the old stuff from the friends list.
     for index, oldItem in ipairs(BackpackMenu.Items) do
@@ -51,8 +56,8 @@ function BackpackMenu.ShowInventory()
     end
     
     spawn(function ()
-        for count = 1, 24 do
-            AddItem(nil);
+        for _, item in pairs(items) do
+            AddItem(item);
             ResetScroll();
         end
     end);

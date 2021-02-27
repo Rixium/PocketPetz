@@ -13,6 +13,8 @@ function OnPlayerJoined(player)
 	local isFirstTime = playerTracker.FirstTime(player);
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);
+
+	itemService.GiveItem(player, 1);
 end
 
 function OnPlayerLeaving(player)
