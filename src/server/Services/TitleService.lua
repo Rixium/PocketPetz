@@ -63,7 +63,8 @@ function TitleService.GetAllTitles(player)
             Description = title.Description,
             CanPurchase = title.PurchasePrice ~= nil,
             PurchasePrice = title.PurchasePrice or 0,
-            Owned = playerHasTitle
+            Owned = playerHasTitle,
+            ProductId = title.ProductId or -1
         }
 
         table.insert(titles, transformed);

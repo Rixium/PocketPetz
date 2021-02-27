@@ -30,7 +30,8 @@ TitleList.Titles = {
         Index = 6,
         Name = "Team Grey",
         Description = "Show your support for Legend Grey",
-        PurchasePrice = 50
+        PurchasePrice = 50,
+        ProductId = 1154343355
     }
 };
 

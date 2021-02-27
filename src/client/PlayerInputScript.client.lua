@@ -7,15 +7,17 @@ function onInteractKeyPressed(actionName, inputState, inputObject)
     end
 end
 
-local replicatedStorage = game:GetService("ReplicatedStorage")
+local replicatedStorage = game:GetService("ReplicatedStorage");
+local marketplaceService = game:GetService("MarketplaceService");
+local players = game:GetService("Players");
 
-local getTitlesRequest = replicatedStorage.Common.Events.GetTitlesRequest;
-local getActiveTitleRequest = replicatedStorage.Common.Events.GetActiveTitleRequest;
-local setActiveTitle = replicatedStorage.Common.Events.SetActiveTitle;
+local getTitlesRequest = replicatedStorage.Common.Events:WaitForChild("GetTitlesRequest");
+local getActiveTitleRequest = replicatedStorage.Common.Events:WaitForChild("GetActiveTitleRequest");
+local setActiveTitle = replicatedStorage.Common.Events:WaitForChild("SetActiveTitle");
 
-local gotTitleTemplate = replicatedStorage.GotTitleTemplate;
-local buyTitleTemplate = replicatedStorage.BuyTitleTemplate;
-local lockedTitleTemplate = replicatedStorage.LockedTitleTemplate;
+local gotTitleTemplate = replicatedStorage:WaitForChild("GotTitleTemplate");
+local buyTitleTemplate = replicatedStorage:WaitForChild("BuyTitleTemplate");
+local lockedTitleTemplate = replicatedStorage:WaitForChild("LockedTitleTemplate");
 
 local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
 local currentActive = nil;
@@ -49,13 +51,13 @@ for index, value in pairs(titles) do
     if(value.CanPurchase and not value.Owned) then
         purchasable = true;
         newTitleLayout = buyTitleTemplate:Clone();
+        newTitleLayout.PriceFrame.PriceLabel.Text = value.PurchasePrice .. " R$";
+
     elseif not value.Owned then
         newTitleLayout = lockedTitleTemplate:Clone();
     else
         newTitleLayout = gotTitleTemplate:Clone();
     end
-
-    print(value);
 
     if(value.Index == activeTitle.Index) then
         currentActive = newTitleLayout;
@@ -66,7 +68,7 @@ for index, value in pairs(titles) do
     newTitleLayout.Frame.Frame.TitleDescription.Text = value.Description;
     newTitleLayout.Parent = titlesScrollingFrame;
 
-    if not purchasable then
+    if not purchasable and value.Owned then
         newTitleLayout.MouseButton1Click:Connect(function ()
             setActiveTitle:InvokeServer(value.Name);
 
@@ -77,8 +79,10 @@ for index, value in pairs(titles) do
             currentActive = newTitleLayout;
             currentActive.RadioSelect.Visible = true;
         end)
-    else
-
+    elseif purchasable and not value.Owned then
+        newTitleLayout.MouseButton1Click:Connect(function ()
+            marketplaceService:PromptProductPurchase(players.LocalPlayer, value.ProductId);
+        end)
     end
 
 end 
