@@ -21,6 +21,8 @@ local buyTitleTemplate = replicatedStorage:WaitForChild("BuyTitleTemplate");
 local lockedTitleTemplate = replicatedStorage:WaitForChild("LockedTitleTemplate");
 
 local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
+local mainGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
+
 local currentActive = nil;
 local SIZE = Vector2.new(0.87, 1);
 local isRunning = false;
@@ -56,8 +58,6 @@ local function SetupTitles()
 
     local activeTitle = getActiveTitleRequest:InvokeServer();
     local titles = getTitlesRequest:InvokeServer();
-    
-    print(titles);
 
     table.sort(titles, function(a, b) 
         return a.Owned and not b.Owned;
@@ -87,6 +87,8 @@ local function SetupTitles()
         newTitleLayout.Frame.TitleName.Text = value.Name;
         newTitleLayout.Frame.Frame.TitleDescription.Text = value.Description;
         newTitleLayout.Parent = titlesScrollingFrame;
+        
+        ResetScroll();
     
         if not purchasable and value.Owned then
             newTitleLayout.MouseButton1Click:Connect(function ()
@@ -108,8 +110,6 @@ local function SetupTitles()
         table.insert(currentElements, newTitleLayout);
     end 
     
-    ResetScroll();
-    
     isRunning = false;
 end
 
@@ -118,3 +118,5 @@ SetupTitles();
 
 local titleUnlocked = replicatedStorage.Common.Events.TitleUnlocked;
 titleUnlocked.OnClientEvent:Connect(SetupTitles);
+
+mainGUI.Buttons.TitleButton.MouseButton1Click:Connect(ResetScroll);
