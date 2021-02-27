@@ -14,9 +14,9 @@ function OnPlayerJoined(player)
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);
 
-	itemService.GiveItem(player, 1);
-	itemService.GiveItem(player, 2);
-	itemService.GiveItem(player, 3);
+
+	-- DATABASE CLEARUP
+	-- itemService.ClearItems(player);
 end
 
 function OnPlayerLeaving(player)

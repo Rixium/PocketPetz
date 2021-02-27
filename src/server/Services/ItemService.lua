@@ -22,10 +22,13 @@ function ItemService.GetPlayerItems(player)
     return items;
 end
 
+function ItemService.ClearItems(player)
+    local itemStore = dataStore2(itemsData, player);
+    itemStore:Set(nil);
+end
+
 function ItemService.GiveItem(player, itemId)
     local itemStore = dataStore2(itemsData, player);
-    -- TODO REMOVE THIS WHEN READY TO RECEIVE ITEMS FOR REALS
-    -- itemStore:Set(nil);
     local items = itemStore:Get({});
 
     table.insert(items, {
