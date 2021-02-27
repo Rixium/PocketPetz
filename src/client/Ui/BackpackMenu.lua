@@ -76,7 +76,7 @@ function BackpackMenu.SetupNavigationBar()
     local foodNavigationButton = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Internal.FoodButton;
     local foodSelector = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Selectors.FoodSelector;
     
-    local chestNavigationButton = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Internal.ChestButton;
+    local chestNavigationButton = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Internal.TreasureButton;
     local chestSelector = inventoryGUI.BackpackFrame.BackpackBack.BackpackNavigationBar.Selectors.ChestSelector;
 
     seedNavigationButton.MouseButton1Click:Connect(function()
