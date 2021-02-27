@@ -24,7 +24,9 @@ local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
 local mainGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
 
 local currentActive = nil;
-local SIZE = Vector2.new(0.87, 1);
+local SIZE = Vector2.new(0.97, 1);
+local PADDING = Vector2.new(0.03, 0);
+
 local isRunning = false;
 
 local currentElements = {};
@@ -38,6 +40,9 @@ local function ResetScroll()
     
     local NewSize = SIZE * titlesScrollingFrame.AbsoluteSize;
     uiGridLayout.CellSize = UDim2.new(0, NewSize.X, 0, NewSize.Y);
+
+    local NewPadding = PADDING * titlesScrollingFrame.AbsoluteSize
+    uiGridLayout.CellPadding = UDim2.new(0, NewPadding .X, 0, NewPadding .Y)
     
     titlesScrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
