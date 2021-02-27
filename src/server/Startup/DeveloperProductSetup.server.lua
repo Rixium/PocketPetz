@@ -14,6 +14,18 @@ productFunctions[1154343355] = function(receipt, player)
 	return true;
 end
 
+-- Team Grey Title
+productFunctions[1154456069] = function(receipt, player)
+    titleService.UnlockTitle(player, "Team Fawn");
+	return true;
+end
+
+-- Team Grey Title
+productFunctions[1154456112] = function(receipt, player)
+    titleService.UnlockTitle(player, "Team Melody");
+	return true;
+end
+
 
 local function ProcessReceipt(receiptInfo)
 	local playerProductKey = receiptInfo.PlayerId .. "_" .. receiptInfo.PurchaseId
