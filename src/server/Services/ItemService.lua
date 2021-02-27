@@ -17,12 +17,9 @@ function ItemService.GetPlayerItems(player)
     local itemStore = dataStore2(titleData, player);
     local items = itemStore:Get({});
 
-    local itemIds = {};
-    for _, item in pairs(items) do
-        table.insert(itemIds, item.ItemId);
-    end
+    local items = itemList.GetAllById(items);
 
-    local items = itemList.GetAllById(itemIds);
+    return items;
 end
 
 return ItemService;

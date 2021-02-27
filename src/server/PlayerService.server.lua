@@ -2,6 +2,7 @@ local serverScriptService = game:GetService("ServerScriptService");
 local playerTracker = require(serverScriptService.Server.PlayerTracker);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local titleService = require(serverScriptService.Server.Services.TitleService);
+local itemService = require(serverScriptService.Server.Services.ItemService);
 
 local currentEventTitle = "AlphaStar";
 
@@ -36,3 +37,6 @@ getActiveTitleRequest.OnServerInvoke = titleService.GetActiveTitle;
 
 local setActiveTitle = replicatedStorage.Common.Events.SetActiveTitle;
 setActiveTitle.OnServerInvoke = titleService.SetActiveTitle;
+
+local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
+getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
