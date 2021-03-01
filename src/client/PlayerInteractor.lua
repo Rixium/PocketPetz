@@ -8,6 +8,7 @@ local dialogUi = require(dialogMenu.Frame.DialogBackground.DialogLabel.Dialog);
 local runService = game:GetService("RunService");
 local contextActionService = game:GetService("ContextActionService");
 local npcs = require(replicatedStorage.Common.Data.NPCs);
+local players = game:GetService("Players");
 
 local locked = false;
 local interactable = nil;
@@ -68,12 +69,12 @@ function PlayerInteractor.Interact()
             runService:UnbindFromRenderStep("CameraUpdate")
             locked = false;
             
-            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = playerWalkSpeed;
-            game.Players.LocalPlayer.Character.Humanoid.JumpHeight = playerJumpHeight;
+            players.LocalPlayer.Character.Humanoid.WalkSpeed = playerWalkSpeed;
+            players.LocalPlayer.Character.Humanoid.JumpHeight = playerJumpHeight;
 
             uiManager.HideAllExcept({"Main GUI", "Interact GUI"});
-            
-            local dialogMenu = game.Players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI");
+
+            local dialogMenu = players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI");
             dialogMenu.Enabled = false;
 
             KeeperDialog.Reset();
@@ -83,20 +84,28 @@ function PlayerInteractor.Interact()
         end
     else
         local camera = workspace.CurrentCamera;
-        local target = workspaceHelper.GetDescendantByName(interactable.Parent, "CameraPoint");
+        local target = interactable:GetPrimaryPartCFrame(); -- workspaceHelper.GetDescendantByName(interactable.Parent, "CameraPoint");
         camera.CameraType = Enum.CameraType.Scriptable;
 
+        local rotateValue = 180;
+
         runService:BindToRenderStep("CameraUpdate", Enum.RenderPriority.Camera.Value + 1, function()
-            camera.CFrame = camera.CFrame:Lerp(target.CFrame, .05)
+            local start = target;
+            local rotation = CFrame.Angles(0, math.rad(rotateValue), 0)
+            rotateValue = rotateValue + 0.1;
+            local distance = 10 -- studs (you can change to something dynamic)
+            local cf = start * rotation
+            cf = cf - (cf.lookVector * distance)
+            camera.CFrame = cf
         end)
 
-        playerWalkSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed;
-        playerJumpHeight = game.Players.LocalPlayer.Character.Humanoid.JumpHeight;
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 0;
-        game.Players.LocalPlayer.Character.Humanoid.JumpHeight = 0;
+        playerWalkSpeed = players.LocalPlayer.Character.Humanoid.WalkSpeed;
+        playerJumpHeight = players.LocalPlayer.Character.Humanoid.JumpHeight;
+        players.LocalPlayer.Character.Humanoid.WalkSpeed = 0;
+        players.LocalPlayer.Character.Humanoid.JumpHeight = 0;
 
         locked = true;
-        
+
         uiManager.HideAllExcept({"Dialog GUI"});
 
         Speak(KeeperDialog);
