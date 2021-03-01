@@ -13,16 +13,16 @@ local clickedPlayer = nil;
 
 function UserMenu.Show(player, adornee)
     clickedPlayer = player;
-    players.LocalPlayer.PlayerGui:WaitForChild("UserMenu").Enabled = true;
-    players.LocalPlayer.PlayerGui:WaitForChild("UserMenu").Adornee = adornee.HumanoidRootPart;
+    players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.Enabled = true;
+    players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.Adornee = adornee.HumanoidRootPart;
 end
 
 function UserMenu.Hide()
-    players.LocalPlayer.PlayerGui:WaitForChild("UserMenu").Enabled = false;
-    players.LocalPlayer.PlayerGui:WaitForChild("UserMenu").Adornee = nil;
+    players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.Enabled = false;
+    players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.Adornee = nil;
 end
 
-players.LocalPlayer.PlayerGui:WaitForChild("UserMenu").ProfileButton.MouseButton1Click:Connect(function ()
+players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
     userProfile.Show(clickedPlayer);
     UserMenu.Hide();
     clickedPlayer = nil;

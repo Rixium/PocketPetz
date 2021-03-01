@@ -9,6 +9,7 @@ local runService = game:GetService("RunService");
 local contextActionService = game:GetService("ContextActionService");
 local npcs = require(replicatedStorage.Common.Data.NPCs);
 local players = game:GetService("Players");
+local userMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserMenu);
 
 local locked = false;
 local interactable = nil;
@@ -108,6 +109,7 @@ function PlayerInteractor.Interact()
         locked = true;
 
         uiManager.HideAllExcept({"Dialog GUI"});
+        userMenu.Hide();
 
         Speak(KeeperDialog);
     end

@@ -5,6 +5,7 @@ local userMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserMenu);
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProfile);
 local friendsList = require(players.LocalPlayer.PlayerScripts.Client.Ui.FriendsList);
+local interactor = require(players.LocalPlayer.PlayerScripts.Client.PlayerInteractor);
 
 -- Variables
 local player = players.LocalPlayer
@@ -14,6 +15,10 @@ local friendsListGUI = uiManager.GetUi("Friends GUI");
 
 -- Functions
 function DoInput(pos)
+    if(interactor.GetInteractable() ~= nil) then
+        return;
+    end
+
     local unitRay = camera:ScreenPointToRay(pos.X, pos.Y);
     local ray = Ray.new(unitRay.Origin, unitRay.Direction * 1000)
 
