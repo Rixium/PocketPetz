@@ -37,4 +37,8 @@ function ItemList.GetAllById(playerItems)
     return selectedItems;
 end
 
+function ItemList.GetById(itemId)
+    return ItemList.Items[itemId];
+end
+
 return ItemList;
