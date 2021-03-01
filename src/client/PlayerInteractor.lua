@@ -87,13 +87,14 @@ function PlayerInteractor.Interact()
         local target = interactable:GetPrimaryPartCFrame(); -- workspaceHelper.GetDescendantByName(interactable.Parent, "CameraPoint");
         camera.CameraType = Enum.CameraType.Scriptable;
 
-        local rotateValue = 180;
+        local startPos = camera.CFrame;
+        local startY = math.deg(math.pi);
 
         runService:BindToRenderStep("CameraUpdate", Enum.RenderPriority.Camera.Value + 1, function()
             local start = target;
-            local rotation = CFrame.Angles(0, math.rad(rotateValue), 0)
-            rotateValue = rotateValue + 0.1;
-            local distance = 10 -- studs (you can change to something dynamic)
+            local rotation = CFrame.Angles(0, math.rad(startY), 0);
+            startY = startY + 0.1;
+            local distance = 15 -- studs (you can change to something dynamic)
             local cf = start * rotation
             cf = cf - (cf.lookVector * distance)
             camera.CFrame = cf
