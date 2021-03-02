@@ -56,10 +56,6 @@ userInputService.InputEnded:Connect(function(input, gameProcessed)
     end
 end);
 
-mainGui.Buttons.ProfileButton.ProfileButton.MouseButton1Click:Connect(function()
-    userProfile.Toggle(players.LocalPlayer.Character);
-end)
-
 mainGui.Buttons.FriendsButton.FriendsButton.MouseButton1Click:Connect(function()
     friendsListGUI.Enabled = not friendsListGUI.Enabled;
     friendsList.ShowFriends();

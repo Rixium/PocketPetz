@@ -12,6 +12,7 @@ local lockedTitleTemplate = replicatedStorage:WaitForChild("LockedTitleTemplate"
 
 local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
 local titlesScrollingFrame = titlesGUI:WaitForChild("TitlesFrame").TitlesBack.InternalTitlesFrame.ScrollingFrame;
+local loadingFrame = titlesGUI:WaitForChild("TitlesFrame").TitlesBack.LoadingFrame;
 
 local currentActive = nil;
 local SIZE = Vector2.new(0.97, 1);
@@ -32,6 +33,8 @@ end
 
 function TitlesMenu.SetupTitles()
     repeat wait(1) until not isRunning 
+
+    loadingFrame.Visible = true;
 
     isRunning = true;
 
@@ -97,6 +100,9 @@ function TitlesMenu.SetupTitles()
     end 
             
     ResetScroll();
+
+    
+    loadingFrame.Visible = false;
 
     isRunning = false;
 end
