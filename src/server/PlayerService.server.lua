@@ -16,7 +16,7 @@ function OnPlayerJoined(player)
 
 
 	-- DATABASE CLEARUP
-	-- itemService.ClearItems(player);
+	itemService.ClearItems(player);
 end
 
 function OnPlayerLeaving(player)

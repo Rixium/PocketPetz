@@ -6,21 +6,21 @@ ItemList.Items = {
         ItemType = "Seed",
         Rarity = "Common",
         Name = "PixieSeed",
-        ModelId = 6453952845
+        ModelId = 6463616043
     },
     [2] = {
         ItemId = 2,
         ItemType = "Seed",
         Rarity = "Common",
         Name = "CoolSeed",
-        ModelId = 6453936175
+        ModelId = 6463613741
     },
     [3] = {
         ItemId = 3,
         ItemType = "Seed",
         Rarity = "Common",
         Name = "BruteSeed",
-        ModelId = 6453949098
+        ModelId = 6463611714
     }
 };
 
