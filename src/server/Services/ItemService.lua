@@ -5,6 +5,7 @@ local serverScriptService = game:GetService("ServerScriptService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local players = game:GetService("Players");
+local gotItemEvent = replicatedStorage.Common.Events.PlayerGotItemEvent;
 
 local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
 local dataStore2 = dataStoreGet.DataStore;
@@ -35,6 +36,11 @@ function ItemService.GiveItem(player, itemId)
         ItemId = itemId
     });
     itemStore:Set(items);
+
+    spawn(function()
+        local itemData = itemList.GetById(itemId);        
+        gotItemEvent:FireClient(player, itemData);
+    end)
 end
 
 return ItemService;

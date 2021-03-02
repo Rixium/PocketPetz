@@ -1,0 +1,4 @@
+{
+    "Name": "PlayerGotItemEvent",
+    "ClassName": "RemoteEvent"
+}
