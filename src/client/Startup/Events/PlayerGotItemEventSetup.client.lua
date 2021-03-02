@@ -12,7 +12,7 @@ local thumbSize = Enum.ThumbnailSize.Size420x420
 
 local mainGui = uiManager.GetUi("Main GUI");
 local gotItemPopup = replicatedStorage.GotItemPopup;
-local bagButton = mainGui:WaitForChild("Buttons").BagButton;
+local bagButton = mainGui:WaitForChild("Buttons").BagButton.BagButton;
 
 -- Functions
 
@@ -32,16 +32,30 @@ local function OnGotItem(itemData)
 
     tween.Completed:Wait()
 
-    local abs = bagButton.AbsolutePosition;
-    local absSize = bagButton.AbsoluteSize;
+    local abs = {
+        X = bagButton.AbsolutePosition.X + bagButton.AbsoluteSize.X / 2,
+        Y = bagButton.AbsolutePosition.Y + bagButton.AbsoluteSize.Y / 2
+    }
+    local toBagInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In);
+    
+    tweenService:Create(newPopup.TextLabel, toBagInfo, { 
+        Size = UDim2.new(0, 0, 0, 0),
+        TextTransparency = 1
+    }):Play();
 
-    local absCenter = {
-        X = abs.X + (absSize.X / 2),
-        Y = abs.Y + (absSize.Y / 2)
-    };    
-    local toBagInfo = TweenInfo.new(2, Enum.EasingStyle.Linear, Enum.EasingDirection.In);
-    local toBag = tweenService:Create(newPopup.Image.ItemImage, toBagInfo, { Position = UDim2.new(0, absCenter.X, 0, absCenter.Y) });
-    toBag:Play();
+    local toBagTween = tweenService:Create(newPopup.Image, toBagInfo, { 
+        Position =  UDim2.new(0, abs.X - newPopup.Image.Parent.AbsolutePosition.X, 0, abs.Y - newPopup.Image.Parent.AbsolutePosition.Y),
+        Size = UDim2.new(0.1, 0, 0.1, 0)
+    });
+
+    toBagTween:Play();
+    toBagTween.Completed:Wait();
+
+    newPopup.Image:Destroy();
+
+    local bagPopInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);
+	local bagPopTween = tweenService:Create(bagButton, bagPopInfo, {Size=UDim2.new(1.2, 0, 1.2, 0)})
+    bagPopTween:Play();
 end
 
 gotItemEvent.OnClientEvent:Connect(OnGotItem);
