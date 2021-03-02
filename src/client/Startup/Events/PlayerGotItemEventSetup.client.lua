@@ -36,11 +36,14 @@ local function OnGotItem(itemData)
         X = bagButton.AbsolutePosition.X + bagButton.AbsoluteSize.X / 2,
         Y = bagButton.AbsolutePosition.Y + bagButton.AbsoluteSize.Y / 2
     }
-    local toBagInfo = TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In);
+    local toBagInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In);
+    local fadeTextInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In);
     
-    tweenService:Create(newPopup.TextLabel, toBagInfo, { 
+    tweenService:Create(newPopup.TextLabel, fadeTextInfo, { 
         Size = UDim2.new(0, 0, 0, 0),
-        TextTransparency = 1
+        TextTransparency = 1,
+        TextStrokeTransparency = 1,
+        Rotation = 360
     }):Play();
 
     newPopup.Image.ZIndex = -10;
