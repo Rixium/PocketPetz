@@ -43,16 +43,19 @@ local function OnGotItem(itemData)
         TextTransparency = 1
     }):Play();
 
+    newPopup.Image.ZIndex = -10;
+
     local toBagTween = tweenService:Create(newPopup.Image, toBagInfo, { 
         Position =  UDim2.new(0, abs.X - newPopup.Image.Parent.AbsolutePosition.X, 0, abs.Y - newPopup.Image.Parent.AbsolutePosition.Y),
         Size = UDim2.new(0.1, 0, 0.1, 0)
     });
-
+    bagButton.Swipe:Play();
     toBagTween:Play();
     toBagTween.Completed:Wait();
 
     newPopup.Image:Destroy();
 
+    bagButton.Pickup:Play();
     local bagPopInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);
 	local bagPopTween = tweenService:Create(bagButton, bagPopInfo, {Size=UDim2.new(1.2, 0, 1.2, 0)})
     bagPopTween:Play();
