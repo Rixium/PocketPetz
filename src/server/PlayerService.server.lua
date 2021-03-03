@@ -58,5 +58,5 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 
 	model:Destroy();
 	
-	playerEquipped:FireAllClients(player, toSend);
+	playerEquipped:FireClient(player, toSend);
 end);

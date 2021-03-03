@@ -9,8 +9,8 @@ local waypoints = nil;
 
 -- Functions
 
-local function OnEquipped(player, model)
-    local playerCharacter = player.Character;
+local function OnEquipped(model)
+    local playerCharacter = players.LocalPlayer.Character;
 
     local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
 
