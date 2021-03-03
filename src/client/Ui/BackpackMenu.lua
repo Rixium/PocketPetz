@@ -7,6 +7,8 @@ local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager)
 local itemBack = replicatedStorage.ItemBack;
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local tweenService = game:GetService("TweenService");
+local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
+
 
 -- Variables
 local inventoryGUI = uiManager.GetUi("Inventory GUI");
@@ -35,6 +37,12 @@ local function ResetScroll()
     scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
 
+local function SelectItem(selectedItem)
+    print("Player has selected " .. selectedItem.ItemData.Name);
+    equipItemRequest:FireServer(selectedItem);
+
+end
+
 local function AddItem(itemToAdd)
     local item = itemBack:clone();
     item.Parent = scrollingFrame;
@@ -43,6 +51,9 @@ local function AddItem(itemToAdd)
         if(debounce) then
             return;
         end
+
+        SelectItem(itemToAdd);
+
         debounce = true;
         item.Click:Play();
         local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);

@@ -44,3 +44,13 @@ setActiveTitle.OnServerInvoke = titleService.SetActiveTitle;
 
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
+
+local insertService = game:GetService("InsertService");
+local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
+local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
+equipItemRequest.OnServerEvent:Connect(function(player, item) 
+	local model = insertService:LoadAsset(item.ItemData.ModelId);
+	model.Parent = player.Character;
+
+	playerEquipped:FireAllClients(player, model);
+end);
