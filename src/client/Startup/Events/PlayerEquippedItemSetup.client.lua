@@ -12,11 +12,26 @@ local waypoints = nil;
 local function OnEquipped(model)
     local playerCharacter = players.LocalPlayer.Character;
 
+    local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
     local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
 
-    model:SetPrimaryPartCFrame(characterCframe);
+    model:SetPrimaryPartCFrame(startFrame);
 
-    game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+    local runner;
+    runner = game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+
+        if not model.PrimaryPart then
+            runner:Disconnect();
+            model:Destroy();
+            return;
+        end
+
+        if not playerCharacter.PrimaryPart then
+            runner:Disconnect();
+            model:Destroy();
+            return;
+        end
+
         local petCframe =  model:GetPrimaryPartCFrame().p;
         characterCframe = playerCharacter:GetPrimaryPartCFrame().p;
         
