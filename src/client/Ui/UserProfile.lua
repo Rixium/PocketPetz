@@ -12,7 +12,7 @@ local profileGUI = mainGUI["Profile GUI"];
 -- Functions
 function UserProfile.Show(character)
     local profilePlayer = players:GetPlayerFromCharacter(character);
-    profileGUI.ProfileBack.HeaderFrame.ImageLabel.NameLabel.Text = profilePlayer.Name;
+    profileGUI.ProfileBack.HeaderFrame.ImageLabel.ImageLabel.NameLabel.Text = profilePlayer.Name;
 
     profileGUI.ProfileBack.ProfileFrame.AddFriends.Visible = profilePlayer.UserId ~= players.LocalPlayer.UserId;
 
@@ -22,7 +22,7 @@ function UserProfile.Show(character)
 
     
     local userTitle = character.Head.AboveHeadGUI.TitleField.Text;
-    profileGUI.ProfileBack.HeaderFrame.ImageLabel.TitleLabel.Text = userTitle;
+    profileGUI.ProfileBack.HeaderFrame.ImageLabel.ImageLabel.TitleLabel.Text = userTitle;
 
 
     spawn(function () 
