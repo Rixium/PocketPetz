@@ -50,7 +50,13 @@ local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 equipItemRequest.OnServerEvent:Connect(function(player, item) 
 	local model = insertService:LoadAsset(item.ItemData.ModelId);
-	model.Parent = player.Character;
+	
+    local toSend = model:FindFirstChildWhichIsA("Model")
 
-	playerEquipped:FireAllClients(player, model);
+	toSend.Parent = player.Character;
+	toSend.PrimaryPart:SetNetworkOwner(player);
+
+	model:Destroy();
+	
+	playerEquipped:FireAllClients(player, toSend);
 end);
