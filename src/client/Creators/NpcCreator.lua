@@ -7,7 +7,6 @@ local marketplaceService = game:GetService("MarketplaceService");
 local npcs = require(replicatedStorage.Common.Data.NPCs);
 local animation = require(game.Players.LocalPlayer.PlayerScripts.Client.Animators.Animation);
 local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
-local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait();
 local playerInteractor = require(game.Players.LocalPlayer.PlayerScripts.Client.PlayerInteractor);
 
 function GiveNpcAboveHeadGUI(npc, npcData)
@@ -68,9 +67,13 @@ function NpcCreator.New(placement)
     
     local animationTrack = animation.Animate(507766388, cloned.Humanoid, true);
 
-    local gameStep;
-
-    gameStep = game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+    game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+        
+        local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait();
+        
+        if(not character.PrimaryPart) then
+            return;
+        end
 
         local characterPosition = character:GetPrimaryPartCFrame().Position;
         local clonedPosition = cloned:GetPrimaryPartCFrame().Position;

@@ -10,10 +10,9 @@ local dataStore2 = dataStoreGet.DataStore;
 
 local activeTitleData = "ActiveTitle";
 
-local function OnPlayerAdded(player)
-	local character = player.Character or player.CharacterAdded:wait();
-
+local function CharacterAdded(character)
 	local board = Billboard:Clone()
+	local player = game.Players:GetPlayerFromCharacter(character);
 	board.Parent = character:WaitForChild("Head")
 
 	character:WaitForChild("Humanoid").NameDisplayDistance = 0
@@ -26,6 +25,10 @@ local function OnPlayerAdded(player)
 	
 	board.NameField.Text = player.Name;
 	board.TitleField.Text = activeTitle;
+end
+
+local function OnPlayerAdded(player)
+	player.CharacterAdded:Connect(CharacterAdded);
 end
 
 game.Players.PlayerAdded:Connect(OnPlayerAdded)
