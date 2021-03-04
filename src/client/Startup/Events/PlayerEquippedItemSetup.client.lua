@@ -8,14 +8,42 @@ local pathfindingService = game:GetService("PathfindingService");
 local waypoints = nil;
 
 -- Functions
+local function ShowXpAbove(model, itemData)
+    local npcAboveHeadGUI = replicatedStorage.ExperienceGUI;
+    local board = npcAboveHeadGUI:Clone()
+    board.Parent = workspace;
+    board.Adornee = model;
+    
+    local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
+    local toLevel = itemData.ItemData.ExperienceToLevel;
 
-local function OnEquipped(model)
+    print(currentExperience);
+    print(toLevel);
+    local width = currentExperience / toLevel;
+    board.Experience.Size = UDim2.new(width,0, 1,0);
+
+    game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+        itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
+
+        width = itemData.PlayerItem.Data.CurrentExperience / itemData.ItemData.ExperienceToLevel;
+        
+        if(width > 1) then
+            width = 1;
+        end
+
+        board.Experience.Size = UDim2.new(width,0, 1,0);
+    end);
+end
+
+local function OnEquipped(model, itemData)
     local playerCharacter = players.LocalPlayer.Character;
 
     local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
     local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
 
     model:SetPrimaryPartCFrame(startFrame);
+
+    ShowXpAbove(model, itemData);
 
     local runner;
     runner = game:GetService("RunService").RenderStepped:Connect(function(deltaTime)

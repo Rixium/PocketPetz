@@ -63,6 +63,11 @@ end
 
 local function GetItemResponse(itemId, player)
     local check = itemChecks[itemId];
+    
+    if not check then
+        return nil;
+    end
+
     return check(player);
 end
 

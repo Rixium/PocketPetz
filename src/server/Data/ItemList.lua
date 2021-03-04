@@ -6,21 +6,24 @@ ItemList.Items = {
         ItemType = "Seed",
         Rarity = "Common",
         Name = "PixieSeed",
-        ModelId = 6463616043
+        ModelId = 6463616043,
+        ExperienceToLevel = 100
     },
     [2] = {
         ItemId = 2,
         ItemType = "Seed",
         Rarity = "Common",
         Name = "CoolSeed",
-        ModelId = 6463613741
+        ModelId = 6463613741,
+        ExperienceToLevel = 100
     },
     [3] = {
         ItemId = 3,
         ItemType = "Seed",
         Rarity = "Common",
         Name = "BruteSeed",
-        ModelId = 6463611714
+        ModelId = 6463611714,
+        ExperienceToLevel = 100
     }
 };
 

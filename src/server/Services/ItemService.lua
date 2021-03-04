@@ -6,12 +6,25 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local players = game:GetService("Players");
 local gotItemEvent = replicatedStorage.Common.Events.PlayerGotItemEvent;
+local httpService = game:GetService("HttpService");
 
 local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
 local dataStore2 = dataStoreGet.DataStore;
 
 -- Variables
 local itemsData = "Items";
+
+local ItemPlayerData = {
+    [1] = {
+        CurrentExperience = 0
+    },
+    [2] = {
+        CurrentExperience = 0
+    },
+    [3] = {
+        CurrentExperience = 0
+    }
+}
 
 -- Functions 
 function ItemService.GetPlayerItems(player)
@@ -28,13 +41,19 @@ function ItemService.ClearItems(player)
     itemStore:Set(nil);
 end
 
+
 function ItemService.GiveItem(player, itemId)
     local itemStore = dataStore2(itemsData, player);
     local items = itemStore:Get({});
 
+    local guid = httpService:GenerateGUID();
+    
     table.insert(items, {
-        ItemId = itemId
+        Id = guid,
+        ItemId = itemId,
+        Data = ItemPlayerData[itemId]
     });
+
     itemStore:Set(items);
 
     spawn(function()
