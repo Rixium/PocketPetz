@@ -4,9 +4,10 @@ local serverScriptService = game:GetService("ServerScriptService");
 local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
 local dataStore2 = dataStoreGet.DataStore;
 local itemsStore = "Items";
+local itemList = require(serverScriptService.Server.Data.ItemList);
 
-local function LevelUpPet(player, pet) 
-    local remaining = pet.Data.CurrentExperience - pet.ExperienceToLevel;
+local function LevelUpPet(player, pet, itemData)
+    local remaining = pet.Data.CurrentExperience - itemData.ExperienceToLevel;
     pet.Data.CurrentExperience = remaining;
 end
 
@@ -18,8 +19,10 @@ function PetService.AddExperience(player, guid, experienceAmount)
         if(item.Id == guid) then
             item.Data.CurrentExperience = item.Data.CurrentExperience + experienceAmount;
 
-            if(item.Data.CurrentExperience >= item.ExperienceToLevel) then
-                LevelUpPet(player, item);
+            local itemData = itemList.GetById(item.ItemId);
+
+            if(item.Data.CurrentExperience >= itemData.ExperienceToLevel) then
+                LevelUpPet(player, item, itemData);
             end
 
             break;

@@ -3,12 +3,15 @@ local PetManager = {};
 -- Imports
 local players = game:GetService("Players");
 local pathfindingService = game:GetService("PathfindingService");
+local replicatedStorage = game:GetService("ReplicatedStorage");
+local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 
 -- Variables
 local activePet = nil;
 local activePetData = nil;
 local activeTarget = nil;
 local runner = nil;
+local toldServer = false;
 local waypoints = {};
 
 -- Functions
@@ -38,6 +41,10 @@ local function AttackTarget()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
     if(waypoints ~= nil and #waypoints > 0) then return end
+    if(toldServer) then return end
+
+    toldServer = true;
+    petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 end
 
 local function DoCombat()

@@ -57,6 +57,12 @@ setActiveTitle.OnServerInvoke = titleService.SetActiveTitle;
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 
+local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
+petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target) 
+	print(petData.ItemData.Name .. " is attacking " .. target.Name);
+	petService.AddExperience(player, petData.PlayerItem.Id, 50);
+end);
+
 local insertService = game:GetService("InsertService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
