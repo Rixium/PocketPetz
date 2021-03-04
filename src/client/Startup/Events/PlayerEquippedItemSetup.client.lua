@@ -17,8 +17,6 @@ local function ShowXpAbove(model, itemData)
     local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
     local toLevel = itemData.ItemData.ExperienceToLevel;
 
-    print(currentExperience);
-    print(toLevel);
     local width = currentExperience / toLevel;
     board.Experience.Size = UDim2.new(width,0, 1,0);
 
