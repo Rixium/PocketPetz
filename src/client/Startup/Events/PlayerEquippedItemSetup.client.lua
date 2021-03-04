@@ -70,7 +70,8 @@ local function OnEquipped(model, itemData)
         characterCframe = playerCharacter:GetPrimaryPartCFrame().p;
         
         if((petCframe - characterCframe).magnitude > 30) then
-            model:SetPrimaryPartCFrame(playerCharacter:GetPrimaryPartCFrame())
+            
+            model:SetPrimaryPartCFrame( playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0)))
         end
 
         if((characterCframe - petCframe).magnitude > 10 and (waypoints == nil or #waypoints == 0)) then

@@ -4,6 +4,7 @@ local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager)
 local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local petService = require(serverScriptService.Server.Services.PetService);
+local physicsService = game:GetService("PhysicsService");
 
 local currentEventTitle = "AlphaStar";
 
@@ -14,6 +15,15 @@ function OnPlayerJoined(player)
 	local isFirstTime = playerTracker.FirstTime(player);
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);
+
+
+	local char = player.Character or player.CharacterAdded:Wait();
+
+	for i,v in pairs(char:GetChildren()) do
+		if v:IsA("BasePart") then
+			physicsService:SetPartCollisionGroup(v, "Players");
+		end
+	end
 
 
 	-- DATABASE CLEARUP
@@ -51,6 +61,7 @@ local insertService = game:GetService("InsertService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 
+local physicsService = game:GetService("PhysicsService");
 equipItemRequest.OnServerEvent:Connect(function(player, item)
 	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
 
@@ -66,6 +77,8 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	toSend.PrimaryPart:SetNetworkOwner(player);
 
 	model:Destroy();
+
+	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
 	
 	playerEquipped:FireClient(player, toSend, item);
 end);
