@@ -7,11 +7,43 @@ local pathfindingService = game:GetService("PathfindingService");
 -- Variables
 local activePet = nil;
 local activePetData = nil;
+local activeTarget = nil;
 local runner = nil;
 local waypoints = {};
 
 -- Functions
-local function UpdatePet()
+local function MoveTo(targetCFrame) 
+    local model = activePet;
+
+    local petCframe =  model:GetPrimaryPartCFrame().p;
+
+    if((targetCFrame.p - petCframe).magnitude > 10 and (waypoints == nil or #waypoints == 0)) then
+        local path = pathfindingService:FindPathAsync(petCframe, targetCFrame.p);
+        waypoints = path:GetWaypoints()
+    elseif currentWaypoint ~= nil then
+        targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,1,0))
+        local newCframe = model:GetPrimaryPartCFrame():Lerp(targetCframe, 0.02)
+        model:SetPrimaryPartCFrame(newCframe)
+
+        if((newCframe.p - targetCframe.p).magnitude < 5) then
+            currentWaypoint = nil;
+        end
+    elseif waypoints ~= nil and #waypoints ~= 0 then
+        currentWaypoint = waypoints[1];
+        table.remove(waypoints, 1);
+    end
+end
+
+local function DoCombat()
+    if(activeTarget == nil) then return end
+    if(activePet == nil) then return end
+
+    MoveTo(activeTarget.CFrame);
+end
+
+local function CheckForCleanup()
+    if(activePet == nil) then return end
+
     local model = activePet;
     local playerCharacter = players.LocalPlayer.Character;
 
@@ -26,29 +58,15 @@ local function UpdatePet()
         model:Destroy();
         return;
     end
+end
 
-    local petCframe =  model:GetPrimaryPartCFrame().p;
-    local characterCframe = playerCharacter:GetPrimaryPartCFrame().p;
-    
-    if((petCframe - characterCframe).magnitude > 30) then
-        
-        model:SetPrimaryPartCFrame( playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0)))
-    end
+local function UpdatePet()
+    CheckForCleanup();
 
-    if((characterCframe - petCframe).magnitude > 10 and (waypoints == nil or #waypoints == 0)) then
-        local path = pathfindingService:FindPathAsync(petCframe, characterCframe);
-        waypoints = path:GetWaypoints()
-    elseif currentWaypoint ~= nil then
-        local targetCframe = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
-        local newCframe = model:GetPrimaryPartCFrame():Lerp(targetCframe, 0.02)
-        model:SetPrimaryPartCFrame(newCframe)
-
-        if((newCframe.p - targetCframe.p).magnitude < 5) then
-            currentWaypoint = nil;
-        end
-    elseif waypoints ~= nil and #waypoints ~= 0 then
-        currentWaypoint = waypoints[1];
-        table.remove(waypoints, 1);
+    if(activeTarget ~= nil) then
+        DoCombat();
+    else
+        MoveTo(players.LocalPlayer.Character:GetPrimaryPartCFrame());
     end
 end
 
@@ -57,7 +75,7 @@ local function SetupPet(pet, petData)
 end
 
 function PetManager.SetTarget(target)
-    print("Pet is now attacking " .. target.Name);
+    activeTarget = target;
 end
 
 function PetManager.SetActivePet(pet, petData)
