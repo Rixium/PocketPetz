@@ -34,11 +34,18 @@ local function MoveTo(targetCFrame)
     end
 end
 
+local function AttackTarget()
+    if(activeTarget == nil) then return end
+    if(activePet == nil) then return end
+    if(waypoints ~= nil and #waypoints > 0) then return end
+end
+
 local function DoCombat()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
 
     MoveTo(activeTarget.CFrame);
+    AttackTarget();
 end
 
 local function CheckForCleanup()
