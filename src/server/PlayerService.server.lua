@@ -3,6 +3,7 @@ local playerTracker = require(serverScriptService.Server.PlayerTracker);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
+local petService = require(serverScriptService.Server.Services.PetService);
 
 local currentEventTitle = "AlphaStar";
 
@@ -16,7 +17,8 @@ function OnPlayerJoined(player)
 
 
 	-- DATABASE CLEARUP
-	itemService.ClearItems(player);
+	-- itemService.ClearItems(player);
+	-- petService.AddExperience(player, "123", 10);
 end
 
 function OnPlayerLeaving(player)
