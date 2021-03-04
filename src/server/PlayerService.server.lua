@@ -48,7 +48,14 @@ getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 local insertService = game:GetService("InsertService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
-equipItemRequest.OnServerEvent:Connect(function(player, item) 
+
+equipItemRequest.OnServerEvent:Connect(function(player, item)
+	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
+
+	if(playerItem == nil) then
+		return;
+	end
+
 	local model = insertService:LoadAsset(item.ItemData.ModelId);
 	
     local toSend = model:FindFirstChildWhichIsA("Model")

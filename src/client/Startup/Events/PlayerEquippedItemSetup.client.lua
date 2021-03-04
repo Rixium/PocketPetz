@@ -6,6 +6,7 @@ local pathfindingService = game:GetService("PathfindingService");
 
 -- Variables
 local waypoints = nil;
+local runner = nil;
 
 -- Functions
 local function ShowXpAbove(model, itemData)
@@ -20,30 +21,37 @@ local function ShowXpAbove(model, itemData)
     local width = currentExperience / toLevel;
     board.Experience.Size = UDim2.new(width,0, 1,0);
 
-    game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
-        itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
+    itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
 
-        width = itemData.PlayerItem.Data.CurrentExperience / itemData.ItemData.ExperienceToLevel;
-        
-        if(width > 1) then
-            width = 1;
-        end
+    width = itemData.PlayerItem.Data.CurrentExperience / itemData.ItemData.ExperienceToLevel;
+    
+    if(width > 1) then
+        width = 1;
+    end
 
-        board.Experience.Size = UDim2.new(width,0, 1,0);
-    end);
+    board.Experience.Size = UDim2.new(width,0, 1,0);
 end
 
 local function OnEquipped(model, itemData)
     local playerCharacter = players.LocalPlayer.Character;
 
+    if(playerCharacter:FindFirstChild("Pet")) then
+        playerCharacter.Pet:Destroy();
+
+        if(runner ~= nil) then 
+            runner:Disconnect();
+            runner = nil;
+        end
+    end
+
     local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
     local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
 
     model:SetPrimaryPartCFrame(startFrame);
+    model.Name = "Pet";
 
     ShowXpAbove(model, itemData);
 
-    local runner;
     runner = game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
 
         if not model.PrimaryPart then

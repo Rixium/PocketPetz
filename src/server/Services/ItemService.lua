@@ -41,6 +41,18 @@ function ItemService.ClearItems(player)
     itemStore:Set(nil);
 end
 
+function ItemService.GetPlayerItemByGuid(player, guid) 
+    local itemStore = dataStore2(itemsData, player);
+    local items = itemStore:Get({});
+
+    for _, item in pairs(items) do
+        if(item.Id == guid) then
+            return item;
+        end
+    end
+
+    return nil;
+end
 
 function ItemService.GiveItem(player, itemId)
     local itemStore = dataStore2(itemsData, player);
