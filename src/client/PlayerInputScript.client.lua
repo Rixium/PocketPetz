@@ -26,8 +26,18 @@ local titlesButton = mainGUI.Buttons.TitleButton.TitleButton.MouseButton1Click:C
 end)
 
 
+local tagFunctions = {};
+
+tagFunctions["Attackable"] = function(obj)
+    local playerPet = game.Players.LocalPlayer.Character.Pet;
+
+    if(playerPet) then
+        playerPet:SetPrimaryPartCFrame(obj.CFrame);
+    end
+end
 
 local userInputService = game:GetService("UserInputService");
+local collectionService = game:GetService("CollectionService");
 
 -- Functions
 function DoInput(pos)
@@ -40,8 +50,15 @@ function DoInput(pos)
         return;
     end
 
-    local ancestor = result:FindFirstAncestorOfClass("Part");
-    
+    local tags = collectionService:GetTags(result);
+
+    for i, v in pairs(tags) do
+        local func = tagFunctions[v];
+
+        if(func == nil) then continue end
+
+        func(result);
+    end
 end
  
 userInputService.InputEnded:Connect(function(input, gameProcessed)
