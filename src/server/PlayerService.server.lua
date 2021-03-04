@@ -61,13 +61,18 @@ local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local runService = game:GetService("RunService");
 local activePets = {};
 
-petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target) 
-	table.insert(activePets, {
+petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
+	activePets[player.UserId] = {
 		Player = player,
 		PetModel = pet,
 		PetData = petData,
 		Target = target
-	});
+	};
+end);
+
+local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
+petStopAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
+	activePets[player.UserId] = nil;
 end);
 
 local insertService = game:GetService("InsertService");
@@ -96,10 +101,12 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	playerEquipped:FireClient(player, toSend, item);
 end);
 
-while true do
-	wait(1)
-	
-	for _, pet in pairs(activePets) do
-		petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, 5);
+spawn(function()
+	while true do
+		wait(1)
+		
+		for _, pet in pairs(activePets) do
+			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, 5);
+		end
 	end
-end
+end);

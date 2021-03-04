@@ -6,6 +6,9 @@ local pathfindingService = game:GetService("PathfindingService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
+local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
+local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local stopCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatButton");
 
 -- Variables
 local board = nil;
@@ -46,11 +49,11 @@ local function AttackTarget()
     if(toldServer) then return end
 
     toldServer = true;
+    stopCombatButton.Visible = true;
     petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 end
 
 local function UpdateXpBar(itemData)
-    print(itemData);
     local width = itemData.Data.CurrentExperience / activePetData.ItemData.ExperienceToLevel;
     
     if(width > 1) then
@@ -141,5 +144,16 @@ end
 function PetManager.IsPetActive()
     return activePet ~= nil;
 end
+
+local function StopCombat()
+    if(activePet == nil) then return end
+    if(activeTarget == nil) then return end
+    stopCombatButton.Visible = false;
+    petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+    activeTarget = nil;
+    toldServer = false;
+end
+
+stopCombatButton.MouseButton1Click:Connect(StopCombat);
 
 return PetManager;
