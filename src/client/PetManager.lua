@@ -5,8 +5,10 @@ local players = game:GetService("Players");
 local pathfindingService = game:GetService("PathfindingService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
+local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 
 -- Variables
+local board = nil;
 local activePet = nil;
 local activePetData = nil;
 local activeTarget = nil;
@@ -47,6 +49,33 @@ local function AttackTarget()
     petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 end
 
+local function UpdateXpBar(itemData)
+    print(itemData);
+    local width = itemData.Data.CurrentExperience / activePetData.ItemData.ExperienceToLevel;
+    
+    if(width > 1) then
+        width = 1;
+    end
+
+    board.Experience.Size = UDim2.new(width,0, 1,0);
+end
+
+local function ShowXpAbove(model, itemData)
+    local npcAboveHeadGUI = replicatedStorage.ExperienceGUI;
+    board = npcAboveHeadGUI:Clone()
+    board.Parent = workspace;
+    board.Adornee = model;
+    
+    local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
+    local toLevel = itemData.ItemData.ExperienceToLevel;
+
+    local width = currentExperience / toLevel;
+    board.Experience.Size = UDim2.new(width,0, 1,0);
+
+    itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
+    UpdateXpBar(itemData.PlayerItem);
+end
+
 local function DoCombat()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
@@ -85,7 +114,12 @@ local function UpdatePet()
 end
 
 local function SetupPet(pet, petData)
+    ShowXpAbove(pet, petData);
+
     runner = game:GetService("RunService").RenderStepped:Connect(UpdatePet);
+    petGotExperience.OnClientEvent:Connect(function(pet) 
+        UpdateXpBar(pet);
+    end);
 end
 
 function PetManager.SetTarget(target)
