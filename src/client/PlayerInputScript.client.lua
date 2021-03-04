@@ -25,14 +25,15 @@ local titlesButton = mainGUI.Buttons.TitleButton.TitleButton.MouseButton1Click:C
     titlesMenu.Toggle();
 end)
 
+local petManager = require(players.LocalPlayer.PlayerScripts.Client.PetManager);
 
 local tagFunctions = {};
 
 tagFunctions["Attackable"] = function(obj)
-    local playerPet = game.Players.LocalPlayer.Character.Pet;
+    local playerActivePet = petManager.GetActivePet();
 
-    if(playerPet) then
-        playerPet:SetPrimaryPartCFrame(obj.CFrame);
+    if playerActivePet ~= nil then
+        petManager.SetTarget(obj);
     end
 end
 

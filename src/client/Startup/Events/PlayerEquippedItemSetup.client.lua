@@ -2,11 +2,7 @@
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local players = game:GetService("Players");
 local playerEquippedItem = replicatedStorage.Common.Events.PlayerEquippedItem;
-local pathfindingService = game:GetService("PathfindingService");
-
--- Variables
-local waypoints = nil;
-local runner = nil;
+local petManager = require(players.LocalPlayer.PlayerScripts.Client.PetManager);
 
 -- Functions
 local function ShowXpAbove(model, itemData)
@@ -50,46 +46,9 @@ local function OnEquipped(model, itemData)
     model:SetPrimaryPartCFrame(startFrame);
     model.Name = "Pet";
 
+    petManager.SetActivePet(model, itemData);
+
     ShowXpAbove(model, itemData);
-
-    runner = game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
-
-        if not model.PrimaryPart then
-            runner:Disconnect();
-            model:Destroy();
-            return;
-        end
-
-        if not playerCharacter.PrimaryPart then
-            runner:Disconnect();
-            model:Destroy();
-            return;
-        end
-
-        local petCframe =  model:GetPrimaryPartCFrame().p;
-        characterCframe = playerCharacter:GetPrimaryPartCFrame().p;
-        
-        if((petCframe - characterCframe).magnitude > 30) then
-            
-            model:SetPrimaryPartCFrame( playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0)))
-        end
-
-        if((characterCframe - petCframe).magnitude > 10 and (waypoints == nil or #waypoints == 0)) then
-            local path = pathfindingService:FindPathAsync(petCframe, characterCframe);
-            waypoints = path:GetWaypoints()
-        elseif currentWaypoint ~= nil then
-            local targetCframe = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
-            local newCframe = model:GetPrimaryPartCFrame():Lerp(targetCframe, 0.02)
-            model:SetPrimaryPartCFrame(newCframe)
-
-            if((newCframe.p - targetCframe.p).magnitude < 5) then
-                currentWaypoint = nil;
-            end
-        elseif waypoints ~= nil and #waypoints ~= 0 then
-            currentWaypoint = waypoints[1];
-            table.remove(waypoints, 1);
-        end
-    end);
 end
 
 playerEquippedItem.OnClientEvent:Connect(OnEquipped);
