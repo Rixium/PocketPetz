@@ -24,6 +24,11 @@ local toldServer = false;
 local waypoints = {};
 local animationPlaying = false;
 local track = nil;
+local attackTrack = nil;
+local targetHitAnimation = nil;
+
+local sound = nil;
+
 
 -- Functions
 
@@ -109,6 +114,27 @@ local function AttackTarget()
     toldServer = true;
     Grow();
     petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+
+    local animator = activeTarget.Parent:WaitForChild("Humanoid"):WaitForChild("Animator");
+    if animator then
+        targetHitAnimation = animator:LoadAnimation(activeTarget.Parent.Animations.Hit);
+    end
+
+    local petAnimator = activePet:WaitForChild("Humanoid"):WaitForChild("Animator")
+    if petAnimator then
+        local animation = Instance.new("Animation");
+        animation.AnimationId = "rbxassetid://" .. 6479792403;
+        attackTrack = petAnimator:LoadAnimation(animation);
+        attackTrack.Looped = true;
+        setPetAnimation:FireServer(animation);
+        attackTrack.KeyframeReached:Connect(function(keyframeName)
+            if(keyframeName == "Hit") then
+                targetHitAnimation:Play();
+                sound:Play();
+            end
+        end);
+        attackTrack:Play();
+    end
 end
 
 local function UpdateXpBar(itemData)
@@ -175,6 +201,14 @@ local function UpdatePet()
 end
 
 local function SetupPet(pet, petData)
+    sound = Instance.new("Sound", pet.Root);
+    sound.SoundId = "rbxassetid://3748780065"
+    sound.Name = "TestSound"
+    sound.Volume = 0.2;
+    sound.RollOffMinDistance = 0;
+    sound.RollOffMaxDistance = 50;
+    sound.RollOffMode = Enum.RollOffMode.LinearSquare;
+
     ShowXpAbove(pet, petData);
 
     runner = game:GetService("RunService").RenderStepped:Connect(UpdatePet);
@@ -184,7 +218,27 @@ local function SetupPet(pet, petData)
     end);
 end
 
+local function StopCombat()
+    if(activePet == nil) then return end
+    if(activeTarget == nil) then return end
+    Shrink();
+    petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+    activeTarget = nil;
+
+    toldServer = false;
+    if(attackTrack ~= nil) then
+        attackTrack:Stop();
+    end
+
+    if(targetHitAnimation ~= nil) then
+        targetHitAnimation:Stop();
+    end
+
+    setPetAnimation:FireServer(nil);
+end
+
 function PetManager.SetTarget(target)
+    StopCombat();
     activeTarget = target;
 end
 
@@ -213,14 +267,6 @@ function PetManager.IsPetActive()
     return activePet ~= nil;
 end
 
-local function StopCombat()
-    if(activePet == nil) then return end
-    if(activeTarget == nil) then return end
-    Shrink();
-    petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
-    activeTarget = nil;
-    toldServer = false;
-end
 
 cancelCombatButton.MouseButton1Click:Connect(StopCombat);
 

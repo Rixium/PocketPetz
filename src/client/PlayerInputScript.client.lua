@@ -52,7 +52,6 @@ function DoInput(pos)
     end
 
     local tags = collectionService:GetTags(result);
-
     for i, v in pairs(tags) do
         local func = tagFunctions[v];
 
