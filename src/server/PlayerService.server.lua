@@ -8,6 +8,9 @@ local physicsService = game:GetService("PhysicsService");
 
 local currentEventTitle = "AlphaStar";
 
+local attackingPets = {};
+local activePets = {};
+
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
 	moneyManager.PlayerJoined(player);
@@ -31,6 +34,15 @@ end
 function OnPlayerLeaving(player)
 	playerTracker.Logout(player);
 	playerTracker.RemovePlayer(player);
+
+	
+	local playersActivePet = activePets[player.UserId];
+
+	if(playersActivePet ~= nil) then
+		playersActivePet:Destroy();
+	end
+
+	attackingPets[player.UserId] = nil;
 end
 
 
@@ -56,8 +68,6 @@ getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local runService = game:GetService("RunService");
-local attackingPets = {};
-local activePets = {};
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	attackingPets[player.UserId] = {
