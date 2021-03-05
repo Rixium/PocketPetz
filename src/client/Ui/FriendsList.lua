@@ -110,7 +110,7 @@ function FriendsList.ShowFriends()
 
     -- Sort the list depending on whether they're playing PocketPetz
     table.sort(playerFriends, function(a, b) 
-        return a.GameId == game.GameId;
+        return a.GameId == game.GameId and b.GameId ~= game.GameId;
     end);
 
     -- Remove the old stuff from the friends list.
