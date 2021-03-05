@@ -91,12 +91,10 @@ local function MoveTo(targetCFrame, shouldTeleport)
 
             setPetAnimation:FireServer(activePet.Animations.Walk);
         end
-    else
-        if(track ~= nil) then
-            animationPlaying = false;
-            track:Stop();
-            setPetAnimation:FireServer(nil);
-        end
+    elseif (track ~= nil and animationPlaying) then
+        animationPlaying = false;
+        track:Stop();
+        setPetAnimation:FireServer(nil);
     end
 end
 
@@ -170,7 +168,7 @@ local function UpdatePet()
     if(activeTarget ~= nil) then
         DoCombat();
     else
-        MoveTo(players.LocalPlayer.Character:GetPrimaryPartCFrame(), true);
+        MoveTo(players.LocalPlayer.Character:WaitForChild("RightFoot").CFrame, true);
     end
 end
 
