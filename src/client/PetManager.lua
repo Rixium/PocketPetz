@@ -74,7 +74,9 @@ local function MoveTo(targetCFrame, shouldTeleport)
         if((newCframe.p - targetCframe.p).magnitude < 5) then
             currentWaypoint = nil;
         end
-    elseif waypoints ~= nil and #waypoints ~= 0 then
+    end
+    
+    if waypoints ~= nil and #waypoints ~= 0 and currentWaypoint == nil then
         currentWaypoint = waypoints[1];
         table.remove(waypoints, 1);
     end
