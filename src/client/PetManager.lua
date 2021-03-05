@@ -8,6 +8,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
+local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
@@ -67,7 +68,7 @@ local function MoveTo(targetCFrame, shouldTeleport)
         local targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,0,3))
         
         local dir = CFrame.new(model:GetPrimaryPartCFrame().Position, targetCframe.Position).lookVector;
-	    local newCframe = model:GetPrimaryPartCFrame() + (dir * 0.2);
+	    local newCframe = model:GetPrimaryPartCFrame() + (dir * 0.25);
         model:SetPrimaryPartCFrame(newCframe)
 
         if((newCframe.p - targetCframe.p).magnitude < 5) then
@@ -81,19 +82,20 @@ local function MoveTo(targetCFrame, shouldTeleport)
     if(currentWaypoint ~= nil) then 
         if not animationPlaying then
             animationPlaying = true;
-            local animation = Instance.new("Animation")
-            animation.AnimationId = "rbxassetid://" .. 6478676762
-            
-            local animator = activePet.Humanoid:FindFirstChildOfClass("Animator")
+
+            local animator = activePet:WaitForChild("Humanoid"):WaitForChild("Animator")
             if animator then
-                track = animator:LoadAnimation(animation)
+                track = animator:LoadAnimation(activePet.Animations.Walk)
                 track:Play()
 		    end
+
+            setPetAnimation:FireServer(activePet.Animations.Walk);
         end
     else
         if(track ~= nil) then
             animationPlaying = false;
             track:Stop();
+            setPetAnimation:FireServer(nil);
         end
     end
 end

@@ -56,10 +56,11 @@ getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local runService = game:GetService("RunService");
+local attackingPets = {};
 local activePets = {};
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
-	activePets[player.UserId] = {
+	attackingPets[player.UserId] = {
 		Player = player,
 		PetModel = pet,
 		PetData = petData,
@@ -67,9 +68,30 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	};
 end);
 
+local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
+setPetAnimation.OnServerEvent:Connect(function(player, animation)
+	local playerPet = activePets[player.UserId];
+	if(playerPet == nil) then return end
+	
+	if(animation == nil) then
+		local humanoid = playerPet:WaitForChild("Humanoid");
+		for _, a in pairs(humanoid:GetPlayingAnimationTracks()) do
+			a:Stop();
+		end
+		return;
+	end
+
+	local animator = playerPet:WaitForChild("Humanoid"):WaitForChild("Animator")
+	if animator then
+		track = animator:LoadAnimation(animation)
+		track:Play()
+	end
+end);
+
+
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 petStopAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
-	activePets[player.UserId] = nil;
+	attackingPets[player.UserId] = nil;
 end);
 
 local insertService = game:GetService("InsertService");
@@ -82,6 +104,11 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 
 	if(playerItem == nil) then
 		return;
+	end
+
+	if(activePets[player.UserId] ~= nil) then
+		local playersCurrentPet = activePets[player.UserId];
+		playersCurrentPet:Destroy();
 	end
 
 	local model = insertService:LoadAsset(item.ItemData.ModelId);
@@ -100,11 +127,13 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 
 	model:Destroy();
 
-	local animator = Instance.new("Animator")
+	local animator = Instance.new("Animator");
 	animator.Parent = toSend:WaitForChild("Humanoid");
 
 	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
 	
+	activePets[player.UserId] = toSend;
+
 	playerEquipped:FireClient(player, toSend, item);
 end);
 
@@ -112,7 +141,7 @@ spawn(function()
 	while true do
 		wait(1)
 		
-		for _, pet in pairs(activePets) do
+		for _, pet in pairs(attackingPets) do
 			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, 5);
 		end
 	end
