@@ -16,16 +16,13 @@ function OnPlayerJoined(player)
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);
 
-
-	local char = player.Character or player.CharacterAdded:Wait();
-
+	local char = players.LocalPlayer.Character or players.LocalPlayer.CharacterAdded:Wait();
 	for i,v in pairs(char:GetChildren()) do
 		if v:IsA("BasePart") then
 			physicsService:SetPartCollisionGroup(v, "Players");
 		end
 	end
-
-
+	
 	-- DATABASE CLEARUP
 	-- itemService.ClearItems(player);
 	-- petService.AddExperience(player, "123", 10);

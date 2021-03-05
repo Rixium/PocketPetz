@@ -69,3 +69,12 @@ userInputService.InputEnded:Connect(function(input, gameProcessed)
 		DoInput(input.Position);
     end
 end);
+
+local physicsService = game:GetService("PhysicsService");
+local char = players.LocalPlayer.Character or players.LocalPlayer.CharacterAdded:Wait();
+
+for i,v in pairs(char:GetChildren()) do
+    if v:IsA("BasePart") then
+        physicsService:SetPartCollisionGroup(v, "Players");
+    end
+end
