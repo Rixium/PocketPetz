@@ -16,7 +16,7 @@ function OnPlayerJoined(player)
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);
 
-	local char = players.LocalPlayer.Character or players.LocalPlayer.CharacterAdded:Wait();
+	local char = player.Character or player.CharacterAdded:Wait();
 	for i,v in pairs(char:GetChildren()) do
 		if v:IsA("BasePart") then
 			physicsService:SetPartCollisionGroup(v, "Players");

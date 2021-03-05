@@ -11,6 +11,7 @@ local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEv
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
+local physicsService = game:GetService("PhysicsService");
 
 -- Variables
 local board = nil;
@@ -47,15 +48,11 @@ end
 
  -- End of UI Stuff
 
-local function MoveTo(targetCFrame, shouldTeleport) 
-    local bodyPos = activePet.PrimaryPart.BodyPosition;
-    local bodyGyro = activePet.PrimaryPart.BodyGyro;
-
+local function MoveTo(targetCFrame, shouldTeleport)
     local distance = (targetCFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
 
     if(shouldTeleport) then
         if(distance > 30) then
-            bodyPos.Position = targetCFrame.p;
             activePet:SetPrimaryPartCFrame(targetCFrame:ToWorldSpace(CFrame.new(3,1,3)));
         end
     end
@@ -67,11 +64,11 @@ local function MoveTo(targetCFrame, shouldTeleport)
         local path = pathfindingService:FindPathAsync(petCframe, targetCFrame.p);
         waypoints = path:GetWaypoints()
     elseif currentWaypoint ~= nil then
-        local targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,1,0))
-        local newCframe = model:GetPrimaryPartCFrame():Lerp(targetCframe, 0.02)
+        local targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,0,3))
+        
+        local dir = CFrame.new(model:GetPrimaryPartCFrame().Position, targetCframe.Position).lookVector;
+	    local newCframe = model:GetPrimaryPartCFrame() + (dir * 0.2);
         model:SetPrimaryPartCFrame(newCframe)
-
-        bodyPos.Position = newCframe.p;
 
         if((newCframe.p - targetCframe.p).magnitude < 5) then
             currentWaypoint = nil;
@@ -194,20 +191,12 @@ function PetManager.SetActivePet(pet, petData)
     activePet = pet;
     activePetData = petData;
 
+    
+	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
     activePet:SetPrimaryPartCFrame(players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)));
 
     print("Player is now using " .. petData.ItemData.Name);
     SetupPet(pet, petData);
-
-    local bodyPos = Instance.new("BodyPosition", activePet.PrimaryPart);
-    bodyPos.MaxForce = Vector3.new(math.huge, 50, math.huge);
-
-    local physProperties = PhysicalProperties.new(3, 0, 0, 1, 1)
-    activePet.PrimaryPart.CustomPhysicalProperties = physProperties
-
-    local bodyGyro = Instance.new("BodyGyro", activePet.PrimaryPart);
-    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
-    
 end
 
 function PetManager.GetActivePet()
