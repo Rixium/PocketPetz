@@ -142,6 +142,10 @@ end
 
 local function SetupPet(pet, petData)
     ShowXpAbove(pet, petData);
+    
+    if(runner ~= null) then 
+        runner:Disconnect();
+    end
 
     runner = game:GetService("RunService").RenderStepped:Connect(UpdatePet);
     petGotExperience.OnClientEvent:Connect(function(pet) 
