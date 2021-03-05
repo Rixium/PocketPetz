@@ -3,6 +3,7 @@ local PetManager = {};
 -- Imports
 local players = game:GetService("Players");
 local pathfindingService = game:GetService("PathfindingService");
+local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
@@ -19,6 +20,8 @@ local activeTarget = nil;
 local runner = nil;
 local toldServer = false;
 local waypoints = {};
+local animationPlaying = false;
+local track = nil;
 
 -- Functions
 
@@ -44,18 +47,31 @@ end
 
  -- End of UI Stuff
 
-local function MoveTo(targetCFrame) 
+local function MoveTo(targetCFrame, shouldTeleport) 
+    local bodyPos = activePet.PrimaryPart.BodyPosition;
+    local bodyGyro = activePet.PrimaryPart.BodyGyro;
+
+    local distance = (targetCFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
+
+    if(shouldTeleport) then
+        if(distance > 30) then
+            bodyPos.Position = targetCFrame.p;
+            activePet:SetPrimaryPartCFrame(targetCFrame:ToWorldSpace(CFrame.new(3,1,3)));
+        end
+    end
+
     local model = activePet;
+    local petCframe = activePet:GetPrimaryPartCFrame().p;
 
-    local petCframe =  model:GetPrimaryPartCFrame().p;
-
-    if((targetCFrame.p - petCframe).magnitude > 10 and (waypoints == nil or #waypoints == 0)) then
+    if(distance > 10 and (#waypoints == 0)) then
         local path = pathfindingService:FindPathAsync(petCframe, targetCFrame.p);
         waypoints = path:GetWaypoints()
     elseif currentWaypoint ~= nil then
-        targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,1,0))
+        local targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,1,0))
         local newCframe = model:GetPrimaryPartCFrame():Lerp(targetCframe, 0.02)
         model:SetPrimaryPartCFrame(newCframe)
+
+        bodyPos.Position = newCframe.p;
 
         if((newCframe.p - targetCframe.p).magnitude < 5) then
             currentWaypoint = nil;
@@ -63,6 +79,21 @@ local function MoveTo(targetCFrame)
     elseif waypoints ~= nil and #waypoints ~= 0 then
         currentWaypoint = waypoints[1];
         table.remove(waypoints, 1);
+    end
+
+    if(currentWaypoint ~= nil) then 
+        if not animationPlaying then
+            animationPlaying = true;
+            local animation = Instance.new("Animation")
+            animation.AnimationId = "rbxassetid://" .. 6478676762
+            track = activePet.Humanoid:LoadAnimation(animation);
+            track:Play();
+        end
+    else
+        if(track ~= nil) then
+            animationPlaying = false;
+            track:Stop();
+        end
     end
 end
 
@@ -107,7 +138,7 @@ local function DoCombat()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
 
-    MoveTo(activeTarget.CFrame);
+    MoveTo(activeTarget.CFrame:ToWorldSpace(CFrame.new(0.3, 0.3, 0.3)));
     AttackTarget();
 end
 
@@ -136,18 +167,15 @@ local function UpdatePet()
     if(activeTarget ~= nil) then
         DoCombat();
     else
-        MoveTo(players.LocalPlayer.Character:GetPrimaryPartCFrame());
+        MoveTo(players.LocalPlayer.Character:GetPrimaryPartCFrame(), true);
     end
 end
 
 local function SetupPet(pet, petData)
     ShowXpAbove(pet, petData);
-    
-    if(runner ~= null) then 
-        runner:Disconnect();
-    end
 
     runner = game:GetService("RunService").RenderStepped:Connect(UpdatePet);
+
     petGotExperience.OnClientEvent:Connect(function(pet) 
         UpdateXpBar(pet);
     end);
@@ -158,11 +186,28 @@ function PetManager.SetTarget(target)
 end
 
 function PetManager.SetActivePet(pet, petData)
+    if(runner ~= null) then
+        activePet:Destroy();
+        runner:Disconnect();
+    end
+
     activePet = pet;
     activePetData = petData;
 
+    activePet:SetPrimaryPartCFrame(players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)));
+
     print("Player is now using " .. petData.ItemData.Name);
     SetupPet(pet, petData);
+
+    local bodyPos = Instance.new("BodyPosition", activePet.PrimaryPart);
+    bodyPos.MaxForce = Vector3.new(math.huge, 50, math.huge);
+
+    local physProperties = PhysicalProperties.new(3, 0, 0, 1, 1)
+    activePet.PrimaryPart.CustomPhysicalProperties = physProperties
+
+    local bodyGyro = Instance.new("BodyGyro", activePet.PrimaryPart);
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
+    
 end
 
 function PetManager.GetActivePet()

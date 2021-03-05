@@ -91,7 +91,9 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	
     local toSend = model:FindFirstChildWhichIsA("Model")
 
+	toSend.PrimaryPart = toSend.Root;
 	toSend.Parent = workspace;
+
 	toSend.PrimaryPart:SetNetworkOwner(player);
 
 	model:Destroy();
