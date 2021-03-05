@@ -83,8 +83,12 @@ local function MoveTo(targetCFrame, shouldTeleport)
             animationPlaying = true;
             local animation = Instance.new("Animation")
             animation.AnimationId = "rbxassetid://" .. 6478676762
-            track = activePet.Humanoid:LoadAnimation(animation);
-            track:Play();
+            
+            local animator = activePet.Humanoid:FindFirstChildOfClass("Animator")
+            if animator then
+                track = animator:LoadAnimation(animation)
+                track:Play()
+		    end
         end
     else
         if(track ~= nil) then

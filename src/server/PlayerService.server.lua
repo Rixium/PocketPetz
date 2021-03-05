@@ -91,9 +91,17 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	toSend.PrimaryPart = toSend.Root;
 	toSend.Parent = workspace;
 
-	toSend.PrimaryPart:SetNetworkOwner(player);
+	for _, child in pairs(toSend:GetChildren()) do
+		if child:IsA("BasePart") then
+			child:SetNetworkOwner(player);
+		end
+	end
+	
 
 	model:Destroy();
+
+	local animator = Instance.new("Animator")
+	animator.Parent = toSend:WaitForChild("Humanoid");
 
 	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
 	
