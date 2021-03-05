@@ -8,7 +8,8 @@ local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
-local stopCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatButton");
+local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
+local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
 
 -- Variables
 local board = nil;
@@ -20,6 +21,29 @@ local toldServer = false;
 local waypoints = {};
 
 -- Functions
+
+-- UI Stuff
+local TweenService = game:GetService("TweenService")
+local GUI = stopCombatFrame;
+
+local function Shrink()
+	local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(GUI, tweenInfo, {Size=UDim2.new(0, 0, 0, 0)})
+	tween:Play()
+    tween.Completed:Wait();
+    stopCombatFrame.Visible = false;
+end
+
+local function Grow()
+    stopCombatFrame.Visible = true;
+	local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+	local tween = TweenService:Create(GUI, tweenInfo, {Size=UDim2.new(0.1, 0, 0.1, 0)})
+	tween:Play()
+    tween.Completed:Wait();
+end
+
+ -- End of UI Stuff
+
 local function MoveTo(targetCFrame) 
     local model = activePet;
 
@@ -49,7 +73,7 @@ local function AttackTarget()
     if(toldServer) then return end
 
     toldServer = true;
-    stopCombatButton.Visible = true;
+    Grow();
     petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 end
 
@@ -148,12 +172,12 @@ end
 local function StopCombat()
     if(activePet == nil) then return end
     if(activeTarget == nil) then return end
-    stopCombatButton.Visible = false;
+    Shrink();
     petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
     activeTarget = nil;
     toldServer = false;
 end
 
-stopCombatButton.MouseButton1Click:Connect(StopCombat);
+cancelCombatButton.MouseButton1Click:Connect(StopCombat);
 
 return PetManager;
