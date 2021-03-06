@@ -19,6 +19,7 @@ local board = nil;
 local activePet = nil;
 local activePetData = nil;
 local activeTarget = nil;
+local nextTarget = nil;
 local runner = nil;
 local toldServer = false;
 local waypoints = {};
@@ -66,27 +67,13 @@ local function MoveTo(targetCFrame, shouldTeleport)
     local model = activePet;
     local petCframe = activePet:GetPrimaryPartCFrame().p;
 
-    if(distance > 10 and (#waypoints == 0)) then
-        local path = pathfindingService:FindPathAsync(petCframe, targetCFrame.p);
-        waypoints = path:GetWaypoints()
-    elseif currentWaypoint ~= nil then
+    if(distance > 5) then
         local targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,0,3))
         
         local dir = CFrame.new(model:GetPrimaryPartCFrame().Position, targetCframe.Position).lookVector;
 	    local newCframe = model:GetPrimaryPartCFrame() + (dir * 0.25);
         model:SetPrimaryPartCFrame(newCframe)
 
-        if((newCframe.p - targetCframe.p).magnitude < 5) then
-            currentWaypoint = nil;
-        end
-    end
-    
-    if waypoints ~= nil and #waypoints ~= 0 and currentWaypoint == nil then
-        currentWaypoint = waypoints[1];
-        table.remove(waypoints, 1);
-    end
-
-    if(currentWaypoint ~= nil) then 
         if not animationPlaying then
             animationPlaying = true;
 
@@ -221,11 +208,7 @@ end
 local function StopCombat()
     if(activePet == nil) then return end
     if(activeTarget == nil) then return end
-    Shrink();
-    petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
-    activeTarget = nil;
 
-    toldServer = false;
     if(attackTrack ~= nil) then
         attackTrack:Stop();
     end
@@ -234,12 +217,25 @@ local function StopCombat()
         targetHitAnimation:Stop();
     end
 
+    Shrink();
+    petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+    activeTarget = nil;
+
+    toldServer = false;
+
     setPetAnimation:FireServer(nil);
 end
 
 function PetManager.SetTarget(target)
+    if(activeTarget == target) then return end
+    if(nextTarget == target) then return end
+
+    nextTarget = target;
+    
     StopCombat();
+
     activeTarget = target;
+    nextTarget = nil;
 end
 
 function PetManager.SetActivePet(pet, petData)
