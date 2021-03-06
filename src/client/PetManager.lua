@@ -8,6 +8,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
+local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
@@ -26,7 +27,10 @@ local animationPlaying = false;
 local track = nil;
 local attackTrack = nil;
 local targetHitAnimation = nil;
+local requesting = false;
 local petSpawning = false;
+local damages = {};
+local RNG = Random.new()
 
 local sound = nil;
 
@@ -129,6 +133,19 @@ local function AttackTarget()
         setPetAnimation:FireServer(animation);
         attackTrack.KeyframeReached:Connect(function(keyframeName)
             if(keyframeName == "Hit") then
+                    
+                local damageGUI = replicatedStorage.DamageBillboard:clone();
+                damageGUI.Frame.Damage.Text = "10";
+                damageGUI.Parent = workspace;
+                damageGUI.Adornee = activeTarget.Parent;
+
+                damageGUI.ExtentsOffset = Vector3.new(RNG:NextNumber(-1.0, 1.0), 0, RNG:NextNumber(-1.0, 1.0));
+
+                table.insert(damages, {
+                    GUI = damageGUI,
+                    Time = 3
+                });
+
                 targetHitAnimation:Play();
                 sound:Play();
             end
@@ -194,13 +211,26 @@ local function CheckForCleanup()
     end
 end
 
-local function UpdatePet()
+local function UpdatePet(delta)
     CheckForCleanup();
 
     if(activeTarget ~= nil) then
         DoCombat();
     else
         MoveTo(players.LocalPlayer.Character:WaitForChild("RightFoot").CFrame, true);
+    end
+
+    for _, damageGUI in pairs(damages) do
+        damageGUI.Time = damageGUI.Time - delta;
+        damageGUI.GUI.ExtentsOffset = Vector3.new(damageGUI.GUI.ExtentsOffset.X, damageGUI.GUI.ExtentsOffset.Y + 2 * delta, damageGUI.GUI.ExtentsOffset.Z);
+        damageGUI.GUI.Frame.ImageLabel.ImageTransparency = damageGUI.GUI.Frame.ImageLabel.ImageTransparency + delta;
+        damageGUI.GUI.Frame.Damage.TextTransparency = damageGUI.GUI.Frame.Damage.TextTransparency + delta;
+    end
+
+    for i, damageGUI in pairs(damages) do
+        if(damageGUI.Time <= 0) then
+            table.remove(damages, i);
+        end
     end
 end
 
@@ -255,11 +285,19 @@ end
 function PetManager.SetTarget(target)
     if(activeTarget == target) then return end
     if(nextTarget == target) then return end
+    if(requesting) then return end
+
+    -- Make sure that the player is trying to attack a valid target, also stores this data
+    -- server side for subsequent requests :)
+    requesting = true;
+    local targetIsValid = petRequestAttack:InvokeServer(target);
+    requesting = false;
+    
+    if not targetIsValid then return end
 
     nextTarget = target;
-    
-    StopCombat();
 
+    StopCombat();
     activeTarget = target;
     nextTarget = nil;
 end

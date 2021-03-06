@@ -5,11 +5,17 @@ local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local petService = require(serverScriptService.Server.Services.PetService);
 local physicsService = game:GetService("PhysicsService");
+local replicatedStorage = game:GetService("ReplicatedStorage");
 
 local currentEventTitle = "AlphaStar";
 
 local attackingPets = {};
 local activePets = {};
+
+local attackables = {};
+attackables[1] = {
+	ExperienceAward = 1
+}
 
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
@@ -70,11 +76,12 @@ local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local runService = game:GetService("RunService");
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
+	local attackbleId = target:GetAttribute("Id");
 	attackingPets[player.UserId] = {
 		Player = player,
 		PetModel = pet,
 		PetData = petData,
-		Target = target
+		AttackableData = attackables[attackbleId]
 	};
 end);
 
@@ -147,12 +154,17 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	playerEquipped:FireClient(player, toSend, item);
 end);
 
+local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
+petRequestAttack.OnServerInvoke = function(player, target) 
+	return true;
+end
+
 spawn(function()
 	while true do
 		wait(1)
 		
 		for _, pet in pairs(attackingPets) do
-			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, 5);
+			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, pet.AttackableData.ExperienceAward);
 		end
 	end
 end);
