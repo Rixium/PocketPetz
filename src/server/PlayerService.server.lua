@@ -155,7 +155,17 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 end);
 
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
-petRequestAttack.OnServerInvoke = function(player, target) 
+petRequestAttack.OnServerInvoke = function(player, target)
+	local playersPet = activePets[player.UserId]
+
+	if(playersPet == nil) then 
+		return false;
+	end
+
+	if((player.Character:GetPrimaryPartCFrame().p - target.CFrame.p).magnitude > 40) then
+		return false;
+	end
+
 	return true;
 end
 
