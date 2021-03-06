@@ -6,6 +6,7 @@ local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager)
 local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProfile);
 local friendsList = require(players.LocalPlayer.PlayerScripts.Client.Ui.FriendsList);
 local interactor = require(players.LocalPlayer.PlayerScripts.Client.PlayerInteractor);
+local tweenService = game:GetService("TweenService");
 
 -- Variables
 local player = players.LocalPlayer
@@ -57,6 +58,21 @@ userInputService.InputEnded:Connect(function(input, gameProcessed)
 end);
 
 mainGui.Buttons.FriendsButton.FriendsButton.MouseButton1Click:Connect(function()
-    friendsListGUI.Enabled = not friendsListGUI.Enabled;
-    friendsList.ShowFriends();
+
+    if(friendsListGUI.Enabled) then
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(friendsListGUI.FriendsFrame, tweenInfo, {Position=UDim2.new(0.5, 0, 1.5, 0)})
+        tween:Play()
+        tween.Completed:Wait();
+        friendsListGUI.Enabled = false;
+    else
+        friendsListGUI.Enabled = true;
+        
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(friendsListGUI.FriendsFrame, tweenInfo, {Position=UDim2.new(0.5, 0, 0.5, 0)})
+        tween:Play()
+        tween.Completed:Wait();
+
+        friendsList.ShowFriends();
+    end
 end);

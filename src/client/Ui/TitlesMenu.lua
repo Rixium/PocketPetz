@@ -8,6 +8,7 @@ local getActiveTitleRequest = replicatedStorage.Common.Events:WaitForChild("GetA
 local setActiveTitle = replicatedStorage.Common.Events:WaitForChild("SetActiveTitle");
 local gotTitleTemplate = replicatedStorage:WaitForChild("GotTitleTemplate");
 local buyTitleTemplate = replicatedStorage:WaitForChild("BuyTitleTemplate");
+local tweenService = game:GetService("TweenService");
 local lockedTitleTemplate = replicatedStorage:WaitForChild("LockedTitleTemplate");
 
 local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
@@ -109,9 +110,21 @@ end
 
 function TitlesMenu.Toggle()
     if (titlesGUI.Enabled) then
+
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(titlesGUI.TitlesFrame, tweenInfo, {Position=UDim2.new(0.5, 0, -0.5, 0)})
+        tween:Play()
+        tween.Completed:Wait();
+
         titlesGUI.Enabled = false;
     else
         titlesGUI.Enabled = true;
+
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(titlesGUI.TitlesFrame, tweenInfo, {Position=UDim2.new(0.5, 0, 0.5, 0)})
+        tween:Play()
+        tween.Completed:Wait();
+
         TitlesMenu.SetupTitles();
     end
 end

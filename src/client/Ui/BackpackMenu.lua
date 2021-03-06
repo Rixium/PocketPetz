@@ -96,7 +96,6 @@ function BackpackMenu.ShowInventory()
 end
 
 function BackpackMenu.Toggle()
-    replicatedStorage.Slide:Play();
     if (inventoryGUI.Enabled) then
         local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
         local tween = tweenService:Create(inventoryGUI.BackpackFrame, tweenInfo, {Position=UDim2.new(-0.5, 0, 0.5, 0)})
