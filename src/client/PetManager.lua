@@ -22,7 +22,6 @@ local activeTarget = nil;
 local nextTarget = nil;
 local runner = nil;
 local toldServer = false;
-local waypoints = {};
 local animationPlaying = false;
 local track = nil;
 local attackTrack = nil;
@@ -95,12 +94,14 @@ end
 local function AttackTarget()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
-    if(waypoints ~= nil and #waypoints > 0) then return end
     if(toldServer) then return end
+
+    local distance = (activeTarget.CFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
+
+    if(distance > 10) then return end
 
     toldServer = true;
     Grow();
-    petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 
     local animator = activeTarget.Parent:WaitForChild("Humanoid"):WaitForChild("Animator");
     if animator then
@@ -122,6 +123,8 @@ local function AttackTarget()
         end);
         attackTrack:Play();
     end
+
+    petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 end
 
 local function UpdateXpBar(itemData)
