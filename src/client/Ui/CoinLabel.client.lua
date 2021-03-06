@@ -5,8 +5,11 @@ local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiMan
 
 local function UpdateCoins(value)
     local mainGui = uiManager.GetUi("Main GUI");
-    local coinLabel = workspaceHelper.GetDescendantByName(mainGui, "CoinCount");
-    coinLabel.Text = value;
+    local coinBackground = mainGui.CoinFrame.CoinBackground;
+    local coinCountFront = coinBackground.CoinCountFront;
+    local coinCountBack = coinBackground.CoinCountBack;
+    coinCountBack.Text = value;
+    coinCountFront.Text = value;
 end
 
 local coinAmount = replicatedStorage.Common.Events.CoinAmount;

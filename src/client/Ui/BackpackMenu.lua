@@ -64,8 +64,8 @@ local function AddItem(itemToAdd)
         debounce = false;
     end)
 
-    item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=150&h=150";
-    item.ThumbBack.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=150&h=150";
+    item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
     table.insert(BackpackMenu.Items, item);
 end
 
@@ -96,11 +96,19 @@ function BackpackMenu.ShowInventory()
 end
 
 function BackpackMenu.Toggle()
+    replicatedStorage.Slide:Play();
     if (inventoryGUI.Enabled) then
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(inventoryGUI.BackpackFrame, tweenInfo, {Position=UDim2.new(-0.5, 0, 0.5, 0)})
+        tween:Play()
+        tween.Completed:Wait();
         inventoryGUI.Enabled = false;
     else
         BackpackMenu.ShowInventory();
         inventoryGUI.Enabled = true;
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(inventoryGUI.BackpackFrame, tweenInfo, {Position=UDim2.new(0, 0, 0.5, 0)})
+        tween:Play()
     end
 end
 
