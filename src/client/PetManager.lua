@@ -87,6 +87,7 @@ local function MoveTo(targetCFrame, shouldTeleport)
     elseif (track ~= nil and animationPlaying) then
         animationPlaying = false;
         track:Stop();
+        track = nil;
         setPetAnimation:FireServer(nil);
     end
 end
@@ -110,9 +111,7 @@ local function AttackTarget()
 
     local petAnimator = activePet:WaitForChild("Humanoid"):WaitForChild("Animator")
     if petAnimator then
-        local animation = Instance.new("Animation");
-        animation.AnimationId = "rbxassetid://" .. 6479792403;
-        attackTrack = petAnimator:LoadAnimation(animation);
+        attackTrack = petAnimator:LoadAnimation(activePet.Animations.Attack);
         attackTrack.Looped = true;
         setPetAnimation:FireServer(animation);
         attackTrack.KeyframeReached:Connect(function(keyframeName)
