@@ -84,14 +84,14 @@ setPetAnimation.OnServerEvent:Connect(function(player, animation)
 	if(playerPet == nil) then return end
 	
 	if(animation == nil) then
-		local humanoid = playerPet:WaitForChild("Humanoid");
+		local humanoid = playerPet:WaitForChild("Humanoid", 1000);
 		for _, a in pairs(humanoid:GetPlayingAnimationTracks()) do
 			a:Stop();
 		end
 		return;
 	end
 
-	local animator = playerPet:WaitForChild("Humanoid"):WaitForChild("Animator")
+	local animator = playerPet:WaitForChild("Humanoid", 1000):WaitForChild("Animator", 1000)
 	if animator then
 		track = animator:LoadAnimation(animation)
 		track:Play()

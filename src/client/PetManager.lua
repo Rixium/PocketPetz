@@ -26,6 +26,7 @@ local animationPlaying = false;
 local track = nil;
 local attackTrack = nil;
 local targetHitAnimation = nil;
+local petSpawning = false;
 
 local sound = nil;
 
@@ -55,6 +56,14 @@ end
  -- End of UI Stuff
 
 local function MoveTo(targetCFrame, shouldTeleport)
+    if(activePet == nil) then return end
+    if(nextPet ~= nil) then return end
+    if(petSpawning) then return end
+
+    if(activePet.Parent == nil) then
+        activePet.AncestryChanged:wait()
+    end
+
     local distance = (targetCFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
 
     if(shouldTeleport) then
@@ -76,13 +85,13 @@ local function MoveTo(targetCFrame, shouldTeleport)
         if not animationPlaying then
             animationPlaying = true;
 
-            local animator = activePet:WaitForChild("Humanoid"):WaitForChild("Animator")
+            local animator = activePet:WaitForChild("Humanoid", 1):WaitForChild("Animator", 1)
             if animator then
                 track = animator:LoadAnimation(activePet.Animations.Walk)
                 track:Play()
+                setPetAnimation:FireServer(activePet.Animations.Walk);
 		    end
 
-            setPetAnimation:FireServer(activePet.Animations.Walk);
         end
     elseif (track ~= nil and animationPlaying) then
         animationPlaying = false;
@@ -96,6 +105,10 @@ local function AttackTarget()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
     if(toldServer) then return end
+
+    if(activePet.Parent == nil) then
+        activePet.AncestryChanged:wait()
+    end
 
     local distance = (activeTarget.CFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
 
@@ -127,6 +140,8 @@ local function AttackTarget()
 end
 
 local function UpdateXpBar(itemData)
+    if(activePetData == nil) then return end
+
     local width = itemData.Data.CurrentExperience / activePetData.ItemData.ExperienceToLevel;
     
     if(width > 1) then
@@ -205,6 +220,15 @@ local function SetupPet(pet, petData)
     petGotExperience.OnClientEvent:Connect(function(pet) 
         UpdateXpBar(pet);
     end);
+    
+    
+    activePetData = petData;
+    activePet = pet;
+    
+	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
+    activePet:SetPrimaryPartCFrame(players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)));
+
+    petSpawning = false;
 end
 
 local function StopCombat()
@@ -241,19 +265,15 @@ function PetManager.SetTarget(target)
 end
 
 function PetManager.SetActivePet(pet, petData)
+    petSpawning = true;
+
     if(runner ~= null) then
         activePet:Destroy();
         runner:Disconnect();
     end
 
-    activePet = pet;
-    activePetData = petData;
-
-    
-	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
-    activePet:SetPrimaryPartCFrame(players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)));
-
     print("Player is now using " .. petData.ItemData.Name);
+
     SetupPet(pet, petData);
 end
 
