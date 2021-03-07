@@ -8,6 +8,7 @@ local npcs = require(replicatedStorage.Common.Data.NPCs);
 local animation = require(game.Players.LocalPlayer.PlayerScripts.Client.Animators.Animation);
 local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local playerInteractor = require(game.Players.LocalPlayer.PlayerScripts.Client.PlayerInteractor);
+local TweenService = game:GetService("TweenService");
 
 function GiveNpcAboveHeadGUI(npc, npcData)
     local board = npcAboveHeadGUI:Clone()
@@ -54,8 +55,9 @@ function NpcCreator.New(placement)
     local interactGUI = replicatedStorage["Interact GUI"]:Clone();
     interactGUI.Adornee = cloned.HumanoidRootPart;
     interactGUI.Parent = game.Players.LocalPlayer.PlayerGui;
+    local button = interactGUI:WaitForChild("ImageButton");
 
-    interactGUI.ImageButton.MouseButton1Click:Connect(function ()
+    button.MouseButton1Click:Connect(function ()
         interactGUI.Enabled = false;
         playerInteractor.SetInteractable(cloned);
         playerInteractor.Interact();
