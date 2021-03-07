@@ -11,6 +11,7 @@ local currentEventTitle = "AlphaStar";
 
 local attackingPets = {};
 local activePets = {};
+local currentTargets = {};
 
 local attackables = {};
 attackables[1] = {
@@ -33,7 +34,7 @@ function OnPlayerJoined(player)
 	end
 	
 	-- DATABASE CLEARUP
-	-- itemService.ClearItems(player);
+	itemService.ClearItems(player);
 	-- petService.AddExperience(player, "123", 10);
 end
 
@@ -72,7 +73,7 @@ setActiveTitle.OnServerInvoke = titleService.SetActiveTitle;
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 
-local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
+local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
 local runService = game:GetService("RunService");
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
@@ -80,8 +81,7 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	attackingPets[player.UserId] = {
 		Player = player,
 		PetModel = pet,
-		PetData = petData,
-		AttackableData = attackables[attackbleId]
+		PetData = petData
 	};
 end);
 
@@ -166,6 +166,8 @@ petRequestAttack.OnServerInvoke = function(player, target)
 		return false;
 	end
 
+	currentTargets[player.UserId] = target;
+
 	return true;
 end
 
@@ -174,7 +176,11 @@ spawn(function()
 		wait(1)
 		
 		for _, pet in pairs(attackingPets) do
-			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, pet.AttackableData.ExperienceAward);
+			local target = currentTargets[pet.Player.UserId];
+			if(target == nil) then continue end
+			local targetData = attackables[target:GetAttribute("Id")];
+			if(targetData == nil) then continue end
+			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, targetData.ExperienceAward);
 		end
 	end
 end);

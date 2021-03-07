@@ -16,13 +16,19 @@ local itemsData = "Items";
 
 local ItemPlayerData = {
     [1] = {
-        CurrentExperience = 0
+        CurrentExperience = 0,
+        CurrentLevel = 1,
+        Nickname = ""
     },
     [2] = {
-        CurrentExperience = 0
+        CurrentExperience = 0,
+        CurrentLevel = 1,
+        Nickname = ""
     },
     [3] = {
-        CurrentExperience = 0
+        CurrentExperience = 0,
+        CurrentLevel = 1,
+        Nickname = ""
     }
 }
 

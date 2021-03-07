@@ -7,10 +7,20 @@ local itemsStore = "Items";
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
+local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 
 local function LevelUpPet(player, pet, itemData)
     local remaining = pet.Data.CurrentExperience - itemData.ExperienceToLevel;
     pet.Data.CurrentExperience = remaining;
+    pet.Data.CurrentLevel = pet.Data.CurrentLevel + 1;
+
+    if(pet.Data.CurrentLevel == itemData.LevelToEvolve) then
+        pet.Data.CurrentExperience = 0;
+
+        local nextPetId = itemData.EvolvesTo;
+        pet.ItemId = nextPetId;
+        petEvolved:FireClient(player);
+    end
 end
 
 function PetService.AddExperience(player, guid, experienceAmount)
@@ -19,9 +29,13 @@ function PetService.AddExperience(player, guid, experienceAmount)
 
     for _, item in pairs(items) do
         if(item.Id == guid) then
-            item.Data.CurrentExperience = item.Data.CurrentExperience + experienceAmount;
 
             local itemData = itemList.GetById(item.ItemId);
+            if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
+                return;
+            end
+
+            item.Data.CurrentExperience = item.Data.CurrentExperience + experienceAmount;
 
             petGotExperience:FireClient(player, item);
 

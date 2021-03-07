@@ -9,6 +9,7 @@ local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
+local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
@@ -31,6 +32,8 @@ local requesting = false;
 local petSpawning = false;
 local damages = {};
 local RNG = Random.new()
+local bodyPosition = nil
+local bodyGyro = nil
 
 local sound = nil;
 
@@ -59,7 +62,7 @@ end
 
  -- End of UI Stuff
 
-local function MoveTo(targetCFrame, shouldTeleport)
+local function MoveTo(target, targetCFrame, shouldTeleport)
     if(activePet == nil) then return end
     if(nextPet ~= nil) then return end
     if(petSpawning) then return end
@@ -68,7 +71,7 @@ local function MoveTo(targetCFrame, shouldTeleport)
         activePet.AncestryChanged:wait()
     end
 
-    local distance = (targetCFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
+    local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
 
     if(shouldTeleport) then
         if(distance > 30) then
@@ -76,33 +79,29 @@ local function MoveTo(targetCFrame, shouldTeleport)
         end
     end
 
+    if(distance < 5) then
+        return false;
+    end 
+
     local model = activePet;
-    local petCframe = activePet:GetPrimaryPartCFrame().p;
+    local petCframe = activePet.Root.CFrame.p;
 
-    if(distance > 5) then
-        local targetCframe = targetCFrame:ToWorldSpace(CFrame.new(3,0,3))
-        
-        local dir = CFrame.new(model:GetPrimaryPartCFrame().Position, targetCframe.Position).lookVector;
-	    local newCframe = model:GetPrimaryPartCFrame() + (dir * 0.25);
-        model:SetPrimaryPartCFrame(newCframe)
+    bodyPosition.Position = activePet.Root.CFrame:Lerp(targetCFrame, 0.15).p;
+    bodyGyro.CFrame = CFrame.new(model.Root.CFrame.Position, targetCFrame.Position);
 
-        if not animationPlaying then
-            animationPlaying = true;
+    if not animationPlaying then
+        animationPlaying = true;
 
-            local animator = activePet:WaitForChild("Humanoid", 1):WaitForChild("Animator", 1)
-            if animator then
-                track = animator:LoadAnimation(activePet.Animations.Walk)
-                track:Play()
-                setPetAnimation:FireServer(activePet.Animations.Walk);
-		    end
-
+        local animator = activePet:WaitForChild("Humanoid", 1):WaitForChild("Animator", 1)
+        if animator then
+            track = animator:LoadAnimation(activePet.Animations.Walk)
+            track:Play()
+            setPetAnimation:FireServer(activePet.Animations.Walk);
         end
-    elseif (track ~= nil and animationPlaying) then
-        animationPlaying = false;
-        track:Stop();
-        track = nil;
-        setPetAnimation:FireServer(nil);
+
     end
+
+    return (petCframe - bodyPosition.Position).magnitude > 0.001;
 end
 
 local function AttackTarget()
@@ -113,10 +112,6 @@ local function AttackTarget()
     if(activePet.Parent == nil) then
         activePet.AncestryChanged:wait()
     end
-
-    local distance = (activeTarget.CFrame.p - activePet:GetPrimaryPartCFrame().p).magnitude;
-
-    if(distance > 10) then return end
 
     toldServer = true;
     Grow();
@@ -146,6 +141,7 @@ local function AttackTarget()
                     Time = 3
                 });
 
+                targetHitAnimation.Looped = false
                 targetHitAnimation:Play();
                 sound:Play();
             end
@@ -165,20 +161,22 @@ local function UpdateXpBar(itemData)
         width = 1;
     end
 
-    board.Experience.Size = UDim2.new(width,0, 1,0);
+    board.Experience.Size = UDim2.new(width,0, 0.4,0);
 end
 
 local function ShowXpAbove(model, itemData)
     local npcAboveHeadGUI = replicatedStorage.ExperienceGUI;
     board = npcAboveHeadGUI:Clone()
     board.Parent = workspace;
-    board.Adornee = model;
+    board.Adornee = model.Root;
     
     local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
     local toLevel = itemData.ItemData.ExperienceToLevel;
 
+    board.NameLabel.Text = itemData.ItemData.Name;
+
     local width = currentExperience / toLevel;
-    board.Experience.Size = UDim2.new(width,0, 1,0);
+    board.Experience.Size = UDim2.new(width,0, 0.4,0);
 
     itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
     UpdateXpBar(itemData.PlayerItem);
@@ -188,8 +186,24 @@ local function DoCombat()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
 
-    MoveTo(activeTarget.CFrame:ToWorldSpace(CFrame.new(0.3, 0.3, 0.3)));
-    AttackTarget();
+    local targetCFrame = activeTarget.CFrame:ToWorldSpace();
+    local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
+    local moved = false;
+
+    if(distance > 3 and distance > 4) then
+        moved = MoveTo(activeTarget, targetCFrame);
+    end 
+
+    if not moved then
+        if (track ~= nil and animationPlaying) then
+            animationPlaying = false;
+            track:Stop();
+            track = nil;
+            setPetAnimation:FireServer(nil);
+        end
+
+        AttackTarget();
+    end
 end
 
 local function CheckForCleanup()
@@ -217,7 +231,22 @@ local function UpdatePet(delta)
     if(activeTarget ~= nil) then
         DoCombat();
     else
-        MoveTo(players.LocalPlayer.Character:WaitForChild("RightFoot").CFrame, true);
+        local targetCFrame = players.LocalPlayer.Character:WaitForChild("RightFoot").CFrame:ToWorldSpace(CFrame.new(3,0,3));
+        local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
+        local moved = false;
+
+        if(distance > 4 and distance > 6) then
+            moved = MoveTo(players.LocalPlayer.Character.Head, targetCFrame, true);
+        end
+
+        if not moved then
+            if (track ~= nil and animationPlaying) then
+                animationPlaying = false;
+                track:Stop();
+                track = nil;
+                setPetAnimation:FireServer(nil);
+            end
+        end
     end
 
     for _, damageGUI in pairs(damages) do
@@ -243,6 +272,15 @@ local function SetupPet(pet, petData)
     sound.RollOffMaxDistance = 50;
     sound.RollOffMode = Enum.RollOffMode.LinearSquare;
 
+    bodyPosition = Instance.new("BodyPosition", pet.Root);
+    bodyPosition.D = 700;
+
+    bodyGyro = Instance.new("BodyGyro", pet.Root);
+
+    bodyPosition.MaxForce = Vector3.new(math.huge, 50, math.huge);
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
+    bodyGyro.D = 10;
+
     ShowXpAbove(pet, petData);
 
     runner = game:GetService("RunService").RenderStepped:Connect(UpdatePet);
@@ -256,7 +294,7 @@ local function SetupPet(pet, petData)
     activePet = pet;
     
 	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
-    activePet:SetPrimaryPartCFrame(players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)));
+    bodyPosition.Position = players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)).p;
 
     petSpawning = false;
 end
@@ -310,6 +348,11 @@ function PetManager.SetActivePet(pet, petData)
         runner:Disconnect();
     end
 
+    if(pet == nil or petData == nil) then 
+        petSpawning = false;    
+        return 
+    end
+
     print("Player is now using " .. petData.ItemData.Name);
 
     SetupPet(pet, petData);
@@ -325,5 +368,12 @@ end
 
 
 cancelCombatButton.MouseButton1Click:Connect(StopCombat);
+
+petEvolved.OnClientEvent:Connect(function()
+    replicatedStorage.LevelUp:Play();
+    StopCombat();
+    PetManager.SetTarget(nil);
+    PetManager.SetActivePet(nil, nil);
+end);
 
 return PetManager;

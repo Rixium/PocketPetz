@@ -16,7 +16,7 @@ local titleUnlocked = replicatedStorage.Common.Events:WaitForChild("TitleUnlocke
 local mainGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
 local titlesMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.TitlesMenu);
 
-contextActionService:BindAction("Interact", onInteractKeyPressed, true, Enum.KeyCode.E);
+contextActionService:BindAction("Interact", onInteractKeyPressed, false, Enum.KeyCode.E);
 
 local titleUnlocked = replicatedStorage.Common.Events.TitleUnlocked;
 titleUnlocked.OnClientEvent:Connect(titlesMenu.SetupTitles);

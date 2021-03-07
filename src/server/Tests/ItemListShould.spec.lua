@@ -17,9 +17,9 @@ return function()
             };
             local returned = itemList.GetAllById(playerItems);
             expect(#returned).to.equal(3);
-            expect(returned[1].ItemData.Name).to.equal("PixieSeed");
-            expect(returned[2].ItemData.Name).to.equal("CoolSeed");
-            expect(returned[3].ItemData.Name).to.equal("BruteSeed");
+            expect(returned[1].ItemData.Name).to.equal("Pixie Seed");
+            expect(returned[2].ItemData.Name).to.equal("Cool Seed");
+            expect(returned[3].ItemData.Name).to.equal("Brute Seed");
         end)
         it("Only By Given Ids", function()
             local playerItems = { 
@@ -32,8 +32,8 @@ return function()
             };
             local returned = itemList.GetAllById(playerItems);
             expect(#returned).to.equal(2);
-            expect(returned[1].ItemData.Name).to.equal("PixieSeed");
-            expect(returned[2].ItemData.Name).to.equal("CoolSeed");
+            expect(returned[1].ItemData.Name).to.equal("Pixie Seed");
+            expect(returned[2].ItemData.Name).to.equal("Cool Seed");
         end)
     end)
 end
