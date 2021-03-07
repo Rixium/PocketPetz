@@ -83,6 +83,13 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 		PetModel = pet,
 		PetData = petData
 	};
+
+    local animator = target.Parent:WaitForChild("Humanoid");
+    if animator then
+        targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Hit);
+        targetHitAnimation:Play();
+    end
+
 end);
 
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;

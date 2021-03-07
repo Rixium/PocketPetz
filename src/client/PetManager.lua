@@ -115,12 +115,7 @@ local function AttackTarget()
 
     toldServer = true;
     Grow();
-
-    local animator = activeTarget.Parent:WaitForChild("Humanoid");
-    if animator then
-        targetHitAnimation = animator:LoadAnimation(activeTarget.Parent.Animations.Hit);
-    end
-
+    
     local petAnimator = activePet:WaitForChild("Humanoid");
     if petAnimator then
         attackTrack = petAnimator:LoadAnimation(activePet.Animations.Attack);
@@ -129,7 +124,7 @@ local function AttackTarget()
             if(keyframeName == "Hit") then
                     
                 local damageGUI = replicatedStorage.DamageBillboard:clone();
-                damageGUI.Frame.Damage.Text = "10";
+                damageGUI.Frame.Damage.Text = math.floor(20 * attackTrack.Length);
                 damageGUI.Parent = workspace;
                 damageGUI.Adornee = activeTarget.Parent;
 
@@ -140,15 +135,13 @@ local function AttackTarget()
                     Time = 3
                 });
 
-                targetHitAnimation.Looped = false
-                targetHitAnimation:Play();
+                petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+
                 sound:Play();
             end
         end);
         attackTrack:Play();
     end
-
-    petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
 end
 
 local function UpdateXpBar(itemData)
