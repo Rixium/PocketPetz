@@ -34,7 +34,7 @@ local function ReceiveItemPickupEvent(itemPickupData)
 
     getItemPopup.MessageFrame.MessageBack.Frame.NameLabel.Text = itemPickupData.Item.Name;
     getItemPopup.MessageFrame.MessageBack.Frame.Frame.MessageText.Text = itemPickupData.Body;
-    getItemPopup.MessageFrame.MessageBack.FaceBack.FaceImage.Image = "rbxthumb://type=Asset&id=" .. itemPickupData.Item.ModelId .. "&w=150&h=150";
+    getItemPopup.MessageFrame.MessageBack.FaceBack.FaceImage.Image = "rbxassetid://" .. itemPickupData.Item.ThumbnailId;
 end
 
 getItemPopup.Frame.AcceptFrame.YesButton.MouseButton1Click:Connect(function()

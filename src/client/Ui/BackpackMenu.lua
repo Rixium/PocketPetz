@@ -64,8 +64,9 @@ local function AddItem(itemToAdd)
         debounce = false;
     end)
 
-    item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
-    item.ThumbBack.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ItemThumbnail.Image = "rbxassetid://" .. itemToAdd.ItemData.ThumbnailId;
+    item.ThumbBack.Image = "rbxassetid://" .. itemToAdd.ItemData.ThumbnailId;
+    
     table.insert(BackpackMenu.Items, item);
 end
 
