@@ -124,7 +124,7 @@ local function AttackTarget()
     local petAnimator = activePet:WaitForChild("Humanoid");
     if petAnimator then
         attackTrack = petAnimator:LoadAnimation(activePet.Animations.Attack);
-        setPetAnimation:FireServer(animation);
+        setPetAnimation:FireServer(activePet.Animations.Attack);
         attackTrack.KeyframeReached:Connect(function(keyframeName)
             if(keyframeName == "Hit") then
                     
