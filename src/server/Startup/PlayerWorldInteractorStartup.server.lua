@@ -19,7 +19,7 @@ local playerDebounce = {};
 local inProgress = {};
 
 itemChecks[1] = function(player)
-    local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3 });
+    local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
     
     if(hasItem) then
         return nil;
@@ -32,7 +32,7 @@ itemChecks[1] = function(player)
 end
 
 itemChecks[2] = function(player)
-    local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3 });
+    local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
 
     if(hasItem) then
         return nil;
@@ -45,7 +45,7 @@ itemChecks[2] = function(player)
 end
 
 itemChecks[3] = function(player)
-    local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3 });
+    local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
     
     if(hasItem) then
         return nil;
