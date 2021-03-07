@@ -7,11 +7,13 @@ local titleData = "Titles";
 local activeTitleData = "ActiveTitle";
 local permissionsData = "Permissions";
 local itemsData = "Items";
+local playerInfoData = "PlayerInfo";
+
 
 local serverScriptService = game:GetService("ServerScriptService");
 local DataStore2 = require(serverScriptService.DataStore2);
 
-DataStore2.Combine("DATA6", firstLoginTime, lastLoginData, goldData, titleData, activeTitleData, permissionsData, itemsData);
+DataStore2.Combine("DATA6", firstLoginTime, lastLoginData, goldData, titleData, activeTitleData, permissionsData, itemsData, playerInfoData);
 
 DataStoreGet.DataStore = DataStore2;
 
