@@ -14,8 +14,23 @@ local dataStore2 = dataStoreGet.DataStore;
 -- Variables
 local playerInfoData = "PlayerInfo";
 
--- Functions 
-function PlayerService.GetPlayerInfo(player) then
+-- Functions
+function PlayerService.CreatePlayerInfo(player)
+    local playerInfoStore = dataStore2(playerInfoData, player);
+    local playerInfo = playerInfoStore:Get(nil);
+
+    if(playerInfo ~= nil) then
+        return 
+    end
+
+    playerInfoStore:Set({
+        CurrentZone = "The Spawn"
+    });
+
+    return playerInfo;
+end
+
+function PlayerService.GetPlayerInfo(player)
     local playerInfoStore = dataStore2(playerInfoData, player);
     local playerInfo = playerInfoStore:Get({ 
         CurrentZone = "The Spawn"

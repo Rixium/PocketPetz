@@ -4,6 +4,7 @@ local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager)
 local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local petService = require(serverScriptService.Server.Services.PetService);
+local playerService = require(serverScriptService.Server.Services.PlayerService);
 local physicsService = game:GetService("PhysicsService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 
@@ -32,6 +33,8 @@ function OnPlayerJoined(player)
 			physicsService:SetPartCollisionGroup(v, "Players");
 		end
 	end
+	
+	playerService.CreatePlayerInfo(player);
 	
 	-- DATABASE CLEARUP
 	itemService.ClearItems(player);
