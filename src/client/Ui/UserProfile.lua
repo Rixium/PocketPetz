@@ -11,13 +11,12 @@ local mainGUI = players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
 local profileGUI = mainGUI["Profile GUI"];
 
 -- Functions
-function UserProfile.Show(character)
-    local profilePlayer = players:GetPlayerFromCharacter(character);
-    profileGUI.ProfileBack.HeaderFrame.ImageLabel.ImageLabel.NameLabel.Text = profilePlayer.Name;
+function UserProfile.Show(player, character)
+    profileGUI.ProfileBack.HeaderFrame.ImageLabel.ImageLabel.NameLabel.Text = player.Name;
 
-    profileGUI.ProfileBack.ProfileFrame.AddFriends.Visible = profilePlayer.UserId ~= players.LocalPlayer.UserId;
+    profileGUI.ProfileBack.ProfileFrame.AddFriends.Visible = player.UserId ~= players.LocalPlayer.UserId;
 
-    local userId = profilePlayer.UserId
+    local userId = player.UserId
     local thumbType = Enum.ThumbnailType.HeadShot
     local thumbSize = Enum.ThumbnailSize.Size420x420
 
@@ -31,7 +30,7 @@ function UserProfile.Show(character)
     end)
 
     local button = profileGUI.ProfileBack.ProfileFrame.AddFriends.AddFriendsButton.MouseButton1Click:Connect(function()
-        starterGuiService:SetCore("PromptSendFriendRequest", profilePlayer);
+        starterGuiService:SetCore("PromptSendFriendRequest", player);
     end);
 
     profileGUI.Visible = true;
@@ -46,15 +45,12 @@ end
 
 function UserProfile.Toggle(character)
     if(profileGUI.Visible) then
-            
         local toTween = profileGUI.ProfileBack;
         local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
         local tween = tweenService:Create(toTween, tweenInfo, {Size=UDim2.new(0, 0, 0, 0)})
         tween:Play();
         tween.Completed:Wait();
         profileGUI.Visible = false;
-    else
-        UserProfile.Show(character);
     end
 end
 

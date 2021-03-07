@@ -20,6 +20,7 @@ function UserMenu.Show(character, adornee)
         return
     end
 
+    clickedCharacter = character;
     clickedPlayer = player;
 
     local menu = players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu;
@@ -51,9 +52,10 @@ function UserMenu.Hide()
 end
 
 players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
-    userProfile.Show(clickedPlayer);
+    userProfile.Show(clickedPlayer, clickedCharacter);
     UserMenu.Hide();
     clickedPlayer = nil;
+    clickedCharacter = nil;
 end)
 
 
