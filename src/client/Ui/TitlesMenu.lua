@@ -32,6 +32,19 @@ local function ResetScroll()
     titlesScrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
 
+local function Grow(toTween)     
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+    local tween = tweenService:Create(toTween, tweenInfo, {Size=UDim2.new(0.7, 0 , 0.7, 0)})
+    tween:Play();
+end      
+local function Shrink(toTween)     
+    if(toTween == nil) then return end
+
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+    local tween = tweenService:Create(toTween, tweenInfo, {Size=UDim2.new(0, 0, 0, 0)})
+    tween:Play();
+end                                
+
 function TitlesMenu.SetupTitles()
     repeat wait(1) until not isRunning 
 
@@ -73,7 +86,8 @@ function TitlesMenu.SetupTitles()
     
         if(value.Index == activeTitle.Index) then
             currentActive = newTitleLayout;
-            newTitleLayout.RadioSelect.Visible = true;
+            newTitleLayout.RadioBack.RadioSelect.Visible = true;
+            Grow(currentActive.RadioBack.RadioSelect);
         end
     
         newTitleLayout.Frame.TitleName.Text = value.Name;
@@ -85,11 +99,17 @@ function TitlesMenu.SetupTitles()
                 setActiveTitle:InvokeServer(value.Name);
     
                 if(currentActive ~= nil) then
-                    currentActive.RadioSelect.Visible = false;
+                    currentActive.RadioBack.RadioSelect.Visible = false;
                 end
     
+                replicatedStorage.ClickSound:Play();
+
+                Shrink(currentActive.RadioBack.RadioSelect);
+
                 currentActive = newTitleLayout;
-                currentActive.RadioSelect.Visible = true;
+                currentActive.RadioBack.RadioSelect.Visible = true;
+
+                Grow(currentActive.RadioBack.RadioSelect);
             end)
         elseif purchasable and not value.Owned then
             newTitleLayout.MouseButton1Click:Connect(function ()
