@@ -4,6 +4,7 @@ local UserProfile = {};
 local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local starterGuiService = game:GetService("StarterGui")
+local tweenService = game:GetService("TweenService")
 
 -- Variables
 local mainGUI = players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
@@ -34,10 +35,23 @@ function UserProfile.Show(character)
     end);
 
     profileGUI.Visible = true;
+
+    replicatedStorage.ClickSound:Play();
+    
+    local toTween = profileGUI.ProfileBack;
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+    local tween = tweenService:Create(toTween, tweenInfo, {Size=UDim2.new(0.628, 0 , 0.5, 0)})
+    tween:Play()
 end
 
 function UserProfile.Toggle(character)
     if(profileGUI.Visible) then
+            
+        local toTween = profileGUI.ProfileBack;
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(toTween, tweenInfo, {Size=UDim2.new(0, 0, 0, 0)})
+        tween:Play();
+        tween.Completed:Wait();
         profileGUI.Visible = false;
     else
         UserProfile.Show(character);
