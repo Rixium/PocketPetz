@@ -92,7 +92,7 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
     if not animationPlaying then
         animationPlaying = true;
 
-        local animator = activePet:WaitForChild("Humanoid", 1):WaitForChild("Animator", 1)
+        local animator = activePet:WaitForChild("Humanoid");
         if animator then
             track = animator:LoadAnimation(activePet.Animations.Walk)
             track:Play()
@@ -116,15 +116,14 @@ local function AttackTarget()
     toldServer = true;
     Grow();
 
-    local animator = activeTarget.Parent:WaitForChild("Humanoid"):WaitForChild("Animator");
+    local animator = activeTarget.Parent:WaitForChild("Humanoid");
     if animator then
         targetHitAnimation = animator:LoadAnimation(activeTarget.Parent.Animations.Hit);
     end
 
-    local petAnimator = activePet:WaitForChild("Humanoid"):WaitForChild("Animator")
+    local petAnimator = activePet:WaitForChild("Humanoid");
     if petAnimator then
         attackTrack = petAnimator:LoadAnimation(activePet.Animations.Attack);
-        attackTrack.Looped = true;
         setPetAnimation:FireServer(animation);
         attackTrack.KeyframeReached:Connect(function(keyframeName)
             if(keyframeName == "Hit") then

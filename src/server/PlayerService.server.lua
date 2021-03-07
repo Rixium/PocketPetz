@@ -34,7 +34,7 @@ function OnPlayerJoined(player)
 	end
 	
 	-- DATABASE CLEARUP
-	itemService.ClearItems(player);
+	-- itemService.ClearItems(player);
 	-- petService.AddExperience(player, "123", 10);
 end
 
@@ -98,7 +98,7 @@ setPetAnimation.OnServerEvent:Connect(function(player, animation)
 		return;
 	end
 
-	local animator = playerPet:WaitForChild("Humanoid", 1000):WaitForChild("Animator", 1000)
+	local animator = playerPet:WaitForChild("Humanoid", 1000);
 	if animator then
 		track = animator:LoadAnimation(animation)
 		track:Play()
@@ -134,18 +134,9 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 
 	toSend.PrimaryPart = toSend.Root;
 	toSend.Parent = workspace;
-
-	for _, child in pairs(toSend:GetChildren()) do
-		if child:IsA("BasePart") then
-			child:SetNetworkOwner(player);
-		end
-	end
-	
+	toSend.PrimaryPart:SetNetworkOwner(player);
 
 	model:Destroy();
-
-	local animator = Instance.new("Animator");
-	animator.Parent = toSend:WaitForChild("Humanoid");
 
 	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
 	
