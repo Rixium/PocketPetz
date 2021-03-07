@@ -59,7 +59,8 @@ local function AddFriendItem(player, userId, isOnline, userName, playerPlaceId)
         item.Frame.Frame.PlaceLabel.Text = "Offline";
     elseif (playerInServer) then
         item.Menu.WhisperFriendBack.Visible = true;
-        item.Frame.Frame.PlaceLabel.Text = "The Spawn";
+        local playerInfo = getPlayerInfo:InvokeServer(userId);
+        item.Frame.Frame.PlaceLabel.Text = playerInfo.CurrentZone;
     elseif (playerPlaceId == gamePlaceId) then
         item.Frame.Frame.PlaceLabel.Text = "Another server";
     else

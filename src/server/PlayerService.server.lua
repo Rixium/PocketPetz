@@ -73,6 +73,17 @@ setActiveTitle.OnServerInvoke = titleService.SetActiveTitle;
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 
+local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
+getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
+	local otherPlayer = players:GetPlayerByUserId(otherPlayerId);
+	if(otherPlayer == nil) then 
+		return nil;
+	end
+
+	local playersInfo = playerService.GetPlayerInfo(otherPlayer);	
+end
+
+
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
 local runService = game:GetService("RunService");
 
