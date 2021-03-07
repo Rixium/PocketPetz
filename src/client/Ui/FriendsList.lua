@@ -4,6 +4,7 @@ local FriendsList = {};
 local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local messagePlayerEvent = replicatedStorage.Common.Events.MessagePlayerEvent;
+local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local friendsListItem = replicatedStorage.FriendBack;
 
