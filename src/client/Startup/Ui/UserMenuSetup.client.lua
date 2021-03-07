@@ -7,12 +7,14 @@ local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProf
 local friendsList = require(players.LocalPlayer.PlayerScripts.Client.Ui.FriendsList);
 local interactor = require(players.LocalPlayer.PlayerScripts.Client.PlayerInteractor);
 local tweenService = game:GetService("TweenService");
+local replicatedStorage = game:GetService("ReplicatedStorage");
 
 -- Variables
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera;
 local mainGui = uiManager.GetUi("Main GUI");
 local friendsListGUI = uiManager.GetUi("Friends GUI");
+local currentCharacter = nil;
 
 -- Functions
 function DoInput(pos)
@@ -41,6 +43,13 @@ function DoInput(pos)
     if humanoid then
         local character = humanoid.Parent;
         if character ~= nil and players:FindFirstChild(character.Name) then
+            if(character == currentCharacter) then
+                currentCharacter = nil;
+                userMenu.Hide();
+                return;
+            end
+
+            currentCharacter = character;
             userMenu.Show(character, ancestor);
             return;
         end
