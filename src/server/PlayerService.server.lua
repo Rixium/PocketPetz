@@ -80,8 +80,6 @@ getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
 getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 	local otherPlayer = players:GetPlayerByUserId(otherPlayerId);
-	print(otherPlayerId);
-	print(otherPlayer);
 
 	if(otherPlayer == nil) then 
 		return nil;
