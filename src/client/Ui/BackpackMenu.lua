@@ -50,7 +50,8 @@ local function SelectItem(selectedItem)
     itemDescription = itemData.Description or "Unknown description..";
 
     local itemImage = itemPopup.ItemImage.ImageLabel.ItemImage;
-    itemImage.Image = "rbxassetid://" .. itemData.ThumbnailId;
+    itemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    
     itemPopupFrame.Visible = true;
     
     local takeOutButton;
@@ -82,12 +83,9 @@ local function AddItem(itemToAdd)
         tween.Completed:Wait();
         debounce = false;
     end)
-
-    -- item.ItemThumbnail.Image = "rbxassetid://" .. itemToAdd.ItemData.ThumbnailId;
-    -- item.ThumbBack.Image = "rbxassetid://" .. itemToAdd.ItemData.ThumbnailId;
-
     
-    item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=150&h=150";
+    item.ThumbBack.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
     
     table.insert(BackpackMenu.Items, item);
 end
