@@ -52,11 +52,13 @@ local function SelectItem(selectedItem)
     local itemImage = itemPopup.ItemImage.ImageLabel.ItemImage;
     itemImage.Image = "rbxassetid://" .. itemData.ThumbnailId;
     itemPopupFrame.Visible = true;
-
-    local takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
+    
+    local takeOutButton;
+    takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
         equipItemRequest:FireServer(selectedItem);
         BackpackMenu.Toggle();
         itemPopupFrame.Visible = false;
+        takeOutButton:Disconnect();
     end);
 end
 
