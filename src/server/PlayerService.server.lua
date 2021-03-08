@@ -88,7 +88,7 @@ getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 	end
 
 	local playersInfo = playerService.GetPlayerInfo(otherPlayer);	
-	print(playersInfo);
+
 	return playersInfo;
 end
 
