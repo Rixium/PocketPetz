@@ -39,8 +39,27 @@ end
 
 local function SelectItem(selectedItem)
     print("Player has selected " .. selectedItem.ItemData.Name);
-    equipItemRequest:FireServer(selectedItem);
+    local itemData = selectedItem.ItemData;
 
+    local itemPopupFrame = inventoryGUI.BackpackFrame.BackpackBack.ItemPopup;
+    local itemPopup = inventoryGUI.BackpackFrame.BackpackBack.ItemPopup.ImageLabel;
+    local itemHeader = itemPopup.ItemHeader;
+    itemHeader.TextLabel.Text = itemData.Name;
+    
+    local itemDescription = itemPopup.ItemDescription;
+    itemDescription = itemData.Description or "Unknown description..";
+
+    local itemImage = itemPopup.ItemImage.ImageLabel.ItemImage;
+    itemImage.Image = "rbxassetid://" .. itemData.ThumbnailId;
+    itemPopupFrame.Visible = true;
+    
+    local takeOutButton;
+    takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
+        equipItemRequest:FireServer(selectedItem);
+        BackpackMenu.Toggle();
+        itemPopupFrame.Visible = false;
+        takeOutButton:Disconnect();
+    end);
 end
 
 local function AddItem(itemToAdd)

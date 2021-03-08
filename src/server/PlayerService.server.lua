@@ -38,7 +38,7 @@ function OnPlayerJoined(player)
 	playerService.CreatePlayerInfo(player);
 	
 	-- DATABASE CLEARUP
-	itemService.ClearItems(player);
+	-- itemService.ClearItems(player);
 	-- petService.AddExperience(player, "123", 10);
 end
 
@@ -80,15 +80,13 @@ getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
 getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 	local otherPlayer = players:GetPlayerByUserId(otherPlayerId);
-	print(otherPlayerId);
-	print(otherPlayer);
 
 	if(otherPlayer == nil) then 
 		return nil;
 	end
 
 	local playersInfo = playerService.GetPlayerInfo(otherPlayer);	
-	print(playersInfo);
+
 	return playersInfo;
 end
 
