@@ -9,19 +9,19 @@ local titleService = require(ServerScriptService.Server.Services.TitleService);
 local productFunctions = {};
 
 -- Team Grey Title
-productFunctions[1154343355] = function(receipt, player)
+productFunctions[1156529689] = function(receipt, player)
     titleService.UnlockTitle(player, "Team Grey");
 	return true;
 end
 
 -- Team Grey Title
-productFunctions[1154456069] = function(receipt, player)
+productFunctions[1156529687] = function(receipt, player)
     titleService.UnlockTitle(player, "Team Fawn");
 	return true;
 end
 
 -- Team Grey Title
-productFunctions[1154456112] = function(receipt, player)
+productFunctions[1156529690] = function(receipt, player)
     titleService.UnlockTitle(player, "Team Melody");
 	return true;
 end

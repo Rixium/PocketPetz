@@ -30,22 +30,22 @@ TitleList.Titles = {
         Index = 6,
         Name = "Team Grey",
         Description = "Show your support for Legend Grey",
-        PurchasePrice = 25,
-        ProductId = 1154343355
+        PurchasePrice = 50,
+        ProductId = 1156529689
     },
     {
         Index = 7,
         Name = "Team Fawn",
         Description = "Show your support for Legend Fawn",
-        PurchasePrice = 25,
-        ProductId = 1154456069
+        PurchasePrice = 50,
+        ProductId = 1156529687
     },
     {
         Index = 8,
         Name = "Team Melody",
         Description = "Show your support for Legend Melody",
-        PurchasePrice = 25,
-        ProductId = 1154456112
+        PurchasePrice = 50,
+        ProductId = 1156529690
     }
 };
 
