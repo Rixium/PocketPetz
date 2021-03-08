@@ -6,6 +6,7 @@ local itemService = require(serverScriptService.Server.Services.ItemService);
 local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
 local physicsService = game:GetService("PhysicsService");
+local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 
 local currentEventTitle = "AlphaStar";
@@ -79,11 +80,16 @@ getItemsRequest.OnServerInvoke = itemService.GetPlayerItems;
 local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
 getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 	local otherPlayer = players:GetPlayerByUserId(otherPlayerId);
+	print(otherPlayerId);
+	print(otherPlayer);
+
 	if(otherPlayer == nil) then 
 		return nil;
 	end
 
 	local playersInfo = playerService.GetPlayerInfo(otherPlayer);	
+	print(playersInfo);
+	return playersInfo;
 end
 
 

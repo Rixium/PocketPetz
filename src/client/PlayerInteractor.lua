@@ -7,6 +7,7 @@ local dialogMenu = game.Players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI")
 local dialogUi = require(dialogMenu.Frame.DialogBackground.DialogLabel.Dialog);
 local runService = game:GetService("RunService");
 local contextActionService = game:GetService("ContextActionService");
+local userInputService = game:GetService("UserInputService");
 local npcs = require(replicatedStorage.Common.Data.NPCs);
 local players = game:GetService("Players");
 local userMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserMenu);
@@ -41,6 +42,8 @@ end
 
 function Speak(dialog)
     if(dialogUi.Ready()) then
+        players.LocalPlayer.PlayerGui:WaitForChild("Dialog GUI").Frame.NameBackground.NameLabel.Text = interactable.Parent.Name;
+
         local next = dialog.GetNext();
         dialogUi.DoDialog(next);
     end
@@ -53,6 +56,15 @@ end
 function PlayerInteractor.GetInteractable()
     return interactable;
 end
+
+userInputService.InputEnded:Connect(function(input, gameProcessed)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		PlayerInteractor.Interact();
+	elseif input.UserInputType == Enum.UserInputType.Touch then
+		PlayerInteractor.Interact();
+    end
+end);
+
 
 function PlayerInteractor.Interact()
     if(interactable == nil) then

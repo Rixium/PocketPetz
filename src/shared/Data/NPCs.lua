@@ -24,6 +24,7 @@ NPCs.Grey = {
     Name = "Grey",
     Title = "Legend",
     Dialog = {
+        "",
         "Yo.",
         "I'm Grey.",
         "CoolPets are my game.",
@@ -43,6 +44,7 @@ NPCs.Fawn = {
     Name = "Fawn",
     Title = "Legend",
     Dialog = {
+        "",
         "Hey, the names Fawn.",
         "BrutePets are absolute beasts!",
         "They can grow to be some of the biggest in the world.",
@@ -61,6 +63,7 @@ NPCs.Melody = {
     Name = "Melody",
     Title = "Legend",
     Dialog = {
+        "",
         "Heya!",
         "You can call me Melody!",
         "PixiePets are awesome, cute singing pets!",
