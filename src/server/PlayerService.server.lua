@@ -38,7 +38,7 @@ function OnPlayerJoined(player)
 	playerService.CreatePlayerInfo(player);
 	
 	-- DATABASE CLEARUP
-	itemService.ClearItems(player);
+	-- itemService.ClearItems(player);
 	-- petService.AddExperience(player, "123", 10);
 end
 
