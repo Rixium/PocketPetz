@@ -5,6 +5,7 @@ local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
 local dataStore2 = dataStoreGet.DataStore;
 local itemsStore = "Items";
 local itemList = require(serverScriptService.Server.Data.ItemList);
+local insertService = game:GetService("InsertService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
@@ -18,8 +19,11 @@ local function LevelUpPet(player, pet, itemData)
         pet.Data.CurrentExperience = 0;
 
         local nextPetId = itemData.EvolvesTo;
+        local nextPet = itemList.GetById(nextPetId);
+
         pet.ItemId = nextPetId;
-        petEvolved:FireClient(player);
+
+        petEvolved:FireClient(player, nextPet);
     end
 end
 

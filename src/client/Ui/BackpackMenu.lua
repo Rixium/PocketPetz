@@ -50,8 +50,17 @@ local function SelectItem(selectedItem)
     itemDescription = itemData.Description or "Unknown description..";
 
     local itemImage = itemPopup.ItemImage.ImageLabel.ItemImage;
-    itemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
     
+    itemPopup.ItemImage.ImageLabel.ThumbBack1.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack2.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack3.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack4.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack5.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack6.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack7.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemPopup.ItemImage.ImageLabel.ThumbBack8.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+
     itemPopupFrame.Visible = true;
     
     local takeOutButton;
@@ -84,7 +93,14 @@ local function AddItem(itemToAdd)
         debounce = false;
     end)
     
-    item.ThumbBack.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack1.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack2.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack3.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack4.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack5.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack6.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack7.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    item.ThumbBack8.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
     item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
     
     table.insert(BackpackMenu.Items, item);
