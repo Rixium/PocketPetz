@@ -2,10 +2,13 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
 local players = game:GetService("Players");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local gameState = require(players.LocalPlayer.PlayerScripts.Client.GameState);
 local zoneIntro = uiManager.GetUi("Zone Intro");
 local tweenService = game:GetService("TweenService");
 
 local playerInfo = getPlayerInfo:InvokeServer(players.LocalPlayer.UserId);
+
+while not gameState.GetReady() do wait(0.1) end
 
 -- Zone switch transition text
 local zoneBack = zoneIntro.ImageLabel;
