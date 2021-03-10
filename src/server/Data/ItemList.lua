@@ -6,7 +6,7 @@ ItemList.Items = {
         ItemId = 1,
         ItemType = "Seed",
         Rarity = "Common",
-        Name = "Pixie Seed",
+        Name = "Lifadee Seed",
         Description = "I wonder what's inside?",
         ModelId = 6492030424,
         ThumbnailId = 6488393425,
@@ -18,7 +18,7 @@ ItemList.Items = {
         ItemId = 2,
         ItemType = "Seed",
         Rarity = "Common",
-        Name = "Cool Seed",
+        Name = "Krocie Seed",
         Description = "I wonder what's inside?",
         ModelId = 6492032325,
         ThumbnailId = 6488394048,
@@ -30,7 +30,7 @@ ItemList.Items = {
         ItemId = 3,
         ItemType = "Seed",
         Rarity = "Common",
-        Name = "Brute Seed",
+        Name = "Pebbles Seed",
         Description = "I wonder what's inside?",
         ModelId = 6492034287,
         ThumbnailId = 6488394187,
@@ -49,7 +49,8 @@ ItemList.Items = {
         ThumbnailId = 6488635682,
         ExperienceToLevel = 200,
         LevelToEvolve = 12,
-        EvolvesTo = 7
+        EvolvesTo = 7,
+        BaseHealth = 10
     },
     [5] = {
         ItemId = 5,
@@ -60,7 +61,8 @@ ItemList.Items = {
         ThumbnailId = 6488713314,
         ExperienceToLevel = 200,
         LevelToEvolve = 12,
-        EvolvesTo = 8
+        EvolvesTo = 8,
+        BaseHealth = 10
     },
     [6] = {
         ItemId = 6,
@@ -71,7 +73,8 @@ ItemList.Items = {
         ThumbnailId = 6488510579,
         ExperienceToLevel = 200,
         LevelToEvolve = 12,
-        EvolvesTo = 9
+        EvolvesTo = 9,
+        BaseHealth = 10
     },
 
     -- Evolution 2
@@ -83,7 +86,8 @@ ItemList.Items = {
         ModelId = 6463613741,
         ExperienceToLevel = 500,
         LevelToEvolve = 25,
-        EvolvesTo = 10
+        EvolvesTo = 10,
+        BaseHealth = 10
     },
     [8] = {
         ItemId = 5,
@@ -93,7 +97,8 @@ ItemList.Items = {
         ModelId = 6463613741,
         ExperienceToLevel = 500,
         LevelToEvolve = 25,
-        EvolvesTo = 11
+        EvolvesTo = 11,
+        BaseHealth = 10
     },
     [9] = {
         ItemId = 6,
@@ -103,7 +108,8 @@ ItemList.Items = {
         ModelId = 6463613741,
         ExperienceToLevel = 500,
         LevelToEvolve = 25,
-        EvolvesTo = 12
+        EvolvesTo = 12,
+        BaseHealth = 10
     },
 
     -- Evolution 3
@@ -112,21 +118,56 @@ ItemList.Items = {
         ItemType = "Pet",
         Rarity = "Legendary",
         Name = "Flutterboo",
-        ModelId = 6463613741
+        ModelId = 6463613741,
+        BaseHealth = 10
     },
     [11] = {
         ItemId = 11,
         ItemType = "Pet",
         Rarity = "Legendary",
         Name = "Gatorain",
-        ModelId = 6463613741
+        ModelId = 6463613741,
+        BaseHealth = 10
     },
     [12] = {
         ItemId = 12,
         ItemType = "Pet",
         Rarity = "Legendary",
         Name = "Bouldagan",
-        ModelId = 6463613741
+        ModelId = 6463613741,
+        BaseHealth = 10
+    },
+    [13] = {
+        ItemId = 13,
+        ItemType = "Pet",
+        Rarity = "Common",
+        Name = "Pigzee",
+        ModelId = 6500864818,
+        BaseHealth = 10,
+        Drops = {
+            [14] = {
+                ItemId = 14,
+                Chance = 0.01
+            },
+            [15] = {
+                ItemId = 15,
+                Chance = 0.001
+            }
+        }
+    },
+    [14] = {
+        ItemId = 14,
+        ItemType = "Seed",
+        Rarity = "Common",
+        Name = "Pigzee Seed",
+        ModelId = 6492030424,
+    },
+    [15] = {
+        ItemId = 15,
+        ItemType = "Seed",
+        Rarity = "Common",
+        Name = "Wild Seed",
+        ModelId = 6492030424
     }
 
 };
