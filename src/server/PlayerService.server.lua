@@ -7,7 +7,9 @@ local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
 local physicsService = game:GetService("PhysicsService");
 local players = game:GetService("Players");
+local collectionService  = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local creatureService = require(serverScriptService.Server.Services.CreatureService);
 
 local currentEventTitle = "AlphaStar";
 
@@ -45,12 +47,11 @@ end
 function OnPlayerLeaving(player)
 	playerTracker.Logout(player);
 	playerTracker.RemovePlayer(player);
-
 	
 	local playersActivePet = activePets[player.UserId];
 
 	if(playersActivePet ~= nil) then
-		playersActivePet:Destroy();
+		playersActivePet.PetModel:Destroy();
 	end
 
 	attackingPets[player.UserId] = nil;
@@ -90,17 +91,15 @@ getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 	return playersInfo;
 end
 
-
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
 local runService = game:GetService("RunService");
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
-	local attackbleId = target:GetAttribute("Id");
-	attackingPets[player.UserId] = {
-		Player = player,
-		PetModel = pet,
-		PetData = petData
-	};
+
+	local playersActiveTarget = attackingPets[player.UserId];
+	if(playersActiveTarget.Target ~= target) then
+		return;
+	end
 
     local animator = target.Parent:WaitForChild("Humanoid");
     if animator then
@@ -114,6 +113,8 @@ local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 setPetAnimation.OnServerEvent:Connect(function(player, animation)
 	local playerPet = activePets[player.UserId];
 	if(playerPet == nil) then return end
+
+	playerPet = playerPet.PetModel;
 	
 	if(animation == nil) then
 		local humanoid = playerPet:WaitForChild("Humanoid", 1000);
@@ -165,7 +166,10 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 
 	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
 	
-	activePets[player.UserId] = toSend;
+	activePets[player.UserId] = {
+		PetModel = toSend,
+		PetData = item	
+	};
 
 	playerEquipped:FireClient(player, toSend, item);
 end);
@@ -173,10 +177,38 @@ end);
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 petRequestAttack.OnServerInvoke = function(player, target)
 	local playersPet = activePets[player.UserId]
+	local petData = petService.GetPetByGuid(player, playersPet.Id);
 
 	if(playersPet == nil) then 
 		return false;
 	end
+
+	for _, obj in pairs(attackingPets) do
+		if(obj.Target == target) then
+			return false;
+		end
+	end
+
+	local attackableId = target:GetAttribute("Id");
+
+	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
+
+	if(playersPet.PetData.ItemData.ItemType == "Seed") then
+		if(targetIsCreature) then
+			return false;
+		end
+	elseif(playersPet.PetData.ItemData.ItemType == "Pet") then
+		if(not targetIsCreature) then
+			return false;
+		end
+	end
+
+	attackingPets[player.UserId] = {
+		Player = player,
+		PetModel = playersPet.PetModel,
+		PetData = playersPet.PetData,
+		Target = target
+	};
 
 	if((player.Character:GetPrimaryPartCFrame().p - target.CFrame.p).magnitude > 40) then
 		return false;

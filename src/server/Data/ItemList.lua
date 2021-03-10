@@ -143,17 +143,7 @@ ItemList.Items = {
         Rarity = "Common",
         Name = "Pigzee",
         ModelId = 6500864818,
-        BaseHealth = 10,
-        Drops = {
-            [14] = {
-                ItemId = 14,
-                Chance = 0.01
-            },
-            [15] = {
-                ItemId = 15,
-                Chance = 0.001
-            }
-        }
+        BaseHealth = 10
     },
     [14] = {
         ItemId = 14,
