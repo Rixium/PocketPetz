@@ -47,7 +47,7 @@ local function SelectItem(selectedItem)
     itemHeader.TextLabel.Text = itemData.Name;
     
     local itemDescription = itemPopup.ItemDescription;
-    itemDescription = itemData.Description or "Unknown description..";
+    itemDescription.TextLabel.Text = itemData.Description or "Unknown description..";
 
     local itemImage = itemPopup.ItemImage.ImageLabel.ItemImage;
     
