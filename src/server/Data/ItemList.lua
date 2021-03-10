@@ -45,6 +45,7 @@ ItemList.Items = {
         ItemType = "Pet",
         Rarity = "Common",
         Name = "Lifadee",
+        Description = "She's humming...",
         ModelId = 6492026121,
         ThumbnailId = 6488635682,
         ExperienceToLevel = 200,
@@ -57,6 +58,7 @@ ItemList.Items = {
         ItemType = "Pet",
         Rarity = "Common",
         Name = "Krocie",
+        Description = "Cool as a ice, baby!",
         ModelId = 6492024166,
         ThumbnailId = 6488713314,
         ExperienceToLevel = 200,
@@ -69,6 +71,7 @@ ItemList.Items = {
         ItemType = "Pet",
         Rarity = "Common",
         Name = "Pebbles",
+        Description = "It's a mean looking fella'",
         ModelId = 6492028403,
         ThumbnailId = 6488510579,
         ExperienceToLevel = 200,
@@ -142,6 +145,7 @@ ItemList.Items = {
         ItemType = "Pet",
         Rarity = "Common",
         Name = "Pigzee",
+        Description = "Oink!",
         ModelId = 6500864818,
         BaseHealth = 10
     },
@@ -150,6 +154,7 @@ ItemList.Items = {
         ItemType = "Seed",
         Rarity = "Common",
         Name = "Pigzee Seed",
+        Description = "It smells funny!",
         ModelId = 6492030424,
     },
     [15] = {
@@ -157,6 +162,7 @@ ItemList.Items = {
         ItemType = "Seed",
         Rarity = "Common",
         Name = "Wild Seed",
+        Description = "A strange looking seed.",
         ModelId = 6492030424
     }
 
