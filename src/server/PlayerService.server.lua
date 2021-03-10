@@ -39,8 +39,9 @@ function OnPlayerJoined(player)
 	
 	playerService.CreatePlayerInfo(player);
 	
-	-- DATABASE CLEARUP
+	-- -- DATABASE CLEARUP
 	-- itemService.ClearItems(player);
+	-- itemService.GiveItem(player, 2);
 	-- petService.AddExperience(player, "123", 10);
 end
 
@@ -100,13 +101,21 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	if(playersActiveTarget.Target ~= target) then
 		return;
 	end
+	
+	local creature = creatureService.GetCreatureByGameObject(target.Parent);
 
-    local animator = target.Parent:WaitForChild("Humanoid");
-    if animator then
-        targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Hit);
-        targetHitAnimation:Play();
-    end
+	if(creature == nil) then 
+		local animator = target.Parent:WaitForChild("Humanoid");
+		if animator then
+			targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Hit);
+			targetHitAnimation:Play();
+		end
 
+		return;
+	end
+
+	creature.UnderAttack = true;
+	creature.Target = pet;
 end);
 
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
@@ -135,6 +144,19 @@ end);
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 petStopAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	attackingPets[player.UserId] = nil;
+
+	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
+	local creature = creatureService.GetCreatureByGameObject(target.Parent);
+
+	if(creature ~= nil) then
+		creature.UnderAttack = false;
+		creature.Target = nil;
+
+		if(creature.EndAttackCallback ~= nil) then
+			creature.EndAttackCallback();
+		end
+
+	end
 end);
 
 local insertService = game:GetService("InsertService");
@@ -151,7 +173,7 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 
 	if(activePets[player.UserId] ~= nil) then
 		local playersCurrentPet = activePets[player.UserId];
-		playersCurrentPet:Destroy();
+		playersCurrentPet.PetModel:Destroy();
 	end
 
 	local model = insertService:LoadAsset(item.ItemData.ModelId);
@@ -175,6 +197,7 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 end);
 
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
+local creatureService = require(serverScriptService.Server.Services.CreatureService);
 petRequestAttack.OnServerInvoke = function(player, target)
 	local playersPet = activePets[player.UserId]
 	local petData = petService.GetPetByGuid(player, playersPet.Id);

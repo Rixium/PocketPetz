@@ -179,7 +179,7 @@ local function DoCombat()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
 
-    local targetCFrame = activeTarget.CFrame:ToWorldSpace();
+    local targetCFrame = activeTarget.Parent.Root.CFrame:ToWorldSpace();
     local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
     local moved = false;
 
