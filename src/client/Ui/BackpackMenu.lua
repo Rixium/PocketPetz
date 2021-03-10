@@ -122,11 +122,14 @@ function BackpackMenu.ShowInventory()
     
     spawn(function ()
         for _, item in pairs(items) do
-            
-            if(item.ItemData.ItemType == "Pet") then
-                item.ItemData.ItemType = "Seed";
+            if(activeTab == "Seed") then
+                if(item.ItemData.ItemType == "Seed" or item.ItemData.ItemType == "Pet") then
+                    AddItem(item);
+                    ResetScroll();
+                end
+                continue;
             end
-
+            
             if(item.ItemData.ItemType == activeTab) then
                 AddItem(item);
                 ResetScroll();
