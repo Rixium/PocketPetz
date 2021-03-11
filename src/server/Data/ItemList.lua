@@ -159,7 +159,8 @@ ItemList.Items = {
         ModelId = 6504277287,
         ExperienceToLevel = 10,
         LevelToEvolve = 2,
-        EvolvesTo = 13
+        EvolvesTo = 13,
+        Value = 10
     },
     [15] = {
         ItemId = 15,
@@ -168,7 +169,8 @@ ItemList.Items = {
         Name = "Wild Seed",
         Description = "A strange looking seed.",
         ModelId = 6504279569,
-        ExperienceToLevel = 100
+        ExperienceToLevel = 100,
+        Value = 100
     }
 };
 
