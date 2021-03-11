@@ -12,6 +12,7 @@ local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.EvolutionGUI);
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
+local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
@@ -331,6 +332,13 @@ function PetManager.SetTarget(target)
     StopCombat();
     activeTarget = target;
     nextTarget = nil;
+
+    local targetKilledEvent;
+
+     targetKilledEvent = targetKilled.OnClientEvent:Connect(function()
+        targetKilledEvent:Disconnect();
+        StopCombat();
+    end);
 end
 
 function PetManager.SetActivePet(pet, petData)

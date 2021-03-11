@@ -9,17 +9,21 @@ local creatures = collectionService:GetTagged("Creature");
 
 for _, creature in pairs(creatures) do
     local id = creature:GetAttribute("Id");
-    local creatureItem = creatureService.GetCreatureDataById(id);
+    local creatureData = creatureService.GetCreatureDataById(id);
+    local creatureItem = itemList.GetById(creatureData.ItemId);
+
+    print(creatureItem);
 
     creatureService.AddCreature({
         GameObject = creature,
         StartPosition = creature.Root.Position,
-        Data = creatureItem,
+        Data = creatureData,
         Alive = true,
         NextPosition = nil,
         LastMove = 0,
         UnderAttack = false,
-        Target = nil
+        Target = nil,
+        CurrentHealth = creatureItem.BaseHealth
     });
 end
 
@@ -35,6 +39,7 @@ while true do
 
         creature.LastMove = creature.LastMove - 1;
 
+        print(creature.Alive);
         if not creature.Alive then continue end
 
         local humanoid = creature.GameObject:WaitForChild("Humanoid");

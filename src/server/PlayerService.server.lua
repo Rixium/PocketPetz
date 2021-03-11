@@ -94,9 +94,9 @@ end
 
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
 local runService = game:GetService("RunService");
+local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
-
 	local playersActiveTarget = attackingPets[player.UserId];
 	if(playersActiveTarget.Target ~= target) then
 		return;
@@ -114,8 +114,28 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 		return;
 	end
 
+	if(creature.Alive == false) then
+		return;
+	end
+
 	creature.UnderAttack = true;
 	creature.Target = pet;
+
+	-- Do damage
+	creature.CurrentHealth = creature.CurrentHealth - 1;
+
+	if(creature.CurrentHealth < 0) then
+		creature.Alive = false;
+		local animator = target.Parent:WaitForChild("Humanoid");
+		
+		targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Death);
+		targetHitAnimation:Play();
+		targetHitAnimation.Stopped:Wait();
+		creature.GameObject:Destroy();
+
+		targetKilled:FireClient(player);
+	end
+
 end);
 
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;

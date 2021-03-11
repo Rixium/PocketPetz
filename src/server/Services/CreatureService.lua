@@ -2,6 +2,7 @@ local CreatureService = {};
 
 CreatureService.CreatureData = {
     [1] = {
+        ItemId = 13,
         Drops = {
             [14] = {
                 ItemId = 14,
