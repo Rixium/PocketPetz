@@ -155,7 +155,10 @@ ItemList.Items = {
         Rarity = "Common",
         Name = "Pigzee Seed",
         Description = "It smells funny!",
-        ModelId = 6492030424,
+        ModelId = 6504277287,
+        ExperienceToLevel = 10,
+        LevelToEvolve = 5,
+        EvolvesTo = 13
     },
     [15] = {
         ItemId = 15,
@@ -163,9 +166,9 @@ ItemList.Items = {
         Rarity = "Common",
         Name = "Wild Seed",
         Description = "A strange looking seed.",
-        ModelId = 6492030424
+        ModelId = 6504279569
+        ExperienceToLevel = 100,
     }
-
 };
 
 function ItemList.GetAllById(playerItems)
