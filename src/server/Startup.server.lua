@@ -17,6 +17,11 @@ local function SetupCreature(creature)
     creature.UnderAttack = false;
     creature.Target = nil;
     creature.DeathTimer = 15;
+
+    if(creature.GameObject == nil) then
+        creature.GameObject = creature.GameObjectTemplate:clone();
+        creature.GameObject.Parent = workspace;
+    end
     
     local healthPanel = healthGUI:clone();
     healthPanel.NameLabel.Text = creature.Item.Name;
@@ -36,7 +41,7 @@ for _, creature in pairs(creatures) do
     local creatureItem = itemList.GetById(creatureData.ItemId);
 
     local newCreature = {
-        GameObject = creature,
+        GameObjectTemplate = creature:clone(),
         StartPosition = creature.Root.Position,
         Data = creatureData,
         Item = creatureItem
@@ -44,6 +49,8 @@ for _, creature in pairs(creatures) do
     
     SetupCreature(newCreature);
 
+    creature:Destroy();
+    
     creatureService.AddCreature(newCreature);
 end
 
@@ -64,9 +71,10 @@ while true do
             creature.DeathTimer = creature.DeathTimer - 1;
 
             if(creature.DeathTimer <= 0) then
-                creature.DeathTimer = 15;
                 SetupCreature(creature);
             end
+
+            continue;
         end
 
         local humanoid = creature.GameObject:WaitForChild("Humanoid");

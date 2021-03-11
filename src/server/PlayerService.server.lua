@@ -98,6 +98,11 @@ local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 
 petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	local playersActiveTarget = attackingPets[player.UserId];
+
+	if(playersActiveTarget == nil) then
+		return;
+	end
+
 	if(playersActiveTarget.Target ~= target) then
 		return;
 	end
@@ -128,15 +133,18 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
     creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
 
 	if(creature.CurrentHealth < 0) then
-		creature.Alive = false;
-		creature.UnderAttack = false;
-		creature.Target = nil;
 		local animator = target.Parent:WaitForChild("Humanoid");
 		
 		targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Death);
 		targetHitAnimation:Play();
 		targetHitAnimation.Stopped:Wait();
+		
 		creature.GameObject:Destroy();
+		creature.GameObject = nil;
+
+		creature.Alive = false;
+		creature.UnderAttack = false;
+		creature.Target = nil;
 
 		targetKilled:FireClient(player);
 	end
