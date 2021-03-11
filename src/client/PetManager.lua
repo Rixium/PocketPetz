@@ -348,6 +348,7 @@ function PetManager.SetActivePet(pet, petData)
 
     if(activePet ~= null) then
         activePet:Destroy();
+        activePet = nil;
     end
 
     if(pet == nil or petData == nil) then 
@@ -373,10 +374,11 @@ cancelCombatButton.MouseButton1Click:Connect(StopCombat);
 
 petEvolved.OnClientEvent:Connect(function(next)
     replicatedStorage.LevelUp:Play();
-    
-    evolutionGui.Setup(activePetData, next);
 
     StopCombat();
+    
+    evolutionGui.Setup(activePetData, next);
+    
     PetManager.SetTarget(nil);
     PetManager.SetActivePet(nil, nil);
 end);

@@ -69,8 +69,9 @@ function OnPlayerJoined(player)
 	playerService.CreatePlayerInfo(player);
 	
 	-- -- DATABASE CLEARUP
-	-- itemService.ClearItems(player);
-	-- itemService.GiveItem(player, 2);
+	itemService.ClearItems(player);
+	wait(5);
+	itemService.GiveItem(player, 2);
 	-- petService.AddExperience(player, "123", 10);
 end
 
@@ -149,7 +150,7 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 
 	local targetData = attackables[target:GetAttribute("Id")];
 	if(targetData ~= nil) then 
-		petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, 1);
+		petService.AddExperience(player, petData.PlayerItem.Id, 1);
 	end
 
 	if(creature == nil) then 
