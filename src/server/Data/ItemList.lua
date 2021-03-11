@@ -177,10 +177,11 @@ ItemList.Items = {
         ItemType = "Pet",
         Rarity = "Common",
         Name = "Beezy",
-        Description = "Buzz off.",
+        Description = "Loves bee-ing around you.",
         ModelId = 6504764631,
         BaseHealth = 10,
-        ExperienceToLevel = 200
+        ExperienceToLevel = 200,
+        GuiOffset = Vector3.new(0, 8, 0)
     },
     [17] = {
         ItemId = 17,
