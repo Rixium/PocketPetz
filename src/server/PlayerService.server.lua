@@ -22,6 +22,35 @@ attackables[1] = {
 	ExperienceAward = 1
 }
 
+local function StopAttacking(player, pet, petData, target)
+	if(player == nil) then
+		return
+	end
+
+	attackingPets[player.UserId] = nil;
+
+	if(target == nil) then
+		return
+	end
+	
+	if(pet == nil) then
+		return
+	end
+
+	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
+	local creature = creatureService.GetCreatureByGameObject(target.Parent);
+
+	if(creature ~= nil) then
+		creature.UnderAttack = false;
+		creature.Target = nil;
+
+		if(creature.EndAttackCallback ~= nil) then
+			creature.EndAttackCallback();
+		end
+
+	end
+end
+
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
 	moneyManager.PlayerJoined(player);
@@ -50,6 +79,8 @@ function OnPlayerLeaving(player)
 	playerTracker.RemovePlayer(player);
 	
 	local playersActivePet = activePets[player.UserId];
+
+	StopAttacking(player, playersActivePet, nil, attackingPets[player.UserId].Target);
 
 	if(playersActivePet ~= nil) then
 		playersActivePet.PetModel:Destroy();
@@ -175,26 +206,7 @@ end);
 
 
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
-petStopAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
-	attackingPets[player.UserId] = nil;
-
-	if(target == nil) then
-		return
-	end
-	
-	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
-	local creature = creatureService.GetCreatureByGameObject(target.Parent);
-
-	if(creature ~= nil) then
-		creature.UnderAttack = false;
-		creature.Target = nil;
-
-		if(creature.EndAttackCallback ~= nil) then
-			creature.EndAttackCallback();
-		end
-
-	end
-end);
+petStopAttackingEvent.OnServerEvent:Connect(StopAttacking);
 
 local insertService = game:GetService("InsertService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
