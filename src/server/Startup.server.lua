@@ -8,35 +8,45 @@ local itemList = require(serverScriptService.Server.Data.ItemList);
 
 local creatures = collectionService:GetTagged("Creature");
 
+local function SetupCreature(creature)
+    creature.CurrentHealth = creature.Item.BaseHealth;
+    creature.MaxHealth = creature.Item.BaseHealth;
+    creature.Alive = true;
+    creature.NextPosition = nil;
+    creature.LastMove = 0;
+    creature.UnderAttack = false;
+    creature.Target = nil;
+    creature.DeathTimer = 15;
+    
+    local healthPanel = healthGUI:clone();
+    healthPanel.NameLabel.Text = creature.Item.Name;
+    
+    local width = creature.Item.BaseHealth / creature.Item.BaseHealth;
+    healthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
+
+    healthPanel.Parent = creature.GameObject;
+    healthPanel.Adornee = creature.GameObject;
+
+    creature.HealthPanel = healthPanel;
+end
+
 for _, creature in pairs(creatures) do
     local id = creature:GetAttribute("Id");
     local creatureData = creatureService.GetCreatureDataById(id);
     local creatureItem = itemList.GetById(creatureData.ItemId);
 
-    local healthPanel = healthGUI:clone();
-    healthPanel.NameLabel.Text = creatureItem.Name;
-    
-    local width = creatureItem.BaseHealth / creatureItem.BaseHealth;
-    healthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
-
-    healthPanel.Parent = workspace;
-    healthPanel.Adornee = creature;
-
-    creatureService.AddCreature({
+    local newCreature = {
         GameObject = creature,
         StartPosition = creature.Root.Position,
         Data = creatureData,
-        Alive = true,
-        NextPosition = nil,
-        LastMove = 0,
-        UnderAttack = false,
-        Target = nil,
-        CurrentHealth = creatureItem.BaseHealth,
-        MaxHealth = creatureItem.BaseHealth,
-        HealthPanel = healthPanel
-    });
+        Item = creatureItem
+    };
+    
+    SetupCreature(newCreature);
 
+    creatureService.AddCreature(newCreature);
 end
+
 
 local lastUpdate = 5;
 local updating = false;
@@ -50,7 +60,14 @@ while true do
 
         creature.LastMove = creature.LastMove - 1;
 
-        if not creature.Alive then continue end
+        if not creature.Alive then 
+            creature.DeathTimer = creature.DeathTimer - 1;
+
+            if(creature.DeathTimer <= 0) then
+                creature.DeathTimer = 15;
+                SetupCreature(creature);
+            end
+        end
 
         local humanoid = creature.GameObject:WaitForChild("Humanoid");
 
