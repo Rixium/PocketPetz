@@ -99,6 +99,12 @@ while true do
                     attackAnimation:Stop();
                     creature.EndAttackCallback = nil;
                 end
+
+                attackAnimation.KeyframeReached:Connect(function(keyframeName)
+                    if(keyframeName == "Hit") then
+                        print(creature.Target);
+                    end
+                end);
             end
         else
             if(creature.LastMove <= 0) then
