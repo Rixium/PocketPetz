@@ -70,8 +70,6 @@ function OnPlayerJoined(player)
 	
 	-- -- DATABASE CLEARUP
 	itemService.ClearItems(player);
-	wait(5);
-	itemService.GiveItem(player, 2);
 	-- petService.AddExperience(player, "123", 10);
 end
 
@@ -191,6 +189,23 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 		creature.Target = nil;
 
 		petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
+
+		local ran = math.random(0, 100);
+
+		local drops = creature.Data.Drops;
+		local expectedDrop = nil;
+
+		for _, drop in pairs(drops) do
+			if(ran > drop.Chance) then
+				continue;
+			end
+
+			expectedDrop = drop;
+		end
+
+		if(expectedDrop ~= nil) then
+			itemService.GiveItem(player, expectedDrop.ItemId);
+		end
 
 		targetKilled:FireClient(player);
 	end

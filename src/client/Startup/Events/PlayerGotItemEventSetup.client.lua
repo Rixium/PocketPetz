@@ -28,7 +28,7 @@ local function OnGotItem(itemData)
     tween:Play();
 
     newPopup.TextLabel.Text = "You got " .. itemData.Name;
-    newPopup.Image.ItemImage.Image = "rbxassetid://" .. itemData.ThumbnailId;
+    newPopup.Image.ItemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
 
     tween.Completed:Wait()
 

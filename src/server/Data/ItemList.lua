@@ -147,7 +147,8 @@ ItemList.Items = {
         Name = "Pigzee",
         Description = "Oink!",
         ModelId = 6500864818,
-        BaseHealth = 10
+        BaseHealth = 10,
+        ExperienceToLevel = 200
     },
     [14] = {
         ItemId = 14,
@@ -157,7 +158,7 @@ ItemList.Items = {
         Description = "It smells funny!",
         ModelId = 6504277287,
         ExperienceToLevel = 10,
-        LevelToEvolve = 5,
+        LevelToEvolve = 2,
         EvolvesTo = 13
     },
     [15] = {
@@ -166,8 +167,8 @@ ItemList.Items = {
         Rarity = "Common",
         Name = "Wild Seed",
         Description = "A strange looking seed.",
-        ModelId = 6504279569
-        ExperienceToLevel = 100,
+        ModelId = 6504279569,
+        ExperienceToLevel = 100
     }
 };
 

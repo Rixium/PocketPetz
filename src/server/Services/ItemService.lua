@@ -14,24 +14,6 @@ local dataStore2 = dataStoreGet.DataStore;
 -- Variables
 local itemsData = "Items";
 
-local ItemPlayerData = {
-    [1] = {
-        CurrentExperience = 0,
-        CurrentLevel = 1,
-        Nickname = ""
-    },
-    [2] = {
-        CurrentExperience = 0,
-        CurrentLevel = 1,
-        Nickname = ""
-    },
-    [3] = {
-        CurrentExperience = 0,
-        CurrentLevel = 1,
-        Nickname = ""
-    }
-}
-
 -- Functions 
 function ItemService.GetPlayerItems(player)
     local itemStore = dataStore2(itemsData, player);
@@ -69,7 +51,11 @@ function ItemService.GiveItem(player, itemId)
     table.insert(items, {
         Id = guid,
         ItemId = itemId,
-        Data = ItemPlayerData[itemId]
+        Data = {
+            CurrentExperience = 0,
+            CurrentLevel = 1,
+            Nickname = ""
+        }
     });
 
     itemStore:Set(items);
