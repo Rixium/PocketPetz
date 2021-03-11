@@ -12,8 +12,6 @@ for _, creature in pairs(creatures) do
     local creatureData = creatureService.GetCreatureDataById(id);
     local creatureItem = itemList.GetById(creatureData.ItemId);
 
-    print(creatureItem);
-
     creatureService.AddCreature({
         GameObject = creature,
         StartPosition = creature.Root.Position,
@@ -39,7 +37,6 @@ while true do
 
         creature.LastMove = creature.LastMove - 1;
 
-        print(creature.Alive);
         if not creature.Alive then continue end
 
         local humanoid = creature.GameObject:WaitForChild("Humanoid");
