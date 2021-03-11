@@ -12,7 +12,8 @@ CreatureService.CreatureData = {
                 ItemId = 15,
                 Chance = 0.001
             }
-        }
+        },
+        BaseExperienceAward = 5
     }
 }
 

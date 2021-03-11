@@ -80,7 +80,14 @@ function OnPlayerLeaving(player)
 	
 	local playersActivePet = activePets[player.UserId];
 
-	StopAttacking(player, playersActivePet, nil, attackingPets[player.UserId].Target);
+	local attacker = attackingPets[player.UserId];
+	local target = nil;
+
+	if(attacker ~= nil) then
+		target = attacker.Target;
+	end
+
+	StopAttacking(player, playersActivePet, nil, target);
 
 	if(playersActivePet ~= nil) then
 		playersActivePet.PetModel:Destroy();
@@ -140,6 +147,11 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	
 	local creature = creatureService.GetCreatureByGameObject(target.Parent);
 
+	local targetData = attackables[target:GetAttribute("Id")];
+	if(targetData ~= nil) then 
+		petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, targetData.ExperienceAward);
+	end
+
 	if(creature == nil) then 
 		local animator = target.Parent:WaitForChild("Humanoid");
 		if animator then
@@ -176,6 +188,8 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 		creature.Alive = false;
 		creature.UnderAttack = false;
 		creature.Target = nil;
+
+		petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
 
 		targetKilled:FireClient(player);
 	end
@@ -290,17 +304,3 @@ petRequestAttack.OnServerInvoke = function(player, target)
 
 	return true;
 end
-
-spawn(function()
-	while true do
-		wait(1)
-		
-		for _, pet in pairs(attackingPets) do
-			local target = currentTargets[pet.Player.UserId];
-			if(target == nil) then continue end
-			local targetData = attackables[target:GetAttribute("Id")];
-			if(targetData == nil) then continue end
-			petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, targetData.ExperienceAward);
-		end
-	end
-end);

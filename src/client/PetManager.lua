@@ -207,20 +207,37 @@ local function CheckForCleanup()
     local playerCharacter = players.LocalPlayer.Character;
 
     if not model.PrimaryPart then
-        runner:Disconnect();
         model:Destroy();
         return;
     end
 
     if not playerCharacter.PrimaryPart then
-        runner:Disconnect();
         model:Destroy();
         return;
     end
 end
 
 local function UpdatePet(delta)
+    
+    for _, damageGUI in pairs(damages) do
+        damageGUI.Time = damageGUI.Time - delta;
+        damageGUI.GUI.ExtentsOffset = Vector3.new(damageGUI.GUI.ExtentsOffset.X, damageGUI.GUI.ExtentsOffset.Y + 2 * delta, damageGUI.GUI.ExtentsOffset.Z);
+        damageGUI.GUI.Frame.ImageLabel.ImageTransparency = damageGUI.GUI.Frame.ImageLabel.ImageTransparency + delta;
+        damageGUI.GUI.Frame.Damage.TextTransparency = damageGUI.GUI.Frame.Damage.TextTransparency + delta;
+    end
+
+    for i, damageGUI in pairs(damages) do
+        if(damageGUI.Time <= 0) then
+            damageGUI.GUI:Destroy();
+            table.remove(damages, i);
+        end
+    end
+
     CheckForCleanup();
+
+    if(activePet == nil) then
+        return;
+    end
 
     if(activeTarget ~= nil) then
         DoCombat();
@@ -240,19 +257,6 @@ local function UpdatePet(delta)
                 track = nil;
                 setPetAnimation:FireServer(nil);
             end
-        end
-    end
-
-    for _, damageGUI in pairs(damages) do
-        damageGUI.Time = damageGUI.Time - delta;
-        damageGUI.GUI.ExtentsOffset = Vector3.new(damageGUI.GUI.ExtentsOffset.X, damageGUI.GUI.ExtentsOffset.Y + 2 * delta, damageGUI.GUI.ExtentsOffset.Z);
-        damageGUI.GUI.Frame.ImageLabel.ImageTransparency = damageGUI.GUI.Frame.ImageLabel.ImageTransparency + delta;
-        damageGUI.GUI.Frame.Damage.TextTransparency = damageGUI.GUI.Frame.Damage.TextTransparency + delta;
-    end
-
-    for i, damageGUI in pairs(damages) do
-        if(damageGUI.Time <= 0) then
-            table.remove(damages, i);
         end
     end
 end
@@ -276,8 +280,6 @@ local function SetupPet(pet, petData)
     bodyGyro.D = 10;
 
     ShowXpAbove(pet, petData);
-
-    runner = game:GetService("RunService").RenderStepped:Connect(UpdatePet);
 
     petGotExperience.OnClientEvent:Connect(function(pet) 
         UpdateXpBar(pet);
@@ -344,9 +346,8 @@ end
 function PetManager.SetActivePet(pet, petData)
     petSpawning = true;
 
-    if(runner ~= null) then
+    if(activePet ~= null) then
         activePet:Destroy();
-        runner:Disconnect();
     end
 
     if(pet == nil or petData == nil) then 
@@ -379,5 +380,7 @@ petEvolved.OnClientEvent:Connect(function(next)
     PetManager.SetTarget(nil);
     PetManager.SetActivePet(nil, nil);
 end);
+
+game:GetService("RunService").RenderStepped:Connect(UpdatePet);
 
 return PetManager;
