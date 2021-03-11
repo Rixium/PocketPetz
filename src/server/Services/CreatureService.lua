@@ -14,6 +14,20 @@ CreatureService.CreatureData = {
             }
         },
         BaseExperienceAward = 20
+    },
+    [2] = {
+        ItemId = 16,
+        Drops = {
+            [17] = {
+                ItemId = 17,
+                Chance = 5
+            },
+            [15] = {
+                ItemId = 15,
+                Chance = 1
+            }
+        },
+        BaseExperienceAward = 20
     }
 }
 

@@ -155,11 +155,11 @@ local function UpdateXpBar(itemData)
         width = 1;
     end
 
-    board.Experience.Size = UDim2.new(width,0, 0.4,0);
+    board.C.ImageLabel.Experience.Size = UDim2.new(width, 0, 1, 0);
 end
 
 local function ShowXpAbove(model, itemData)
-    local npcAboveHeadGUI = replicatedStorage.ExperienceGUI;
+    local npcAboveHeadGUI = replicatedStorage.PetGUI;
     board = npcAboveHeadGUI:Clone()
     board.Parent = workspace;
     board.Adornee = model.Root;
@@ -167,10 +167,10 @@ local function ShowXpAbove(model, itemData)
     local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
     local toLevel = itemData.ItemData.ExperienceToLevel;
 
-    board.NameLabel.Text = itemData.ItemData.Name;
+    board.A.Text = itemData.ItemData.Name;
 
     local width = currentExperience / toLevel;
-    board.Experience.Size = UDim2.new(width,0, 0.4,0);
+    board.C.ImageLabel.Experience.Size = UDim2.new(width,0, 1,0);
 
     itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
     UpdateXpBar(itemData.PlayerItem);

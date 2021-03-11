@@ -171,7 +171,29 @@ ItemList.Items = {
         ModelId = 6504279569,
         ExperienceToLevel = 100,
         Value = 100
-    }
+    },
+    [16] = {
+        ItemId = 16,
+        ItemType = "Pet",
+        Rarity = "Common",
+        Name = "Beezy",
+        Description = "Buzz off.",
+        ModelId = 6504764631,
+        BaseHealth = 10,
+        ExperienceToLevel = 200
+    },
+    [17] = {
+        ItemId = 17,
+        ItemType = "Seed",
+        Rarity = "Common",
+        Name = "Beezy Seed",
+        Description = "I can hear it buzzing..",
+        ModelId = 6505008452,
+        ExperienceToLevel = 10,
+        LevelToEvolve = 2,
+        EvolvesTo = 16,
+        Value = 50
+    },
 };
 
 function ItemList.GetAllById(playerItems)
