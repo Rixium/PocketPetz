@@ -123,9 +123,14 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 
 	-- Do damage
 	creature.CurrentHealth = creature.CurrentHealth - 1;
+    
+    local width = creature.CurrentHealth / creature.MaxHealth;
+    creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
 
 	if(creature.CurrentHealth < 0) then
 		creature.Alive = false;
+		creature.UnderAttack = false;
+		creature.Target = nil;
 		local animator = target.Parent:WaitForChild("Humanoid");
 		
 		targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Death);
@@ -165,6 +170,10 @@ local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEv
 petStopAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 	attackingPets[player.UserId] = nil;
 
+	if(target == nil) then
+		return
+	end
+	
 	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
 	local creature = creatureService.GetCreatureByGameObject(target.Parent);
 

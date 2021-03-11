@@ -2,6 +2,7 @@
 local collectionService = game:GetService("CollectionService");
 local serverScriptService = game:GetService("ServerScriptService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local healthGUI = replicatedStorage.HealthGUI;
 local creatureService = require(serverScriptService.Server.Services.CreatureService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
 
@@ -12,6 +13,15 @@ for _, creature in pairs(creatures) do
     local creatureData = creatureService.GetCreatureDataById(id);
     local creatureItem = itemList.GetById(creatureData.ItemId);
 
+    local healthPanel = healthGUI:clone();
+    healthPanel.NameLabel.Text = creatureItem.Name;
+    
+    local width = creatureItem.BaseHealth / creatureItem.BaseHealth;
+    healthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
+
+    healthPanel.Parent = workspace;
+    healthPanel.Adornee = creature;
+
     creatureService.AddCreature({
         GameObject = creature,
         StartPosition = creature.Root.Position,
@@ -21,8 +31,11 @@ for _, creature in pairs(creatures) do
         LastMove = 0,
         UnderAttack = false,
         Target = nil,
-        CurrentHealth = creatureItem.BaseHealth
+        CurrentHealth = creatureItem.BaseHealth,
+        MaxHealth = creatureItem.BaseHealth,
+        HealthPanel = healthPanel
     });
+
 end
 
 local lastUpdate = 5;
