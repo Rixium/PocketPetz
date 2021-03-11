@@ -149,7 +149,7 @@ petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
 
 	local targetData = attackables[target:GetAttribute("Id")];
 	if(targetData ~= nil) then 
-		petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, targetData.ExperienceAward);
+		petService.AddExperience(pet.Player, pet.PetData.PlayerItem.Id, 1);
 	end
 
 	if(creature == nil) then 
