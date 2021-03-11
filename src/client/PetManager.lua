@@ -146,36 +146,6 @@ local function AttackTarget()
     end
 end
 
-local function UpdateXpBar(itemData)
-    if(activePetData == nil) then return end
-
-    local width = itemData.Data.CurrentExperience / activePetData.ItemData.ExperienceToLevel;
-    
-    if(width > 1) then
-        width = 1;
-    end
-
-    board.C.ImageLabel.Experience.Size = UDim2.new(width, 0, 1, 0);
-end
-
-local function ShowXpAbove(model, itemData)
-    local npcAboveHeadGUI = replicatedStorage.PetGUI;
-    board = npcAboveHeadGUI:Clone()
-    board.Parent = workspace;
-    board.Adornee = model.Root;
-    
-    local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
-    local toLevel = itemData.ItemData.ExperienceToLevel;
-
-    board.A.Text = itemData.ItemData.Name;
-
-    local width = currentExperience / toLevel;
-    board.C.ImageLabel.Experience.Size = UDim2.new(width,0, 1,0);
-
-    itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
-    UpdateXpBar(itemData.PlayerItem);
-end
-
 local function DoCombat()
     if(activeTarget == nil) then return end
     if(activePet == nil) then return end
@@ -278,13 +248,6 @@ local function SetupPet(pet, petData)
     bodyPosition.MaxForce = Vector3.new(math.huge, 50, math.huge);
     bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
     bodyGyro.D = 10;
-
-    ShowXpAbove(pet, petData);
-
-    petGotExperience.OnClientEvent:Connect(function(pet) 
-        UpdateXpBar(pet);
-    end);
-    
     
     activePetData = petData;
     activePet = pet;

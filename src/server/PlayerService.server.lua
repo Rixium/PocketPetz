@@ -5,6 +5,7 @@ local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
+local activePetService = require(serverScriptService.Server.Services.ActivePetService);
 local physicsService = game:GetService("PhysicsService");
 local players = game:GetService("Players");
 local collectionService  = game:GetService("CollectionService");
@@ -12,44 +13,6 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local creatureService = require(serverScriptService.Server.Services.CreatureService);
 
 local currentEventTitle = "AlphaStar";
-
-local attackingPets = {};
-local activePets = {};
-local currentTargets = {};
-
-local attackables = {};
-attackables[1] = {
-	ExperienceAward = 1
-}
-
-local function StopAttacking(player, pet, petData, target)
-	if(player == nil) then
-		return
-	end
-
-	attackingPets[player.UserId] = nil;
-
-	if(target == nil) then
-		return
-	end
-	
-	if(pet == nil) then
-		return
-	end
-
-	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
-	local creature = creatureService.GetCreatureByGameObject(target.Parent);
-
-	if(creature ~= nil) then
-		creature.UnderAttack = false;
-		creature.Target = nil;
-
-		if(creature.EndAttackCallback ~= nil) then
-			creature.EndAttackCallback();
-		end
-
-	end
-end
 
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
@@ -67,34 +30,14 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
-	
-	-- -- DATABASE CLEARUP
-	itemService.ClearItems(player);
-	wait(5);
-	itemService.GiveItem(player, 4);
-	-- petService.AddExperience(player, "123", 10);
 end
 
 function OnPlayerLeaving(player)
 	playerTracker.Logout(player);
 	playerTracker.RemovePlayer(player);
 	
-	local playersActivePet = activePets[player.UserId];
-
-	local attacker = attackingPets[player.UserId];
-	local target = nil;
-
-	if(attacker ~= nil) then
-		target = attacker.Target;
-	end
-
-	StopAttacking(player, playersActivePet, nil, target);
-
-	if(playersActivePet ~= nil) then
-		playersActivePet.PetModel:Destroy();
-	end
-
-	attackingPets[player.UserId] = nil;
+	activePetService.StopAttacking(player);
+	activePetService.RemovePlayerPet(player);
 end
 
 
@@ -132,119 +75,15 @@ getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 end
 
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
-local runService = game:GetService("RunService");
-local targetKilled = replicatedStorage.Common.Events.TargetKilled;
-
-petAttackingEvent.OnServerEvent:Connect(function(player, pet, petData, target)
-	local playersActiveTarget = attackingPets[player.UserId];
-
-	if(playersActiveTarget == nil) then
-		return;
-	end
-
-	if(playersActiveTarget.Target ~= target) then
-		return;
-	end
-	
-	local creature = creatureService.GetCreatureByGameObject(target.Parent);
-
-	local targetData = attackables[target:GetAttribute("Id")];
-	if(targetData ~= nil) then 
-		petService.AddExperience(player, petData.PlayerItem.Id, 1);
-	end
-
-	if(creature == nil) then 
-		local animator = target.Parent:WaitForChild("Humanoid");
-		if animator then
-			targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Hit);
-			targetHitAnimation:Play();
-		end
-
-		return;
-	end
-
-	if(creature.Alive == false) then
-		return;
-	end
-
-	creature.UnderAttack = true;
-	creature.Target = pet;
-
-	-- Do damage
-	creature.CurrentHealth = creature.CurrentHealth - 1;
-    
-    local width = creature.CurrentHealth / creature.MaxHealth;
-    creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
-
-	if(creature.CurrentHealth < 0) then
-		local animator = target.Parent:WaitForChild("Humanoid");
-		
-		targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Death);
-		targetHitAnimation:Play();
-		targetHitAnimation.Stopped:Wait();
-		
-		creature.GameObject:Destroy();
-		creature.GameObject = nil;
-
-		creature.Alive = false;
-		creature.UnderAttack = false;
-		creature.Target = nil;
-
-		petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
-
-		local ran = math.random(0, 100);
-
-		local drops = creature.Data.Drops;
-		local expectedDrop = nil;
-
-		for _, drop in pairs(drops) do
-			if(ran > drop.Chance) then
-				continue;
-			end
-
-			expectedDrop = drop;
-		end
-
-		if(expectedDrop ~= nil) then
-			itemService.GiveItem(player, expectedDrop.ItemId);
-		end
-
-		targetKilled:FireClient(player);
-	end
-
-end);
+petAttackingEvent.OnServerEvent:Connect(activePetService.PetAttack);
 
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
-setPetAnimation.OnServerEvent:Connect(function(player, animation)
-	local playerPet = activePets[player.UserId];
-	if(playerPet == nil) then return end
-
-	playerPet = playerPet.PetModel;
-	
-	if(animation == nil) then
-		local humanoid = playerPet:WaitForChild("Humanoid", 1000);
-		for _, a in pairs(humanoid:GetPlayingAnimationTracks()) do
-			a:Stop();
-		end
-		return;
-	end
-
-	local animator = playerPet:WaitForChild("Humanoid", 1000);
-	if animator then
-		track = animator:LoadAnimation(animation)
-		track:Play()
-	end
-end);
-
+setPetAnimation.OnServerEvent:Connect(activePetService.PetAnimation);
 
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
-petStopAttackingEvent.OnServerEvent:Connect(StopAttacking);
+petStopAttackingEvent.OnServerEvent:Connect(activePetService.StopAttacking);
 
-local insertService = game:GetService("InsertService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
-local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
-
-local physicsService = game:GetService("PhysicsService");
 equipItemRequest.OnServerEvent:Connect(function(player, item)
 	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
 
@@ -252,73 +91,11 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 		return;
 	end
 
-	if(activePets[player.UserId] ~= nil) then
-		local playersCurrentPet = activePets[player.UserId];
-		playersCurrentPet.PetModel:Destroy();
+	-- TODO, use server data instead of client
+	if(item.ItemData.ItemType == "Pet" or item.ItemData.ItemType == "Seed") then
+		activePetService.AddActivePet(player, item);
 	end
-
-	local model = insertService:LoadAsset(item.ItemData.ModelId);
-	
-    local toSend = model:FindFirstChildWhichIsA("Model")
-
-	toSend.PrimaryPart = toSend.Root;
-	toSend.Parent = workspace;
-	toSend.PrimaryPart:SetNetworkOwner(player);
-
-	model:Destroy();
-
-	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
-	
-	activePets[player.UserId] = {
-		PetModel = toSend,
-		PetData = item	
-	};
-
-	playerEquipped:FireClient(player, toSend, item);
 end);
 
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
-local creatureService = require(serverScriptService.Server.Services.CreatureService);
-petRequestAttack.OnServerInvoke = function(player, target)
-	local playersPet = activePets[player.UserId]
-	local petData = petService.GetPetByGuid(player, playersPet.Id);
-
-	if(playersPet == nil) then 
-		return false;
-	end
-
-	for _, obj in pairs(attackingPets) do
-		if(obj.Target == target) then
-			return false;
-		end
-	end
-
-	local attackableId = target:GetAttribute("Id");
-
-	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
-
-	if(playersPet.PetData.ItemData.ItemType == "Seed") then
-		if(targetIsCreature) then
-			return false;
-		end
-	elseif(playersPet.PetData.ItemData.ItemType == "Pet") then
-		if(not targetIsCreature) then
-			return false;
-		end
-	end
-
-	attackingPets[player.UserId] = {
-		Player = player,
-		PetModel = playersPet.PetModel,
-		PetData = playersPet.PetData,
-		Target = target
-	};
-
-	if((player.Character:GetPrimaryPartCFrame().p - target.CFrame.p).magnitude > 40) then
-		return false;
-	end
-
-	currentTargets[player.UserId] = target;
-
-	return true;
-end
+petRequestAttack.OnServerInvoke = activePetService.RequestPetAttack;
