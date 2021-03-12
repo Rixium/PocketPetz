@@ -295,12 +295,20 @@ function ActivePetService.RequestPetAttack(player, target)
 		return false;
 	end
 
-	local petData = petService.GetPetByGuid(player, playersPet.Id);
+	local petData = petService.GetPetByGuid(player, playersPet.PetData.PlayerItem.Id);
+
+	if(petData == nil) then
+		return false;
+	end
 
 	for _, obj in pairs(activePets) do
 		if(obj.Target == target) then
 			return false;
 		end
+	end
+
+	if(petData.Data.CurrentHealth <= 0) then
+		return false;
 	end
 
 	local attackableId = target:GetAttribute("Id");
