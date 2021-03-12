@@ -48,7 +48,7 @@ function ItemService.GiveItem(player, itemId)
 
     local guid = httpService:GenerateGUID();
     
-    table.insert(items, {
+    local newItem = {
         Id = guid,
         ItemId = itemId,
         Data = {
@@ -56,14 +56,16 @@ function ItemService.GiveItem(player, itemId)
             CurrentLevel = 1,
             Nickname = ""
         }
-    });
-
-    itemStore:Set(items);
-
+    };
+    
     spawn(function()
-        local itemData = itemList.GetById(itemId);        
+        local itemData = itemList.GetById(itemId);
+        newItem.CurrentHealth = itemData.BaseHealth;
         gotItemEvent:FireClient(player, itemData);
     end)
+
+    table.insert(items, newItem);
+    itemStore:Set(items);
 end
 
 return ItemService;

@@ -182,6 +182,15 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 	creature.UnderAttack = true;
 	creature.Target = playersPet.PetModel;
+	creature.HitTargetCallback = function()
+		local petData = playersPet.PetData;
+		local playerItemData = petData.PlayerItem.Data;
+		local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
+		currentHealth = currentHealth - 1;
+
+		playerItemData.CurrentHealth = currentHealth;
+		petService.UpdatePet(player, petData.PlayerItem.Id, petData.PlayerItem.Data);
+	end
 
 	-- Do damage
 	creature.CurrentHealth = creature.CurrentHealth - 1;

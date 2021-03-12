@@ -29,6 +29,18 @@ function PetService.GetPetByGuid(player, guid)
     return nil;
 end
 
+function PetService.UpdatePet(player, guid, data)
+    local itemStore = dataStore2(itemsStore, player);
+    local items = itemStore:Get({});
+
+    for _, item in pairs(items) do
+        if(item.Id == guid) then
+            item.Data = data;
+            return;
+        end
+    end
+end
+
 function PetService.AddExperience(player, guid, experienceAmount)
     local itemStore = dataStore2(itemsStore, player);
     local items = itemStore:Get({});

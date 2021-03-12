@@ -79,6 +79,7 @@ function CreatureService.SetupCreature(creature)
     creature.UnderAttack = false;
     creature.Target = nil;
     creature.DeathTimer = 15;
+    creature.HitTargetCallback = nil;
 
     if(creature.GameObject == nil) then
         creature.GameObject = creature.GameObjectTemplate:clone();
@@ -152,7 +153,9 @@ function CreatureService.HandleAttack(creature)
 
         attackAnimation.KeyframeReached:Connect(function(keyframeName)
             if(keyframeName == "Hit") then
-                
+                if(creature.HitTargetCallback ~= nil) then
+                    creature.HitTargetCallback();
+                end
             end
         end);
     end
