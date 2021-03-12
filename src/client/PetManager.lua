@@ -40,9 +40,6 @@ local RNG = Random.new()
 local bodyPosition = nil
 local bodyGyro = nil
 
-local sound = nil;
-
-
 -- Functions
 
 -- UI Stuff
@@ -141,8 +138,6 @@ local function AttackTarget()
                 });
 
                 petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
-
-                sound:Play();
             end
         end);
         attackTrack:Play();
@@ -235,14 +230,6 @@ local function UpdatePet(delta)
 end
 
 local function SetupPet(pet, petData)
-    sound = Instance.new("Sound", pet.Root);
-    sound.SoundId = "rbxassetid://3748780065"
-    sound.Name = "TestSound"
-    sound.Volume = 0.2;
-    sound.RollOffMinDistance = 0;
-    sound.RollOffMaxDistance = 50;
-    sound.RollOffMode = Enum.RollOffMode.LinearSquare;
-
     bodyPosition = Instance.new("BodyPosition", pet.Root);
     bodyPosition.D = 700;
 
@@ -354,9 +341,7 @@ petFainted.OnClientEvent:Connect(function()
     PetManager.SetTarget(nil);
 
     local messageUi = petFaintNotification:clone();
-
-    print(activePetData);
-
+    
     messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";
     messageUi.MessageBack.FaceBack.FaceImage.Image = "rbxthumb://type=Asset&id=" .. activePetData.ItemData.ModelId .. "&w=420&h=420";
 

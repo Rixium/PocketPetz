@@ -33,6 +33,7 @@ function OnPlayerJoined(player)
 	playerService.CreatePlayerInfo(player);
 
 	itemService.ClearItems(player);
+	wait(5);
 	itemService.GiveItem(player, 13);
 end
 

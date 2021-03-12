@@ -114,6 +114,22 @@ function ActivePetService.AddActivePet(player, item)
 
 	UpdateHealthBar(playersPet, playersPet.PetData);
 	UpdateXpBar(playersPet, playersPet.PetData);
+	
+	local deadSound = Instance.new("Sound", toSend.Root);
+	deadSound.SoundId = "rbxassetid://852561358"
+	deadSound.Name = "DeadSound"
+	deadSound.Volume = 0.2;
+	deadSound.RollOffMinDistance = 0;
+	deadSound.RollOffMaxDistance = 50;
+	deadSound.RollOffMode = Enum.RollOffMode.LinearSquare;
+	
+    local hitSound = Instance.new("Sound", playersPet.PetModel.Root);
+    hitSound.SoundId = "rbxassetid://3748780065"
+    hitSound.Name = "HitSound"
+    hitSound.Volume = 0.2;
+    hitSound.RollOffMinDistance = 0;
+    hitSound.RollOffMaxDistance = 50;
+    hitSound.RollOffMode = Enum.RollOffMode.LinearSquare;
 
 	playerEquipped:FireClient(player, toSend, item);
 end
@@ -219,6 +235,8 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
 		currentHealth = currentHealth - 1;
 
+		creature.GameObject.Root.HitSound:Play();
+
 		playerItemData.CurrentHealth = currentHealth;
 		petService.UpdatePet(player, petData.PlayerItem.Id, petData.PlayerItem.Data);
 		UpdateHealthBar(playersPet, petData);
@@ -226,6 +244,8 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		if(currentHealth <= 0) then
 			ActivePetService.StopAttacking(player, petData);
 			petFainted:FireClient(player);
+
+			playersPet.PetModel.Root.DeadSound:Play();
 
 			local animator = playersPet.PetModel:WaitForChild("Humanoid");
 			local deadAnimation = animator:LoadAnimation(playersPet.PetModel.Animations.Death);
@@ -235,6 +255,8 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			ActivePetService.RemovePlayerPet(player);
 		end
 	end
+
+	playersPet.PetModel.Root.HitSound:Play();
 
 	-- Do damage
 	creature.CurrentHealth = creature.CurrentHealth - 1;

@@ -85,6 +85,14 @@ function CreatureService.SetupCreature(creature)
         creature.GameObject = creature.GameObjectTemplate:clone();
         creature.GameObject.Parent = workspace;
     end
+
+    local sound = Instance.new("Sound", creature.GameObject.Root);
+    sound.SoundId = "rbxassetid://2331617000"
+    sound.Name = "HitSound"
+    sound.Volume = 0.2;
+    sound.RollOffMinDistance = 0;
+    sound.RollOffMaxDistance = 50;
+    sound.RollOffMode = Enum.RollOffMode.LinearSquare;
     
     local healthPanel = healthGUI:clone();
     healthPanel.NameLabel.Text = creature.Item.Name;
