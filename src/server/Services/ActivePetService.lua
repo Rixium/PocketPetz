@@ -22,7 +22,7 @@ attackables[1] = {
 
 -- Functions
 
-local function UpdateXpBar(itemData)
+local function UpdateXpBar(activePetData, itemData)
     if(activePetData == nil) then return end
 
     local width = itemData.Data.CurrentExperience / activePetData.ItemData.ExperienceToLevel;
@@ -34,7 +34,24 @@ local function UpdateXpBar(itemData)
     board.C.ImageLabel.Experience.Size = UDim2.new(width, 0, 1, 0);
 end
 
-local function ShowXpAbove(model, itemData)
+local function UpdateHealthBar(pet, petData)
+    if(petData == nil) then return end
+
+	local currentHealth = petData.PlayerItem.Data.CurrentHealth;
+	local maxHealth = petData.ItemData.BaseHealth;
+
+    local width = currentHealth / maxHealth;
+    
+    if(width > 1) then
+        width = 1;
+	elseif(width < 0) then
+		width = 0;
+	end
+
+    pet.AboveHeadGUI.B.ImageLabel.Health.Size = UDim2.new(width, 0, 1, 0);
+end
+
+local function AddAboveHeadGUI(model, itemData)
     local npcAboveHeadGUI = replicatedStorage.PetGUI;
     board = npcAboveHeadGUI:Clone()
     board.Parent = workspace;
@@ -45,7 +62,6 @@ local function ShowXpAbove(model, itemData)
 	if(offset ~= nil) then
 		board.StudsOffset = offset;
 	end
-	
     
     local currentExperience = itemData.PlayerItem.Data.CurrentExperience;
     local toLevel = itemData.ItemData.ExperienceToLevel;
@@ -56,6 +72,8 @@ local function ShowXpAbove(model, itemData)
     board.C.ImageLabel.Experience.Size = UDim2.new(width,0, 1,0);
 
     itemData.PlayerItem.Data.CurrentExperience = itemData.PlayerItem.Data.CurrentExperience + 0.1;
+
+	return board;
 end
 
 function ActivePetService.AddActivePet(player, item)
@@ -77,13 +95,18 @@ function ActivePetService.AddActivePet(player, item)
 
 	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Pets")
 	
-	activePets[player.UserId] = {
+	local aboveHeadGUI = AddAboveHeadGUI(toSend, item);
+
+	local playersPet = {
 		PetModel = toSend,
 		PetData = item,
-		Target = nil
+		Target = nil,
+		AboveHeadGUI = aboveHeadGUI
 	};
 
-	ShowXpAbove(toSend, item);
+	activePets[player.UserId] = playersPet;
+
+	UpdateHealthBar(playersPet, playersPet.PetData);
 
 	playerEquipped:FireClient(player, toSend, item);
 end
@@ -190,6 +213,12 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 		playerItemData.CurrentHealth = currentHealth;
 		petService.UpdatePet(player, petData.PlayerItem.Id, petData.PlayerItem.Data);
+
+		if(currentHealth <= 0) then
+			ActivePetService.StopAttacking(player, petData);
+		end
+
+		UpdateHealthBar(playersPet, petData);
 	end
 
 	-- Do damage

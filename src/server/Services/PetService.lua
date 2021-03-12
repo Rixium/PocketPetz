@@ -36,9 +36,11 @@ function PetService.UpdatePet(player, guid, data)
     for _, item in pairs(items) do
         if(item.Id == guid) then
             item.Data = data;
-            return;
+            break;
         end
     end
+
+    itemStore:Set(items);
 end
 
 function PetService.AddExperience(player, guid, experienceAmount)
