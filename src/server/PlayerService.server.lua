@@ -31,6 +31,10 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
+
+	itemService.ClearItems(player);
+	wait(4);
+	itemService.GiveItem(player, 2);
 end
 
 function OnPlayerLeaving(player)

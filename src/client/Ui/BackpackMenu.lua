@@ -84,6 +84,8 @@ local function AddItem(itemToAdd)
 
     local health = itemToAdd.PlayerItem.Data.CurrentHealth or 1;
 
+    item.LevelText.Text = "Lv. " .. itemToAdd.PlayerItem.Data.CurrentLevel;
+
     if(health <= 0) then
         item.Cross.Visible = true;
     end
