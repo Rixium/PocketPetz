@@ -86,6 +86,7 @@ end
 function ActivePetService.AddActivePet(player, item)
 	if(activePets[player.UserId] ~= nil) then
 		local playersCurrentPet = activePets[player.UserId];
+		ActivePetService.StopAttacking(player, playersCurrentPet.PetData);
 		playersCurrentPet.PetModel:Destroy();
 	end
 
@@ -122,7 +123,7 @@ function ActivePetService.AddActivePet(player, item)
 	deadSound.RollOffMinDistance = 0;
 	deadSound.RollOffMaxDistance = 50;
 	deadSound.RollOffMode = Enum.RollOffMode.LinearSquare;
-	
+
     local hitSound = Instance.new("Sound", playersPet.PetModel.Root);
     hitSound.SoundId = "rbxassetid://3748780065"
     hitSound.Name = "HitSound"
@@ -344,6 +345,8 @@ function ActivePetService.RequestPetAttack(player, target)
 			return false;
 		end
 	end
+
+	ActivePetService.StopAttacking(player, playersPet.PetData);
 
 	local currentHealth = petData.Data.CurrentHealth or 1;
 	if(currentHealth <= 0) then

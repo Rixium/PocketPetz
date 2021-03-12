@@ -31,10 +31,6 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
-
-	itemService.ClearItems(player);
-	wait(5);
-	itemService.GiveItem(player, 13);
 end
 
 function OnPlayerLeaving(player)
@@ -99,7 +95,8 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	local itemData = itemList.GetById(playerItem.ItemId);
 
 	if(itemData.ItemType == "Pet" or itemData.ItemType == "Seed") then
-		if(playerItem.Data.CurrentHealth > 0) then
+		local health = playerItem.Data.CurrentHealth or 1;
+		if(health > 0) then
 			activePetService.AddActivePet(player, {
 				PlayerItem = playerItem,
 				ItemData = itemData

@@ -63,7 +63,9 @@ local function SelectItem(selectedItem)
 
     itemPopupFrame.Visible = true;
 
-    if(selectedItem.PlayerItem.Data.CurrentHealth > 0) then
+    local health = selectedItem.PlayerItem.Data.CurrentHealth or 1;
+
+    if(health > 0) then
         local takeOutButton;
         takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
             equipItemRequest:FireServer(selectedItem);
@@ -80,9 +82,7 @@ local function AddItem(itemToAdd)
     local item = itemBack:clone();
     item.Parent = scrollingFrame;
 
-    print(itemToAdd);
-
-    local health = itemToAdd.PlayerItem.Data.CurrentHealth;
+    local health = itemToAdd.PlayerItem.Data.CurrentHealth or 1;
 
     if(health <= 0) then
         item.Cross.Visible = true;

@@ -341,10 +341,7 @@ petFainted.OnClientEvent:Connect(function()
     PetManager.SetTarget(nil);
 
     local messageUi = petFaintNotification:clone();
-    
     messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";
-    messageUi.MessageBack.FaceBack.FaceImage.Image = "rbxthumb://type=Asset&id=" .. activePetData.ItemData.ModelId .. "&w=420&h=420";
-
     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
 end);
 
