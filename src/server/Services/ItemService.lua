@@ -60,12 +60,11 @@ function ItemService.GiveItem(player, itemId)
     
     spawn(function()
         local itemData = itemList.GetById(itemId);
-        newItem.CurrentHealth = itemData.BaseHealth;
+        newItem.Data.CurrentHealth = itemData.BaseHealth;
         gotItemEvent:FireClient(player, itemData);
+        table.insert(items, newItem);
+        itemStore:Set(items);
     end)
-
-    table.insert(items, newItem);
-    itemStore:Set(items);
 end
 
 return ItemService;

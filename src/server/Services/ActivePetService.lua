@@ -7,6 +7,7 @@ local physicsService = game:GetService("PhysicsService");
 local collectionService = game:GetService("CollectionService");
 local serverScriptService = game:GetService("ServerScriptService");
 local itemService = require(serverScriptService.Server.Services.ItemService);
+local itemList = require(serverScriptService.Server.Data.ItemList);
 local petService = require(serverScriptService.Server.Services.PetService);
 local creatureService = require(serverScriptService.Server.Services.CreatureService);
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
@@ -37,8 +38,8 @@ end
 local function UpdateHealthBar(pet, petData)
     if(petData == nil) then return end
 
-	local currentHealth = petData.PlayerItem.Data.CurrentHealth;
-	local maxHealth = petData.ItemData.BaseHealth;
+	local currentHealth = petData.PlayerItem.Data.CurrentHealth or 1;
+	local maxHealth = petData.ItemData.BaseHealth or 1;
 
     local width = currentHealth / maxHealth;
     
@@ -307,19 +308,22 @@ function ActivePetService.RequestPetAttack(player, target)
 		end
 	end
 
-	if(petData.Data.CurrentHealth <= 0) then
+	local currentHealth = petData.Data.CurrentHealth or 1;
+	if(currentHealth <= 0) then
 		return false;
 	end
+
+	local itemData = itemList.GetById(petData.ItemId);
 
 	local attackableId = target:GetAttribute("Id");
 
 	local targetIsCreature = collectionService:HasTag(target.Parent, "Creature");
 
-	if(playersPet.PetData.ItemData.ItemType == "Seed") then
+	if(itemData.ItemType == "Seed") then
 		if(targetIsCreature) then
 			return false;
 		end
-	elseif(playersPet.PetData.ItemData.ItemType == "Pet") then
+	elseif(itemData.ItemType == "Pet") then
 		if(not targetIsCreature) then
 			return false;
 		end
