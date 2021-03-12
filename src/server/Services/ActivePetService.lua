@@ -23,16 +23,21 @@ attackables[1] = {
 
 -- Functions
 
-local function UpdateXpBar(activePetData, itemData)
-    if(activePetData == nil) then return end
+local function UpdateXpBar(pet, petData)
+	if(petData == nil) then return end
 
-    local width = itemData.Data.CurrentExperience / activePetData.ItemData.ExperienceToLevel;
+	local currentExperience = petData.PlayerItem.Data.CurrentExperience or 1;
+	local experienceToLevel = petData.ItemData.ExperienceToLevel or 1;
+
+    local width = currentExperience / experienceToLevel;
     
     if(width > 1) then
         width = 1;
-    end
+	elseif(width < 0) then
+		width = 0;
+	end
 
-    board.C.ImageLabel.Experience.Size = UDim2.new(width, 0, 1, 0);
+    pet.AboveHeadGUI.C.ImageLabel.Experience.Size = UDim2.new(width, 0, 1, 0);
 end
 
 local function UpdateHealthBar(pet, petData)
@@ -108,6 +113,7 @@ function ActivePetService.AddActivePet(player, item)
 	activePets[player.UserId] = playersPet;
 
 	UpdateHealthBar(playersPet, playersPet.PetData);
+	UpdateXpBar(playersPet, playersPet.PetData);
 
 	playerEquipped:FireClient(player, toSend, item);
 end
@@ -187,7 +193,8 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 	local targetData = attackables[target:GetAttribute("Id")];
 	if(targetData ~= nil) then 
-		petService.AddExperience(player, petData.PlayerItem.Id, targetData.ExperienceAward);
+		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, targetData.ExperienceAward);
+		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
 	end
 
 	if(creature == nil) then 
@@ -214,12 +221,11 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 		playerItemData.CurrentHealth = currentHealth;
 		petService.UpdatePet(player, petData.PlayerItem.Id, petData.PlayerItem.Data);
+		UpdateHealthBar(playersPet, petData);
 
 		if(currentHealth <= 0) then
 			ActivePetService.StopAttacking(player, petData);
 		end
-
-		UpdateHealthBar(playersPet, petData);
 	end
 
 	-- Do damage
@@ -242,7 +248,8 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		creature.UnderAttack = false;
 		creature.Target = nil;
 
-		petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
+		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
+		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
 
 		local ran = math.random(0, 100);
 

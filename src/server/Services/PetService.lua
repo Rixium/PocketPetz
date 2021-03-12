@@ -89,6 +89,12 @@ function PetService.AddExperience(player, guid, experienceAmount)
     end
 
     itemStore:Set(items);
+
+    return {
+        PlayerItem = item,
+        ItemData = itemData
+    };
+    
 end
 
 return PetService;
