@@ -12,6 +12,7 @@ local petService = require(serverScriptService.Server.Services.PetService);
 local creatureService = require(serverScriptService.Server.Services.CreatureService);
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
+local petFainted = replicatedStorage.Common.Events.PetFainted;
 
 -- Variables
 local activePets = {};
@@ -225,6 +226,14 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 		if(currentHealth <= 0) then
 			ActivePetService.StopAttacking(player, petData);
+			petFainted:FireClient(player);
+
+			local animator = playersPet.PetModel:WaitForChild("Humanoid");
+			local deadAnimation = animator:LoadAnimation(playersPet.PetModel.Animations.Death);
+			deadAnimation:Play();
+			deadAnimation.Stopped:Wait();
+			
+			ActivePetService.RemovePlayerPet(player);
 		end
 	end
 

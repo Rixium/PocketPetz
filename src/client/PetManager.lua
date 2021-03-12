@@ -10,6 +10,7 @@ local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
+local petFainted = replicatedStorage.Common.Events.PetFainted;
 local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.EvolutionGUI);
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
@@ -344,6 +345,11 @@ petEvolved.OnClientEvent:Connect(function(next)
     
     PetManager.SetTarget(nil);
     PetManager.SetActivePet(nil, nil);
+end);
+
+petFainted.OnClientEvent:Connect(function()
+    StopCombat();
+    PetManager.SetTarget(nil);
 end);
 
 game:GetService("RunService").RenderStepped:Connect(UpdatePet);
