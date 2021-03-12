@@ -15,6 +15,8 @@ local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.Evoluti
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
+local petFaintNotification = replicatedStorage.PetFaintNotification;
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
 local physicsService = game:GetService("PhysicsService");
@@ -350,6 +352,15 @@ end);
 petFainted.OnClientEvent:Connect(function()
     StopCombat();
     PetManager.SetTarget(nil);
+
+    local messageUi = petFaintNotification:clone();
+
+    print(activePetData);
+
+    messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";
+    messageUi.MessageBack.FaceBack.FaceImage.Image = "rbxthumb://type=Asset&id=" .. activePetData.ItemData.ModelId .. "&w=420&h=420";
+
+    notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
 end);
 
 game:GetService("RunService").RenderStepped:Connect(UpdatePet);

@@ -62,19 +62,31 @@ local function SelectItem(selectedItem)
     itemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
 
     itemPopupFrame.Visible = true;
-    
-    local takeOutButton;
-    takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
-        equipItemRequest:FireServer(selectedItem);
-        BackpackMenu.Toggle();
-        itemPopupFrame.Visible = false;
-        takeOutButton:Disconnect();
-    end);
+
+    if(selectedItem.PlayerItem.Data.CurrentHealth > 0) then
+        local takeOutButton;
+        takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
+            equipItemRequest:FireServer(selectedItem);
+            BackpackMenu.Toggle();
+            itemPopupFrame.Visible = false;
+            takeOutButton:Disconnect();
+        end);
+    else
+        itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
+    end
 end
 
 local function AddItem(itemToAdd)
     local item = itemBack:clone();
     item.Parent = scrollingFrame;
+
+    print(itemToAdd);
+
+    local health = itemToAdd.PlayerItem.Data.CurrentHealth;
+
+    if(health <= 0) then
+        item.Cross.Visible = true;
+    end
 
     item.ImageButton.MouseButton1Click:Connect(function()
         if(debounce) then

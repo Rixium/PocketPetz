@@ -84,7 +84,6 @@ local function AddAboveHeadGUI(model, itemData)
 end
 
 function ActivePetService.AddActivePet(player, item)
-    
 	if(activePets[player.UserId] ~= nil) then
 		local playersCurrentPet = activePets[player.UserId];
 		playersCurrentPet.PetModel:Destroy();

@@ -3,6 +3,7 @@ local playerTracker = require(serverScriptService.Server.PlayerTracker);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
+local itemList = require(serverScriptService.Server.Data.ItemList);
 local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
 local activePetService = require(serverScriptService.Server.Services.ActivePetService);
@@ -30,6 +31,9 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
+
+	itemService.ClearItems(player);
+	itemService.GiveItem(player, 13);
 end
 
 function OnPlayerLeaving(player)
@@ -91,9 +95,15 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 		return;
 	end
 
-	-- TODO, use server data instead of client
-	if(item.ItemData.ItemType == "Pet" or item.ItemData.ItemType == "Seed") then
-		activePetService.AddActivePet(player, item);
+	local itemData = itemList.GetById(playerItem.ItemId);
+
+	if(itemData.ItemType == "Pet" or itemData.ItemType == "Seed") then
+		if(playerItem.Data.CurrentHealth > 0) then
+			activePetService.AddActivePet(player, {
+				PlayerItem = playerItem,
+				ItemData = itemData
+			});
+		end
 	end
 end);
 
