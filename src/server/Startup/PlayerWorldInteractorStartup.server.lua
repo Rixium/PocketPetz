@@ -3,11 +3,13 @@ local players = game:GetService("Players");
 local itemTakerService = require(serverScriptService.Server.Services.ItemTakerService);
 local playerDataChecker = require(serverScriptService.Server.Services.PlayerDataCheckerService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
+local petService = require(serverScriptService.Server.Services.PetService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local itemPickupEvent = replicatedStorage.Common.Events.ItemPickupEvent;
 local itemApprovePickupEvent = replicatedStorage.Common.Events.ItemApprovePickupEvent;
 local itemDeclinePickupEvent = replicatedStorage.Common.Events.ItemDeclinePickupEvent;
+local playerClickedWorldObject = replicatedStorage.Common.Events.PlayerClickedWorldObject;
 
 local itemGivers = itemTakerService.GetAll();
 
@@ -136,3 +138,8 @@ itemDeclinePickupEvent.OnServerEvent:Connect(function(player, itemId)
     local verify = inProgress[player.UserId] == itemId;
     inProgress[player.UserId] = nil;
 end)
+
+playerClickedWorldObject.OnServerInvoke = function(player, worldObject)
+    petService.HealAll(player);
+    return true;
+end
