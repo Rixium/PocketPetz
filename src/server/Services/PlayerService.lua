@@ -6,6 +6,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local players = game:GetService("Players");
 local gotItemEvent = replicatedStorage.Common.Events.PlayerGotItemEvent;
+local playerSwitchedZone = replicatedStorage.Common.Events.PlayerSwitchedZone;
 local httpService = game:GetService("HttpService");
 
 local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
@@ -39,6 +40,18 @@ function PlayerService.GetPlayerInfo(player)
     playerInfoStore:Set(playerInfo);
 
     return playerInfo;
+end
+
+function PlayerService.SetPlayerLocation(player, locationName) 
+    local playerInfoStore = dataStore2(playerInfoData, player);
+    local playerInfo = playerInfoStore:Get({ 
+        CurrentZone = locationName
+    });
+
+    playerInfo.CurrentZone = locationName;
+    playerInfoStore:Set(playerInfo);
+
+    playerSwitchedZone:FireClient(player, locationName);
 end
 
 return PlayerService;
