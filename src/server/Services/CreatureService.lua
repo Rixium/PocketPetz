@@ -3,6 +3,7 @@ local CreatureService = {};
 -- Imports
 
 local serverScriptService = game:GetService("ServerScriptService");
+local physicsService = game:GetService("PhysicsService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local collectionService = game:GetService("CollectionService");
 local itemList = require(serverScriptService.Server.Data.ItemList);
@@ -85,6 +86,8 @@ function CreatureService.SetupCreature(creature)
         creature.GameObject = creature.GameObjectTemplate:clone();
         creature.GameObject.Parent = workspace;
     end
+    
+	physicsService:SetPartCollisionGroup(creature.GameObject.Root, "Pets");
 
     local sound = Instance.new("Sound", creature.GameObject.Root);
     sound.SoundId = "rbxassetid://2331617000"

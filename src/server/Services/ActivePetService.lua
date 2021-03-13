@@ -15,6 +15,7 @@ local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
 local petsHealed = replicatedStorage.Common.Events.PetsHealed;
+local stopAttacking = replicatedStorage.Common.Events.StopAttacking;
 
 -- Variables
 local activePets = {};
@@ -262,30 +263,27 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 	playersPet.PetModel.Root.HitSound:Play();
 
 	-- Do damage
-	creature.CurrentHealth = creature.CurrentHealth - 1;
+	creature.CurrentHealth = creature.CurrentHealth - 10;
     
     local width = creature.CurrentHealth / creature.MaxHealth;
     creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
 
-	if(creature.CurrentHealth < 0) then
+	if(creature.CurrentHealth < 0 and creature.Alive) then
+		creature.Alive = false;
+		creature.UnderAttack = false;
+		creature.Target = nil;
+
+		ActivePetService.StopAttacking(player, playersPet.PetData);
+		stopAttacking:FireClient(player);
+
 		local animator = target.Parent:WaitForChild("Humanoid");
 		
 		targetHitAnimation = animator:LoadAnimation(target.Parent.Animations.Death);
 		targetHitAnimation:Play();
 		targetHitAnimation.Stopped:Wait();
 		
-		local deathPoint = creature.GameObject.Root.CFrame.p;
-
-		creature.GameObject:Destroy();
-		creature.GameObject = nil;
-
-		creature.Alive = false;
-		creature.UnderAttack = false;
-		creature.Target = nil;
-
-		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
-		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
-
+		local deathPoint = creature.GameObject.HumanoidRootPart.CFrame.p;
+		
 		local ran = math.random(0, 100);
 
 		local drops = creature.Data.Drops;
@@ -308,6 +306,12 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		if(expectedDrop ~= nil) then
 			worldService.DropItemFor(player, expectedDrop.ItemId, deathPoint);
 		end
+		
+		creature.GameObject:Destroy();
+		creature.GameObject = nil;
+
+		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
+		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
 
 		targetKilled:FireClient(player);
 	end

@@ -11,6 +11,7 @@ local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEv
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
+local stopAttacking = replicatedStorage.Common.Events.StopAttacking;
 local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.EvolutionGUI);
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
@@ -343,6 +344,11 @@ petFainted.OnClientEvent:Connect(function()
     local messageUi = petFaintNotification:clone();
     messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";
     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
+end);
+
+stopAttacking.OnClientEvent:Connect(function()
+    StopCombat();
+    PetManager.SetTarget(nil);
 end);
 
 game:GetService("RunService").RenderStepped:Connect(UpdatePet);

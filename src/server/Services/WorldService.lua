@@ -3,6 +3,7 @@ local WorldService = {};
 -- Imports
 local insertService = game:GetService("InsertService");
 local serverScriptService = game:GetService("ServerScriptService");
+local physicsService = game:GetService("PhysicsService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
@@ -20,9 +21,11 @@ function WorldService.DropItemFor(player, itemId, position)
 
     local toSend = model:FindFirstChildWhichIsA("Model")
 	toSend.PrimaryPart = toSend.Root;
-    toSend:SetPrimaryPartCFrame(CFrame.new(position) + Vector3.new(0, 2, 0));
+    toSend:SetPrimaryPartCFrame(CFrame.new(position));
 	toSend.Parent = workspace;
+	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Items");
     toSend.Root:SetNetworkOwner(player);
+
 	model:Destroy();
 
     itemDropped:FireClient(player, toSend);
