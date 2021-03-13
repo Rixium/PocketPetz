@@ -13,6 +13,7 @@ local creatureService = require(serverScriptService.Server.Services.CreatureServ
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
+local petsHealed = replicatedStorage.Common.Events.PetsHealed;
 
 -- Variables
 local activePets = {};
@@ -376,6 +377,23 @@ function ActivePetService.RequestPetAttack(player, target)
 	playersPet.Target = target;
 
 	return true;
+end
+
+function ActivePetService.PetHealed(player, petId) 
+	petService.HealPet(player, petId);
+
+	local playersActivePet = ActivePetService.GetActivePet(player);
+	if(playersActivePet == nil) then
+		return;
+	end
+	
+	if(playersActivePet.PetData.PlayerItem.Id ~= petId) then
+		return;
+	end
+
+	playersActivePet.PetData.PlayerItem.Data.CurrentHealth = playersActivePet.PetData.ItemData.BaseHealth;
+
+	UpdateHealthBar(playersActivePet, playersActivePet.PetData);
 end
 
 return ActivePetService;

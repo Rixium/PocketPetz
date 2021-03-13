@@ -14,7 +14,7 @@ local pets = {};
 local mainGUI = uiManager.GetUi("Main GUI");
 local healthTerminalFrame = mainGUI:WaitForChild("HealthTerminalFrame");
 
-local function AddItem(itemToAdd)
+local function AddItem(itemToAdd, index)
     if(#pets >= 3) then return end
     
     local item = healthCentrePet:clone();
@@ -42,6 +42,9 @@ local function AddItem(itemToAdd)
 
     item.SendFrame.SendMessageButton.MouseButton1Click:Connect(function()
         healPet:FireServer(itemToAdd.PlayerItem.Id);
+        item:Destroy();
+        table.remove(pets, index);
+        healthTerminalFrame.ImageLabel.PetsHealthy.Visible = (#pets == 0);
     end);
     
     table.insert(pets, item);
@@ -68,9 +71,13 @@ for index, healthTerminal in pairs(healthTerminals) do
         spawn(function ()
             for _, item in pairs(items) do
                 if(item.ItemData.ItemType == "Pet") then
-                    AddItem(item);
+                    if(item.PlayerItem.Data.CurrentHealth ~= item.ItemData.BaseHealth) then 
+                        AddItem(item, #pets + 1);
+                    end
                 end
             end
+
+            healthTerminalFrame.ImageLabel.PetsHealthy.Visible = (#pets == 0);
         end);
 
         healthTerminalFrame.Visible = true;

@@ -109,4 +109,4 @@ local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 petRequestAttack.OnServerInvoke = activePetService.RequestPetAttack;
 
 local healPet = replicatedStorage.Common.Events.HealPet;
-healPet.OnServerEvent:Connect(petService.HealPet);
+healPet.OnServerEvent:Connect(activePetService.PetHealed);
