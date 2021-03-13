@@ -43,58 +43,65 @@ function PetService.UpdatePet(player, guid, data)
     itemStore:Set(items);
 end
 
+function PetService.HealAll(player)
+    local itemStore = dataStore2(itemsStore, player);
+    local items = itemStore:Get({});
+
+    for _, item in pairs(items) do
+        local health = item.Data.CurrentHealth or nil;
+        if(health ~= nil) then
+            local itemData = itemList.GetById(item.ItemId);
+            item.Data.CurrentHealth = itemData.BaseHealth;
+        end
+    end
+
+    itemStore:Set(items);
+end
+
 function PetService.AddExperience(player, guid, experienceAmount)
     local itemStore = dataStore2(itemsStore, player);
     local items = itemStore:Get({});
 
-    local item = nil;
-    
-    for _, i in pairs(items) do
-        if(i.Id == guid) then
-            item = i;
-            break;
+    for _, item in pairs(items) do
+        if(item.Id == guid) then
+            local pet = item;
+
+            local itemData = itemList.GetById(item.ItemId);
+            if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
+                return;
+            end
+        
+            item.Data.CurrentExperience = item.Data.CurrentExperience + experienceAmount;
+        
+            petGotExperience:FireClient(player, item);
+        
+            if(item.Data.CurrentExperience >= itemData.ExperienceToLevel) then
+                LevelUpPet(player, item, itemData);
+            end
+        
+            
+            if(pet.Data.CurrentLevel == itemData.LevelToEvolve) then
+                pet.Data.CurrentExperience = 0;
+        
+                local nextPetId = itemData.EvolvesTo;
+                local nextPet = itemList.GetById(nextPetId);
+        
+                pet.ItemId = nextPetId;
+                pet.Data.CurrentHealth = nextPet.BaseHealth;
+        
+                petEvolved:FireClient(player, nextPet);
+            end
+            
+            itemStore:Set(items);
+
+            return {
+                PlayerItem = item,
+                ItemData = itemData
+            };
         end
     end
 
-    if(item == nil) then
-        return;
-    end
-
-    local pet = item;
-
-    local itemData = itemList.GetById(item.ItemId);
-    if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
-        return;
-    end
-
-    item.Data.CurrentExperience = item.Data.CurrentExperience + experienceAmount;
-
-    petGotExperience:FireClient(player, item);
-
-    if(item.Data.CurrentExperience >= itemData.ExperienceToLevel) then
-        LevelUpPet(player, item, itemData);
-    end
-
-    
-    if(pet.Data.CurrentLevel == itemData.LevelToEvolve) then
-        pet.Data.CurrentExperience = 0;
-
-        local nextPetId = itemData.EvolvesTo;
-        local nextPet = itemList.GetById(nextPetId);
-
-        pet.ItemId = nextPetId;
-        pet.Data.CurrentHealth = nextPet.BaseHealth;
-
-        petEvolved:FireClient(player, nextPet);
-    end
-
-    itemStore:Set(items);
-
-    return {
-        PlayerItem = item,
-        ItemData = itemData
-    };
-    
+    return nil;    
 end
 
 return PetService;
