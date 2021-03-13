@@ -58,6 +58,24 @@ function PetService.HealAll(player)
     itemStore:Set(items);
 end
 
+function PetService.HealPet(player, guid)
+    local itemStore = dataStore2(itemsStore, player);
+    local items = itemStore:Get({});
+
+    for _, item in pairs(items) do
+        if(item.Id == guid) then
+            local health = item.Data.CurrentHealth or nil;
+            if(health ~= nil) then
+                local itemData = itemList.GetById(item.ItemId);
+                item.Data.CurrentHealth = itemData.BaseHealth;
+            end
+            break;
+        end
+    end
+
+    itemStore:Set(items);
+end
+
 function PetService.AddExperience(player, guid, experienceAmount)
     local itemStore = dataStore2(itemsStore, player);
     local items = itemStore:Get({});

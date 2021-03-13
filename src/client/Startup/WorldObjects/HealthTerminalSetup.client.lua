@@ -1,9 +1,51 @@
 local collectionService = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local tweenService = game:GetService("TweenService");
 local playerClickedWorldObject = replicatedStorage.Common.Events.PlayerClickedWorldObject;
+local healPet = replicatedStorage.Common.Events.HealPet;
 local players = game:GetService("Players");
+local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
+local healthCentrePet = replicatedStorage.HealthCentrePet;
+local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 
 local healthTerminals = collectionService:GetTagged("HealthTerminal");
+local pets = {};
+
+local mainGUI = uiManager.GetUi("Main GUI");
+local healthTerminalFrame = mainGUI:WaitForChild("HealthTerminalFrame");
+
+local function AddItem(itemToAdd)
+    if(#pets >= 3) then return end
+    
+    local item = healthCentrePet:clone();
+    local frame = item.Frame.ItemBack;
+
+    item.Parent = healthTerminalFrame.ImageLabel.PetFrame;
+
+    local health = itemToAdd.PlayerItem.Data.CurrentHealth or 1;
+
+    frame.LevelText.Text = "Lv. " .. itemToAdd.PlayerItem.Data.CurrentLevel;
+
+    if(health <= 0) then
+        frame.Cross.Visible = true;
+    end
+
+    frame.ThumbBack1.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack2.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack3.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack4.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack5.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack6.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack7.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ThumbBack8.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+    frame.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
+
+    item.SendFrame.SendMessageButton.MouseButton1Click:Connect(function()
+        healPet:FireServer(itemToAdd.PlayerItem.Id);
+    end);
+    
+    table.insert(pets, item);
+end
 
 for index, healthTerminal in pairs(healthTerminals) do
 
@@ -13,8 +55,30 @@ for index, healthTerminal in pairs(healthTerminals) do
     local button = interactGUI:WaitForChild("ImageButton");
 
     button.MouseButton1Click:Connect(function ()
-        interactGUI.Enabled = false;
-        playerClickedWorldObject:InvokeServer(healthTerminal);
+
+        local items = getItemsRequest:InvokeServer();
+
+        -- Remove the old stuff from the friends list.
+        for index, oldPet in ipairs(pets) do
+            oldPet:Destroy();
+        end
+
+        pets = {};
+        
+        spawn(function ()
+            for _, item in pairs(items) do
+                if(item.ItemData.ItemType == "Pet") then
+                    AddItem(item);
+                end
+            end
+        end);
+
+        healthTerminalFrame.Visible = true;
+
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(healthTerminalFrame, tweenInfo, {Position=UDim2.new(0.5, 0, 0.5, 0)})
+
+        tween:Play()
     end)
 
     game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
