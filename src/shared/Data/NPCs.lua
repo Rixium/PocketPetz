@@ -78,5 +78,22 @@ NPCs.Melody = {
     Hair = 4876397180,
     Face = 12145366
 };
+NPCs.Nurse = {
+    Name = "Nurse",
+    Title = "PetVet",
+    Dialog = {
+        "",
+        "Hey there!",
+        "You can revive your pets here, if they faint in a fight!",
+        "Just step up to the booth, and I'll get them fixed right up."
+    },
+    SeeAnimation = 507770239,
+    ShirtId = 5987710633,
+    PantsId = 1470760374,
+    SkinColor = Color3.fromRGB(200, 178, 151),
+    Body = Templates.Woman,
+    Hair = 451220849,
+    Face = 616380929
+};
 
 return NPCs;
