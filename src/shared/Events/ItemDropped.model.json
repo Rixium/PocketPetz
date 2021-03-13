@@ -1,0 +1,4 @@
+{
+    "Name": "ItemDropped",
+    "ClassName": "RemoteEvent"
+}

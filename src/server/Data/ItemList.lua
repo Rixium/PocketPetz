@@ -195,6 +195,15 @@ ItemList.Items = {
         EvolvesTo = 16,
         Value = 50
     },
+    [18] = {
+        ItemId = 18,
+        ItemType = "Coin",
+        Rarity = "Common",
+        Name = "Coin",
+        Description = "I can hear it buzzing..",
+        ModelId = 6514406633,
+        Value = 10
+    },
 };
 
 function ItemList.GetAllById(playerItems)

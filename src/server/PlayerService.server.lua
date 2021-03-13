@@ -12,6 +12,7 @@ local physicsService = game:GetService("PhysicsService");
 local players = game:GetService("Players");
 local collectionService  = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local worldService = require(serverScriptService.Server.Services.WorldService);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 
 local currentEventTitle = "AlphaStar";
@@ -32,6 +33,7 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
+
 end
 
 function OnPlayerLeaving(player)

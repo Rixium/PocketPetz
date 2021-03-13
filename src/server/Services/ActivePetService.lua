@@ -10,6 +10,7 @@ local itemService = require(serverScriptService.Server.Services.ItemService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local petService = require(serverScriptService.Server.Services.PetService);
 local creatureService = require(serverScriptService.Server.Services.CreatureService);
+local worldService = require(serverScriptService.Server.Services.WorldService);
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
@@ -273,6 +274,8 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		targetHitAnimation:Play();
 		targetHitAnimation.Stopped:Wait();
 		
+		local deathPoint = creature.GameObject.Root.CFrame.p;
+
 		creature.GameObject:Destroy();
 		creature.GameObject = nil;
 
@@ -296,8 +299,14 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			expectedDrop = drop;
 		end
 
+		worldService.DropItemFor(player, 18, deathPoint);
+		worldService.DropItemFor(player, 18, deathPoint);
+		worldService.DropItemFor(player, 18, deathPoint);
+		worldService.DropItemFor(player, 18, deathPoint);
+		worldService.DropItemFor(player, 18, deathPoint);
+	
 		if(expectedDrop ~= nil) then
-			itemService.GiveItem(player, expectedDrop.ItemId);
+			worldService.DropItemFor(player, expectedDrop.ItemId, deathPoint);
 		end
 
 		targetKilled:FireClient(player);
