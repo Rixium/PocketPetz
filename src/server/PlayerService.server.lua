@@ -7,11 +7,12 @@ local itemList = require(serverScriptService.Server.Data.ItemList);
 local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
 local activePetService = require(serverScriptService.Server.Services.ActivePetService);
+local activePetService = require(serverScriptService.Server.Services.ActivePetService);
 local physicsService = game:GetService("PhysicsService");
 local players = game:GetService("Players");
 local collectionService  = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
-local creatureService = require(serverScriptService.Server.Services.CreatureService);
+local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 
 local currentEventTitle = "AlphaStar";
 
@@ -109,4 +110,12 @@ local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 petRequestAttack.OnServerInvoke = activePetService.RequestPetAttack;
 
 local healPet = replicatedStorage.Common.Events.HealPet;
-healPet.OnServerEvent:Connect(activePetService.PetHealed);
+healPet.OnServerEvent:Connect(function(player, petId)
+	local didPay = moneyManager.RemoveMoney(player, 10);
+
+	if(not didPay) then
+		return;
+	end
+
+	activePetService.PetHealed(player, petId);
+end);

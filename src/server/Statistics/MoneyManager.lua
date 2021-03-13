@@ -14,6 +14,18 @@ function MoneyManager.AddMoney(player, money)
 	playerMoneyDataStore:Increment(money);
 end
 
+function MoneyManager.RemoveMoney(player, money)
+	local playerMoneyDataStore = dataStore2(moneyPouchName, player);
+	local value = playerMoneyDataStore:Get();
+
+	if(value > money) then
+		playerMoneyDataStore:Increment(-money);
+		return true;
+	end
+	
+	return false;
+end
+
 
 function MoneyManager.PlayerJoined(player)
 	local playerMoneyDataStore = dataStore2(moneyPouchName, player);
