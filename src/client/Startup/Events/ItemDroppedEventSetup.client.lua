@@ -10,7 +10,6 @@ local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
 local pickingUpDebounce = false;
 
 local function ItemDropped(itemId, position)
-    print("ITEM DROPPED");
     local itemToDrop = replicatedStorage.Drops[itemId];
     local cloned = itemToDrop:clone();
     cloned.PrimaryPart = cloned.Root;
