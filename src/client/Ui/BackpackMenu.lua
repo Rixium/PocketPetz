@@ -38,7 +38,6 @@ local function ResetScroll()
 end
 
 local function SelectItem(selectedItem)
-    print("Player has selected " .. selectedItem.ItemData.Name);
     local itemData = selectedItem.ItemData;
 
     local itemPopupFrame = inventoryGUI.BackpackFrame.BackpackBack.ItemPopup;
@@ -76,6 +75,8 @@ local function SelectItem(selectedItem)
     else
         itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
     end
+
+    inventoryGUI.BackpackFrame.BackpackBack.InternalBackpackFrame.ItemGrid.Visible = false;
 end
 
 local function AddItem(itemToAdd)
@@ -160,8 +161,10 @@ function BackpackMenu.Toggle()
         local tween = tweenService:Create(inventoryGUI.BackpackFrame, tweenInfo, {Position=UDim2.new(-0.5, 0, 0.5, 0)})
         tween:Play()
         tween.Completed:Wait();
+        inventoryGUI.BackpackFrame.BackpackBack.ItemPopup.Visible = false;
         inventoryGUI.Enabled = false;
     else
+        inventoryGUI.BackpackFrame.BackpackBack.ItemPopup.Visible = false;
         BackpackMenu.ShowInventory();
         inventoryGUI.Enabled = true;
         local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)

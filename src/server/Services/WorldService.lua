@@ -12,7 +12,7 @@ local itemDropped = replicatedStorage.Common.Events.ItemDropped;
 local playersDrops = {};
 
 -- Functions
-function WorldService.DropItemFor(player, itemId, position)
+function WorldService.DropItemFor(player, itemId, count, position)
     local item = itemList.GetById(itemId);
 
     if(item == nil) then return end
@@ -25,11 +25,12 @@ function WorldService.DropItemFor(player, itemId, position)
     
     table.insert(playerDrops, {
         ItemId = itemId,
+        Count = count,
         Position = position
     });
 
     playersDrops[player.UserId] = playerDrops;
-    itemDropped:FireClient(player, itemId, position);
+    itemDropped:FireClient(player, itemId, count, position);
 end
 
 function WorldService.PickUp(player, itemId)
@@ -43,9 +44,20 @@ function WorldService.PickUp(player, itemId)
 
     for index, drop in pairs(playerDrops) do
         if(drop.ItemId == itemId) then
-            playerDrops[index] = nil;    
-            playersDrops[player.UserId] = playerDrops;
-            return true;
+            if(drop.Count > 0) then
+                drop.Count = drop.Count - 1;
+
+                if(drop.Count <= 0) then
+                    playerDrops[index] = nil;   
+                end
+                
+                playersDrops[player.UserId] = playerDrops;
+                return true;
+            else
+                playerDrops[index] = nil;   
+            end
+            
+            return false;
         end
     end
 

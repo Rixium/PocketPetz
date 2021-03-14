@@ -308,18 +308,14 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		end
 
 		if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(player.UserId, doubleCoinGamePassId) then
-			for count = 1, 10 do
-				worldService.DropItemFor(player, 18, deathPoint);
-			end
+			worldService.DropItemFor(player, 18, 10, deathPoint);
 		else
-			for count = 1, 5 do
-				worldService.DropItemFor(player, 18, deathPoint);
-			end
+			worldService.DropItemFor(player, 18, 5, deathPoint);
 		end
 		
 	
 		if(expectedDrop ~= nil) then
-			worldService.DropItemFor(player, expectedDrop.ItemId, deathPoint);
+			worldService.DropItemFor(player, expectedDrop.ItemId, 1, deathPoint);
 		end
 		
 		creature.GameObject:Destroy();
