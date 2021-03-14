@@ -11,6 +11,9 @@ local pickingUpDebounce = false;
 
 local function ItemDropped(itemId, position)
     local itemToDrop = replicatedStorage.Drops[itemId];
+
+    if(itemToDrop == nil) then return end
+    
     local cloned = itemToDrop:clone();
     cloned.PrimaryPart = cloned.Root;
     cloned.Parent = workspace;
@@ -28,9 +31,9 @@ local function ItemDropped(itemId, position)
 
     itemRunService = game:GetService("RunService").RenderStepped:Connect(function()
         bf.Velocity = Vector3.new(bf.Velocity.X * 0.9, bf.Velocity.Y, bf.Velocity.Z * 0.9);
-        item.PrimaryPart.CFrame = item.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(1), 0)
+        item.Root.CFrame = item.Root.CFrame * CFrame.Angles(0, math.rad(1), 0);
     end); 
-    
+
     touchEvent = item.PrimaryPart.Touched:Connect(function(toucher)
         local primary = toucher.Parent;
         local player = players:GetPlayerFromCharacter(toucher.Parent);
@@ -45,15 +48,18 @@ local function ItemDropped(itemId, position)
             itemRunService:Disconnect();
             pickingUpDebounce = false;
             
-            local sound = item.Pickup;
-            sound:Play();
+            local sound;
+            if(item:FindFirstChild("Pickup")) then
+                sound = item.Pickup;
+                sound:Play();
+            end
 
-            local itemPosition = item:GetPrimaryPartCFrame().p;
+            itemPosition = item:GetPrimaryPartCFrame().p;
             local x, y, z = item:GetPrimaryPartCFrame():ToEulerAnglesYXZ();
 
             local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0);
             local targetCFrame = CFrame.new(Vector3.new(itemPosition.X, itemPosition.Y + 10, itemPosition.Z), Vector3.new(x, math.rad(y + 180), z));
-            local tween = tweenService:Create(item.Root, tweenInfo, { CFrame = targetCFrame, Transparency = 1 });
+            local tween = tweenService:Create(item.Root, tweenInfo, { CFrame = targetCFrame });
             
             for _, child in pairs(item.PrimaryPart:GetChildren()) do
                 if child:IsA('BasePart') then
@@ -63,7 +69,10 @@ local function ItemDropped(itemId, position)
 
             tween:Play();
 
-            sound.Ended:Wait();
+            if(sound ~= nil) then
+                sound.Ended:Wait();
+            end
+
             item:Destroy();
 
         end

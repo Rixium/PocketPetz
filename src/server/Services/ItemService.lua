@@ -42,7 +42,7 @@ function ItemService.GetPlayerItemByGuid(player, guid)
     return nil;
 end
 
-function ItemService.GiveItem(player, itemId)
+function ItemService.GiveItem(player, itemId, shouldNotify)
     local itemStore = dataStore2(itemsData, player);
     local items = itemStore:Get({});
 
@@ -61,7 +61,11 @@ function ItemService.GiveItem(player, itemId)
     spawn(function()
         local itemData = itemList.GetById(itemId);
         newItem.Data.CurrentHealth = itemData.BaseHealth;
-        gotItemEvent:FireClient(player, itemData);
+
+        if(shouldNotify ~= nil and shouldNotify == true) then
+            gotItemEvent:FireClient(player, itemData);
+        end
+        
         table.insert(items, newItem);
         itemStore:Set(items);
     end)
