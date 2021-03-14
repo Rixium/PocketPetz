@@ -33,6 +33,7 @@ function OnPlayerJoined(player)
 		end
 	end
 	
+	playerService.SetPlayerLocation(player, "The Spawn");
 	playerService.CreatePlayerInfo(player);
 end
 

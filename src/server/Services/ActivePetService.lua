@@ -292,7 +292,7 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		targetHitAnimation:Play();
 		targetHitAnimation.Stopped:Wait();
 		
-		local deathPoint = creature.GameObject.HumanoidRootPart.CFrame.p;
+		local deathPoint = creature.GameObject.Root.CFrame.p + Vector3.new(0, 0.5, 0);
 		
 		local ran = math.random(0, 100);
 

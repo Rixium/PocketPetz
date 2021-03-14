@@ -66,8 +66,6 @@ local function ItemDropped(itemId, count, position)
                     itemPosition = item:GetPrimaryPartCFrame().p;
                     local x, y, z = item:GetPrimaryPartCFrame():ToEulerAnglesYXZ();
 
-                    item.Root.Massless = false;
-
                     local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0);
                     local targetCFrame = CFrame.new(Vector3.new(itemPosition.X, itemPosition.Y + 10, itemPosition.Z), Vector3.new(x, math.rad(y + 180), z));
                     local tween = tweenService:Create(item.Root, tweenInfo, { CFrame = targetCFrame });
