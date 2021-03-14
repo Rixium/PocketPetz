@@ -34,7 +34,6 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
-
 end
 
 function OnPlayerLeaving(player)
@@ -124,12 +123,14 @@ healPet.OnServerEvent:Connect(function(player, petId)
 end);
 
 local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
-itemPickedUp.OnServerEvent:Connect(function(player, itemId)
+itemPickedUp.OnServerInvoke = function(player, itemId)
 	local pickedUp = worldService.PickUp(player, itemId);
 
 	if(not pickedUp) then
-		return;
+		return false;
 	end
 
 	dropService.GetDrop(player, itemId);
-end);
+
+	return true;
+end

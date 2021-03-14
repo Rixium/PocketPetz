@@ -25,6 +25,8 @@ attackables[1] = {
 	ExperienceAward = 1
 }
 
+local doubleCoinGamePassId = 15816140;
+
 -- Functions
 
 local function UpdateXpBar(pet, petData)
@@ -297,11 +299,16 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			expectedDrop = drop;
 		end
 
-		worldService.DropItemFor(player, 18, deathPoint);
-		worldService.DropItemFor(player, 18, deathPoint);
-		worldService.DropItemFor(player, 18, deathPoint);
-		worldService.DropItemFor(player, 18, deathPoint);
-		worldService.DropItemFor(player, 18, deathPoint);
+		if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(player.UserId, doubleCoinGamePassId) then
+			for count = 1, 10 do
+				worldService.DropItemFor(player, 18, deathPoint);
+			end
+		else
+			for count = 1, 5 do
+				worldService.DropItemFor(player, 18, deathPoint);
+			end
+		end
+		
 	
 		if(expectedDrop ~= nil) then
 			worldService.DropItemFor(player, expectedDrop.ItemId, deathPoint);

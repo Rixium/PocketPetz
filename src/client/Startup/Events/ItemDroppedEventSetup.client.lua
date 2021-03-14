@@ -7,8 +7,10 @@ local itemDropped = replicatedStorage.Common.Events.ItemDropped;
 local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
 
 -- Functions
+local pickingUpDebounce = false;
 
 local function ItemDropped(itemId, position)
+    print("ITEM DROPPED");
     local itemToDrop = replicatedStorage.Drops[itemId];
     local cloned = itemToDrop:clone();
     cloned.PrimaryPart = cloned.Root;
@@ -21,23 +23,29 @@ local function ItemDropped(itemId, position)
     local bf;
     
 	physicsService:SetPartCollisionGroup(item.PrimaryPart, "Items");
-    spawn(function()
-        bf = Instance.new("BodyVelocity", item.PrimaryPart);
-        bf.Velocity = Vector3.new(math.random(-100, 100), 0, math.random(-100, 100));
-        itemRunService = game:GetService("RunService").RenderStepped:Connect(function()
-            bf.Velocity = Vector3.new(bf.Velocity.X * 0.9, bf.Velocity.Y, bf.Velocity.Z * 0.9);
-            item.PrimaryPart.CFrame = item.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(1), 0)
-        end); 
-    end)
+
+    bf = Instance.new("BodyVelocity", item.PrimaryPart);
+    bf.Velocity = Vector3.new(math.random(-100, 100), 0, math.random(-100, 100));
+
+    itemRunService = game:GetService("RunService").RenderStepped:Connect(function()
+        bf.Velocity = Vector3.new(bf.Velocity.X * 0.9, bf.Velocity.Y, bf.Velocity.Z * 0.9);
+        item.PrimaryPart.CFrame = item.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(1), 0)
+    end); 
     
     touchEvent = item.PrimaryPart.Touched:Connect(function(toucher)
         local primary = toucher.Parent;
         local player = players:GetPlayerFromCharacter(toucher.Parent);
         
         if player then
+            if(pickingUpDebounce) then
+                return;
+            end
+            pickingUpDebounce = true;
             touchEvent:Disconnect();
-            itemPickedUp:FireServer(itemId);
+            local pickedUp = itemPickedUp:InvokeServer(itemId);
             itemRunService:Disconnect();
+            pickingUpDebounce = false;
+            
             local sound = item.Pickup;
             sound:Play();
 
@@ -58,6 +66,7 @@ local function ItemDropped(itemId, position)
 
             sound.Ended:Wait();
             item:Destroy();
+
         end
     end)
 end

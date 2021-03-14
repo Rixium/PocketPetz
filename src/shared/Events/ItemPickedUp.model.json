@@ -1,4 +1,4 @@
 {
     "Name": "ItemPickedUp",
-    "ClassName": "RemoteEvent"
+    "ClassName": "RemoteFunction"
 }

@@ -43,14 +43,10 @@ function WorldService.PickUp(player, itemId)
 
     for index, drop in pairs(playerDrops) do
         if(drop.ItemId == itemId) then
-            removalIndex = index;
-            break;
+            playerDrops[index] = nil;    
+            playersDrops[player.UserId] = playerDrops;
+            return true;
         end
-    end
-
-    if(removalIndex ~= -1) then
-        table.remove(playerDrops, removalIndex);
-        return true;
     end
 
     return false;
