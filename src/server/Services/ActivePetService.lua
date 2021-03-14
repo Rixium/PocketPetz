@@ -26,6 +26,8 @@ attackables[1] = {
 }
 
 local doubleCoinGamePassId = 15816140;
+local doubleExperienceGamePassId = 15821713;
+
 
 -- Functions
 
@@ -215,7 +217,13 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 	local targetData = attackables[target:GetAttribute("Id")];
 	if(targetData ~= nil) then 
-		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, targetData.ExperienceAward);
+		local expectedExperience = targetData.ExperienceAward;
+
+		if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(player.UserId, doubleExperienceGamePassId) then
+			expectedExperience = expectedExperience * 2;
+		end
+
+		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, expectedExperience);
 		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
 	end
 
@@ -317,7 +325,13 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		creature.GameObject:Destroy();
 		creature.GameObject = nil;
 
-		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, creature.Data.BaseExperienceAward);
+		local expectedExperience = creature.Data.BaseExperienceAward;
+		
+		if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(player.UserId, doubleExperienceGamePassId) then
+			expectedExperience = expectedExperience * 2;
+		end
+		
+		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, expectedExperience);
 		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
 
 		targetKilled:FireClient(player);
