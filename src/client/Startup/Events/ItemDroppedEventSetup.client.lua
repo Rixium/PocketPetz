@@ -8,6 +8,7 @@ local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
 
 -- Functions
 local pickingUpDebounce = false;
+local drops = {};
 
 local function ItemDropped(itemId, position)
     local itemToDrop = replicatedStorage.Drops[itemId];
@@ -15,24 +16,19 @@ local function ItemDropped(itemId, position)
     if(itemToDrop == nil) then return end
     
     local cloned = itemToDrop:clone();
+
+	physicsService:SetPartCollisionGroup(cloned.Root, "Items");
     cloned.PrimaryPart = cloned.Root;
     cloned.Parent = workspace;
     cloned:SetPrimaryPartCFrame(CFrame.new(position));
 
     local item = cloned;
-    local itemRunService = nil;
     local touchEvent = nil;
-    local bf;
-    
-	physicsService:SetPartCollisionGroup(item.PrimaryPart, "Items");
-
-    bf = Instance.new("BodyVelocity", item.PrimaryPart);
+    local bf = Instance.new("BodyVelocity", item.PrimaryPart);
     bf.Velocity = Vector3.new(math.random(-100, 100), 0, math.random(-100, 100));
 
-    itemRunService = game:GetService("RunService").RenderStepped:Connect(function()
-        bf.Velocity = Vector3.new(bf.Velocity.X * 0.9, bf.Velocity.Y, bf.Velocity.Z * 0.9);
-        item.Root.CFrame = item.Root.CFrame * CFrame.Angles(0, math.rad(1), 0);
-    end); 
+    drops[item] = item;
+    
 
     touchEvent = item.PrimaryPart.Touched:Connect(function(toucher)
         local primary = toucher.Parent;
@@ -45,7 +41,7 @@ local function ItemDropped(itemId, position)
             pickingUpDebounce = true;
             touchEvent:Disconnect();
             local pickedUp = itemPickedUp:InvokeServer(itemId);
-            itemRunService:Disconnect();
+            drops[item] = nil;
             pickingUpDebounce = false;
             
             local sound;
@@ -78,5 +74,15 @@ local function ItemDropped(itemId, position)
         end
     end)
 end
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    for _, item in pairs(drops) do
+        if(item == nil) then continue end
+        local bf = item.PrimaryPart.BodyVelocity;
+        if(bf == nil) then continue end
+        bf.Velocity = Vector3.new(bf.Velocity.X * 0.9, bf.Velocity.Y, bf.Velocity.Z * 0.9);
+        item.Root.CFrame = item.Root.CFrame * CFrame.Angles(0, math.rad(1), 0);
+    end
+end);
 
 itemDropped.OnClientEvent:Connect(ItemDropped);
