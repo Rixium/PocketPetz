@@ -6,7 +6,15 @@ local itemDropped = replicatedStorage.Common.Events.ItemDropped;
 
 -- Functions
 
-local function ItemDropped(item)
+local function ItemDropped(itemId, position)
+    local itemToDrop = replicatedStorage.Drops[itemId];
+    local cloned = itemToDrop:clone();
+    cloned.PrimaryPart = cloned.Root;
+    cloned.Parent = workspace;
+    cloned:SetPrimaryPartCFrame(CFrame.new(position));
+
+    local item = cloned;
+    
 	physicsService:SetPartCollisionGroup(item.PrimaryPart, "Items");
     spawn(function()
         local bf = Instance.new("BodyVelocity", item.PrimaryPart);

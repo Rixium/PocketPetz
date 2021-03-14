@@ -129,6 +129,9 @@ local function AttackTarget()
                 local damageGUI = replicatedStorage.DamageBillboard:clone();
                 damageGUI.Frame.Damage.Text = math.floor(20 * attackTrack.Length);
                 damageGUI.Parent = workspace;
+
+                if(activeTarget == nil) then return end
+                
                 damageGUI.Adornee = activeTarget.Parent;
 
                 damageGUI.ExtentsOffset = Vector3.new(RNG:NextNumber(-1.0, 1.0), 0, RNG:NextNumber(-1.0, 1.0));

@@ -9,26 +9,27 @@ local itemService = require(serverScriptService.Server.Services.ItemService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local itemDropped = replicatedStorage.Common.Events.ItemDropped;
 
+local playersDrops = {};
+
 -- Functions
 function WorldService.DropItemFor(player, itemId, position)
     local item = itemList.GetById(itemId);
 
     if(item == nil) then return end
 
-    local modelId = item.ModelId;
+    local playerDrops = playersDrops[player.UserId];
     
-	local model = insertService:LoadAsset(modelId);
+    if(playerDrops == nil) then
+        playerDrops = {};
+    end
+    
+    table.insert(playerDrops, {
+        ItemId = itemId,
+        Position = position
+    });
 
-    local toSend = model:FindFirstChildWhichIsA("Model")
-	toSend.PrimaryPart = toSend.Root;
-    toSend:SetPrimaryPartCFrame(CFrame.new(position));
-	toSend.Parent = workspace;
-	physicsService:SetPartCollisionGroup(toSend.PrimaryPart, "Items");
-    toSend.Root:SetNetworkOwner(player);
-
-	model:Destroy();
-
-    itemDropped:FireClient(player, toSend);
+    playersDrops[player.UserId] = playerDrops;
+    itemDropped:FireClient(player, itemId, position);
 end
 
 return WorldService;
