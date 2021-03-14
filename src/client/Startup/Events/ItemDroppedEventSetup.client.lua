@@ -1,8 +1,10 @@
 -- Imports
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local players = game:GetService("Players");
+local tweenService = game:GetService("TweenService");
 local physicsService = game:GetService("PhysicsService");
 local itemDropped = replicatedStorage.Common.Events.ItemDropped;
+local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
 
 -- Functions
 
@@ -14,17 +16,50 @@ local function ItemDropped(itemId, position)
     cloned:SetPrimaryPartCFrame(CFrame.new(position));
 
     local item = cloned;
+    local itemRunService = nil;
+    local touchEvent = nil;
+    local bf;
     
 	physicsService:SetPartCollisionGroup(item.PrimaryPart, "Items");
     spawn(function()
-        local bf = Instance.new("BodyVelocity", item.PrimaryPart);
+        bf = Instance.new("BodyVelocity", item.PrimaryPart);
         bf.Velocity = Vector3.new(math.random(-100, 100), 0, math.random(-100, 100));
-        game:GetService("RunService").RenderStepped:Connect(function()
+        itemRunService = game:GetService("RunService").RenderStepped:Connect(function()
             bf.Velocity = Vector3.new(bf.Velocity.X * 0.9, bf.Velocity.Y, bf.Velocity.Z * 0.9);
             item.PrimaryPart.CFrame = item.PrimaryPart.CFrame * CFrame.Angles(0, math.rad(1), 0)
         end); 
     end)
     
+    touchEvent = item.PrimaryPart.Touched:Connect(function(toucher)
+        local primary = toucher.Parent;
+        local player = players:GetPlayerFromCharacter(toucher.Parent);
+        
+        if player then
+            touchEvent:Disconnect();
+            itemPickedUp:FireServer(itemId);
+            itemRunService:Disconnect();
+            local sound = item.Pickup;
+            sound:Play();
+
+            local itemPosition = item:GetPrimaryPartCFrame().p;
+            local x, y, z = item:GetPrimaryPartCFrame():ToEulerAnglesYXZ();
+
+            local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0);
+            local targetCFrame = CFrame.new(Vector3.new(itemPosition.X, itemPosition.Y + 10, itemPosition.Z), Vector3.new(x, math.rad(y + 180), z));
+            local tween = tweenService:Create(item.Root, tweenInfo, { CFrame = targetCFrame, Transparency = 1 });
+            
+            for _, child in pairs(item.PrimaryPart:GetChildren()) do
+                if child:IsA('BasePart') then
+                    tweenService:Create(child, tweenInfo, { Transparency = 1 }):Play();
+                end
+            end
+
+            tween:Play();
+
+            sound.Ended:Wait();
+            item:Destroy();
+        end
+    end)
 end
 
 itemDropped.OnClientEvent:Connect(ItemDropped);

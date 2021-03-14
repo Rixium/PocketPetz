@@ -32,4 +32,28 @@ function WorldService.DropItemFor(player, itemId, position)
     itemDropped:FireClient(player, itemId, position);
 end
 
+function WorldService.PickUp(player, itemId)
+    local playerDrops = playersDrops[player.UserId];
+
+    if(playerDrops == nil) then
+        return false;
+    end
+
+    local removalIndex = -1;
+
+    for index, drop in pairs(playerDrops) do
+        if(drop.ItemId == itemId) then
+            removalIndex = index;
+            break;
+        end
+    end
+
+    if(removalIndex ~= -1) then
+        table.remove(playerDrops, removalIndex);
+        return true;
+    end
+
+    return false;
+end
+
 return WorldService;

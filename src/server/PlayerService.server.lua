@@ -14,6 +14,7 @@ local collectionService  = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local worldService = require(serverScriptService.Server.Services.WorldService);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
+local dropService = require(serverScriptService.Server.Services.DropService);
 
 local currentEventTitle = "AlphaStar";
 
@@ -120,4 +121,15 @@ healPet.OnServerEvent:Connect(function(player, petId)
 	end
 
 	activePetService.PetHealed(player, petId);
+end);
+
+local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
+itemPickedUp.OnServerEvent:Connect(function(player, itemId)
+	local pickedUp = worldService.PickUp(player, itemId);
+
+	if(not pickedUp) then
+		return;
+	end
+
+	dropService.GetDrop(player, itemId);
 end);
