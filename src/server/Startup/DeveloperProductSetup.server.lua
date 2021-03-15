@@ -5,7 +5,7 @@ local Players = game:GetService("Players");
 local purchaseHistoryStore = DataStoreService:GetDataStore("PurchaseHistory");
 
 local titleService = require(ServerScriptService.Server.Services.TitleService);
-local PlayerService = require(ServerScriptService.Server.Services.PlayerService);
+local playerService = require(ServerScriptService.Server.Services.PlayerService);
 
 local productFunctions = {};
 
@@ -30,16 +30,19 @@ end
 -- 2-Hour Legend
 productFunctions[1158563777] = function(receipt, player)
 	playerService.MakeLegendForHours(player, 2);
+	return true;
 end
 
 -- 1-Day Legend
 productFunctions[1158563847] = function(receipt, player)
 	playerService.MakeLegendForDays(player, 1);
+	return true;
 end
 
 -- Lifetime Legend
 productFunctions[1158563952] = function(receipt, player)
 	playerService.MakeLegendForLife(player);
+	return true;
 end
 
 local function ProcessReceipt(receiptInfo)

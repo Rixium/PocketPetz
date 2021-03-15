@@ -101,7 +101,7 @@ function PlayerService.MakeLegendForHours(player, hours)
     end
 
     playerInfo.IsLegend = true;
-    
+
     playerInfoStore:Set(playerInfo);
 end
 
