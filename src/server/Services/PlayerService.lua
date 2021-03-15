@@ -88,17 +88,28 @@ function PlayerService.IsPlayerLegend(player)
     return playerInfo.IsLegend;
 end
 
-function PlayerService.MakeLegendForDays(player, days)
+function PlayerService.MakeLegendForHours(player, hours)
     local playerInfoStore = dataStore2(playerInfoData, player);
     local playerInfo = playerInfoStore:Get();
 
-    playerInfo.LegendExpiration = os.time() + (days * 24 * 60 * 60);
+    local secondsToAdd = (hours * 60 * 60);
+
+    if(playerInfo.LegendExpiration > os.time()) then
+        playerInfo.LegendExpiration = playerInfo.LegendExpiration + secondsToAdd;
+    else
+        playerInfo.LegendExpiration = os.time() + secondsToAdd;
+    end
+
     playerInfo.IsLegend = true;
     
     playerInfoStore:Set(playerInfo);
 end
 
-function PlayerService.MakePermenantLegend(player)
+function PlayerService.MakeLegendForDays(player, days)
+    PlayerService.MakeLegendForHours(player, days * 24);
+end
+
+function PlayerService.MakeLegendForLife(player)
     local playerInfoStore = dataStore2(playerInfoData, player);
     local playerInfo = playerInfoStore:Get();
 

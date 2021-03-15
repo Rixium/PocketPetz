@@ -46,6 +46,11 @@ TitleList.Titles = {
         Description = "Show your support for Legend Melody",
         PurchasePrice = 50,
         ProductId = 1156529690
+    },
+    {
+        Index = 9,
+        Name = "Legend",
+        Description = "You are a legend in the lands"
     }
 };
 
