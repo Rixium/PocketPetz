@@ -21,7 +21,11 @@ for index, adStation in pairs(adStations) do
     local button = interactGUI:WaitForChild("ImageButton");
 
     button.MouseButton1Click:Connect(function ()
-        marketplaceService:PromptProductPurchase(players.LocalPlayer, 1158563777);
+        local toTween = mainGUI.LegendFrame
+        toTween.Visible = true;
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+		local tween = tweenService:Create(toTween, tweenInfo, {Position=UDim2.new(0.5, 0, 0.5, 0)})
+		tween:Play()
     end)
 
     game:GetService("RunService").RenderStepped:Connect(function(deltaTime)

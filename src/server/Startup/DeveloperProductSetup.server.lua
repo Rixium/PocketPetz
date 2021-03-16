@@ -35,7 +35,7 @@ end
 
 -- 1-Day Legend
 productFunctions[1158563847] = function(receipt, player)
-	playerService.MakeLegendForDays(player, 1);
+	playerService.MakeLegendForDays(player, 3);
 	return true;
 end
 
