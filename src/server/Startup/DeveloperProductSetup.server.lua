@@ -64,8 +64,7 @@ local function ProcessReceipt(receiptInfo)
 	end
 	
 	local handler = productFunctions[receiptInfo.ProductId]
-	handler(receiptInfo, player);
-
+	
 	local success, result = pcall(handler, receiptInfo, player)
 
 	if not success or not result then
