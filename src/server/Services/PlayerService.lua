@@ -67,25 +67,13 @@ function PlayerService.IsPlayerLegend(player)
 
     if(playerInfo == nil) then return false end
 
-    if(playerInfo.IsLegend == nil) then
-        playerInfo.IsLegend = false;
+    -- If they've never become a legend before, then we can set not legend here.
+    if(playerInfo.LegendExpiration == nil) then
         playerInfo.LegendExpiration = NOT_LEGEND;
-    end
-    
-    if(playerInfo.LegendExpiration == PERMENANT_LEGEND) then
-        playerInfo.IsLegend = true;
-    elseif(os.time() >= playerInfo.LegendExpiration) then
-        playerInfo.IsLegend = false;
-        playerInfo.LegendExpiration = NOT_LEGEND;
+        playerInfoStore:Set(playerInfo);
     end
 
-    if(playerInfo.LegendExpiration == NOT_LEGEND) then
-        playerInfo.IsLegend = false;
-    end
-
-    playerInfoStore:Set(playerInfo);
-
-    return playerInfo.IsLegend;
+    return (playerInfo.LegendExpiration == PERMENANT_LEGEND or playerInfo.LegendExpiration > os.time());
 end
 
 function PlayerService.MakeLegendForHours(player, hours)
@@ -100,8 +88,6 @@ function PlayerService.MakeLegendForHours(player, hours)
         playerInfo.LegendExpiration = os.time() + secondsToAdd;
     end
 
-    playerInfo.IsLegend = true;
-
     playerInfoStore:Set(playerInfo);
 end
 
@@ -113,7 +99,6 @@ function PlayerService.MakeLegendForLife(player)
     local playerInfoStore = dataStore2(playerInfoData, player);
     local playerInfo = playerInfoStore:Get();
 
-    playerInfo.IsLegend = true;
     playerInfo.LegendExpiration = PERMENANT_LEGEND;
 
     playerInfoStore:Set(playerInfo);
