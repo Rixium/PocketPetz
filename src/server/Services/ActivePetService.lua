@@ -286,9 +286,7 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
 			local damage = ActivePetService.CalculateDamage(playerItemData.CurrentLevel, "Bronze", creature.Item, petData.ItemData);
 			currentHealth = currentHealth - damage;
-
-			print(currentHealth);
-
+			
 			creature.GameObject.Root.HitSound:Play();
 
 			playerItemData.CurrentHealth = currentHealth;
