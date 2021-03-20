@@ -66,6 +66,7 @@ local function SelectItem(selectedItem)
 
     if(health > 0) then
         local takeOutButton;
+        itemPopup.ItemContextButtons.ContextButtonBack.Visible = true;
         takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
             equipItemRequest:FireServer(selectedItem);
             BackpackMenu.Toggle();
