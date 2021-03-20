@@ -191,6 +191,41 @@ function ActivePetService.RemovePlayerPet(player)
     activePets[player.UserId] = nil;
 end
 
+function ActivePetService.CalculateDamage(level, rarity, c1, c2)
+	local basePetDamage = c1.BaseAttack;
+	local baseCreatureDefence = c2.BaseAttack;
+
+	-- First check the percentage of the base damage we'll do.
+	basePetDamage = basePetDamage / 100 * math.random(level, 100 + level);
+	
+	local petRarity = rarity;
+
+	-- Then the rarity damage to do.
+	local rarityDamage = 0;
+	local divisionAmount = 100;
+
+	if(petRarity == "Silver") then
+		rarityDamage = basePetDamage / 100 * 10;
+	elseif(petRarity == "Gold") then
+		rarityDamage = basePetDamage / 100 * 20;
+	elseif(petRarity == "Diamond") then
+		rarityDamage = basePetDamage / 100 * 30;
+	end
+
+	local percentageRoll = math.random(level, 100 + level); -- Offset the percentage with the pets level, so there is an actual benefit to levelling up.
+
+	if(percentageRoll > 90) then
+		divisionAmount = 50; -- This is a crit (double damage!)
+	end
+
+	local actualRarityDamage = rarityDamage / divisionAmount * percentageRoll;
+
+	local finalDamage = basePetDamage + actualRarityDamage;
+	local finalDefence = baseCreatureDefence / 100 * math.random(0, 100 - level); -- Another offset that is dependent on the attackers level
+
+	return math.clamp(finalDefence - finalDamage, 0, finalDamage);
+end
+
 function ActivePetService.PetAttack(player, pet, petData, target)
     local playersPet = ActivePetService.GetActivePet(player);
 
@@ -243,37 +278,56 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 	creature.UnderAttack = true;
 	creature.Target = playersPet.PetModel;
-	creature.HitTargetCallback = function()
-		local petData = playersPet.PetData;
-		local playerItemData = petData.PlayerItem.Data;
-		local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
-		currentHealth = currentHealth - 1;
 
-		creature.GameObject.Root.HitSound:Play();
+	if(creature.HitTargetCallback == nil) then
+		creature.HitTargetCallback = function()
+			local petData = playersPet.PetData;
+			local playerItemData = petData.PlayerItem.Data;
+			local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
+			local damage = ActivePetService.CalculateDamage(playerItemData.CurrentLevel, "Bronze", creature.Item, petData.ItemData);
+			currentHealth = currentHealth - damage;
 
-		playerItemData.CurrentHealth = currentHealth;
-		petService.UpdatePet(player, petData.PlayerItem.Id, petData.PlayerItem.Data);
-		UpdateHealthBar(playersPet, petData);
+			print(currentHealth);
 
-		if(currentHealth <= 0) then
-			ActivePetService.StopAttacking(player, petData);
-			petFainted:FireClient(player);
+			creature.GameObject.Root.HitSound:Play();
 
-			playersPet.PetModel.Root.DeadSound:Play();
+			playerItemData.CurrentHealth = currentHealth;
+			petService.UpdatePet(player, petData.PlayerItem.Id, petData.PlayerItem.Data);
+			UpdateHealthBar(playersPet, petData);
 
-			local animator = playersPet.PetModel:WaitForChild("Humanoid");
-			local deadAnimation = animator:LoadAnimation(playersPet.PetModel.Animations.Death);
-			deadAnimation:Play();
-			deadAnimation.Stopped:Wait();
-			
-			ActivePetService.RemovePlayerPet(player);
+			if(currentHealth <= 0) then
+				ActivePetService.StopAttacking(player, petData);
+				petFainted:FireClient(player);
+
+				if(playersPet.PetModel.Root ~= nil) then
+					playersPet.PetModel.Root.DeadSound:Play()
+				end
+				
+				local animator = playersPet.PetModel:WaitForChild("Humanoid", 1000);
+
+				if(animator ~= nil) then
+					if(playersPet.PetModel.Animations.Death ~= nil) then
+						local deadAnimation = animator:LoadAnimation(playersPet.PetModel.Animations.Death);
+						deadAnimation:Play();
+						deadAnimation.Stopped:Wait();
+					end
+				end
+
+				ActivePetService.RemovePlayerPet(player);
+			end
 		end
 	end
 
 	playersPet.PetModel.Root.HitSound:Play();
 
 	-- Do damage
-	creature.CurrentHealth = creature.CurrentHealth - 10;
+	local damageToDeal = ActivePetService.CalculateDamage(
+		playersPet.PetData.PlayerItem.Data.CurrentLevel, -- Current Level of Pet
+		playersPet.PetData.PlayerItem.Data.Rarity,       -- The Pets Rarity
+		playersPet.PetData.ItemData,                     -- The Pet's Item (Holds important base stats)
+		creature.Item);                                  -- The opponents item (Holds important base stats)
+
+	creature.CurrentHealth = creature.CurrentHealth - damageToDeal;
     
     local width = creature.CurrentHealth / creature.MaxHealth;
     creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);

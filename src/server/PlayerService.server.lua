@@ -36,7 +36,7 @@ function OnPlayerJoined(player)
 	playerService.SetPlayerLocation(player, "The Spawn");
 	playerService.CreatePlayerInfo(player);
 
-	itemService.ClearItems(player);
+	-- itemService.ClearItems(player);
 end
 
 function OnPlayerLeaving(player)
