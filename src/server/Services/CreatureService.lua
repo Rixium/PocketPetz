@@ -16,7 +16,7 @@ CreatureService.CreatureData = {
         Drops = {
             [14] = {
                 ItemId = 14,
-                Chance = 20
+                Chance = 5
             },
             [15] = {
                 ItemId = 15,
