@@ -223,11 +223,14 @@ function ActivePetService.CalculateDamage(level, rarity, c1, c2)
 	local finalDamage = basePetDamage + actualRarityDamage;
 	local finalDefence = baseCreatureDefence / 100 * math.random(0, 100 - level); -- Another offset that is dependent on the attackers level
 
-	return math.clamp(finalDefence - finalDamage, 0, finalDamage);
+	return { FinalDamage = finalDamage, FinalDefence = finalDefence };
 end
 
 function ActivePetService.PetAttack(player, pet, petData, target)
     local playersPet = ActivePetService.GetActivePet(player);
+
+	local damageAmount;
+	local defenceAmount;
 
     -- The player apparently doesn't have a pet out, therefore, hacking :(
     if(playersPet == nil) then
@@ -277,15 +280,16 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 	end
 
 	creature.UnderAttack = true;
-	creature.Target = playersPet.PetModel;
 
-	if(creature.HitTargetCallback == nil) then
+	if(creature.HitTargetCallback == nil or creature.Target ~= playersPet.PetModel) then
 		creature.HitTargetCallback = function()
 			local petData = playersPet.PetData;
 			local playerItemData = petData.PlayerItem.Data;
 			local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
-			local damage = ActivePetService.CalculateDamage(playerItemData.CurrentLevel, "Bronze", creature.Item, petData.ItemData);
-			currentHealth = currentHealth - damage;
+			local resultingDamages = ActivePetService.CalculateDamage(playerItemData.CurrentLevel, "Bronze", creature.Item, petData.ItemData);
+			local actualDamage = math.clamp(resultingDamages.FinalDefence - resultingDamages.FinalDamage, 0, resultingDamages.FinalDamage);
+			
+			currentHealth = currentHealth - actualDamage;
 			
 			creature.GameObject.Root.HitSound:Play();
 
@@ -297,35 +301,48 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 				ActivePetService.StopAttacking(player, petData);
 				petFainted:FireClient(player);
 
-				if(playersPet.PetModel.Root ~= nil) then
-					playersPet.PetModel.Root.DeadSound:Play()
-				end
-				
-				local animator = playersPet.PetModel:WaitForChild("Humanoid", 1000);
-
-				if(animator ~= nil) then
-					if(playersPet.PetModel.Animations.Death ~= nil) then
-						local deadAnimation = animator:LoadAnimation(playersPet.PetModel.Animations.Death);
-						deadAnimation:Play();
-						deadAnimation.Stopped:Wait();
+				local success = pcall(function()
+					if(playersPet.PetModel.Root ~= nil) then
+						playersPet.PetModel.Root.DeadSound:Play()
 					end
+					
+					local animator = playersPet.PetModel:WaitForChild("Humanoid", 1000);
+	
+					if(animator ~= nil) then
+						if(playersPet.PetModel.Animations.Death ~= nil) then
+							local deadAnimation = animator:LoadAnimation(playersPet.PetModel.Animations.Death);
+							deadAnimation:Play();
+							deadAnimation.Stopped:Wait();
+						end
+					end
+					ActivePetService.RemovePlayerPet(player);
+					return true;
+				end);
+				
+				if not success then
+					ActivePetService.RemovePlayerPet(player);
 				end
-
-				ActivePetService.RemovePlayerPet(player);
 			end
 		end
 	end
 
+	creature.Target = playersPet.PetModel;
+
 	playersPet.PetModel.Root.HitSound:Play();
 
 	-- Do damage
-	local damageToDeal = ActivePetService.CalculateDamage(
+	local resultingDamages = ActivePetService.CalculateDamage(
 		playersPet.PetData.PlayerItem.Data.CurrentLevel, -- Current Level of Pet
 		playersPet.PetData.PlayerItem.Data.Rarity,       -- The Pets Rarity
 		playersPet.PetData.ItemData,                     -- The Pet's Item (Holds important base stats)
 		creature.Item);                                  -- The opponents item (Holds important base stats)
 
-	creature.CurrentHealth = creature.CurrentHealth - damageToDeal;
+	local actualDamage = math.clamp(resultingDamages.FinalDefence - resultingDamages.FinalDamage, 0, resultingDamages.FinalDamage);
+
+	damageAmount = actualDamage;
+	defenceAmount = resultingDamages.FinalDefence;
+
+	creature.CurrentHealth = creature.CurrentHealth - actualDamage;
     
     local width = creature.CurrentHealth / creature.MaxHealth;
     creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
@@ -384,6 +401,12 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 
 		targetKilled:FireClient(player);
 	end
+
+	return {
+		Damage = damageAmount,
+		Defended = defenceAmount
+	};
+
 end
 
 function ActivePetService.PetAnimation(player, animation)

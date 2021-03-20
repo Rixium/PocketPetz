@@ -45,6 +45,7 @@ local function AddItem(itemToAdd, index)
         item:Destroy();
         table.remove(pets, index);
         healthTerminalFrame.ImageLabel.PetsHealthy.Visible = (#pets == 0);
+        replicatedStorage.PaySound:Play();
     end);
     
     table.insert(pets, item);

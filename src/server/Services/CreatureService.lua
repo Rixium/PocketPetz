@@ -144,32 +144,35 @@ end
 function CreatureService.HandleAttack(creature)
     if not creature.Alive then return end
     if not creature.UnderAttack then return end
+    if creature.Target == nil then return end
 
-    local humanoid = creature.GameObject:WaitForChild("Humanoid");
-    local targetPos = creature.Target:GetPrimaryPartCFrame().p;
-    local distance = (targetPos - creature.GameObject.Root.Position).magnitude;
+    pcall(function()
+        local humanoid = creature.GameObject:WaitForChild("Humanoid");
+        local targetPos = creature.Target:GetPrimaryPartCFrame().p;
+        local distance = (targetPos - creature.GameObject.Root.Position).magnitude;
 
-    creature.GameObject.Root.CFrame = CFrame.new(creature.GameObject.Root.Position, targetPos);
+        creature.GameObject.Root.CFrame = CFrame.new(creature.GameObject.Root.Position, targetPos);
 
-    if(distance > 10) then return end
+        if(distance > 10) then return end
 
-    if(creature.EndAttackCallback == nil) then
-        local attackAnimation = humanoid:LoadAnimation(creature.GameObject.Animations.Attack);
-        attackAnimation:Play();
-        
-        creature.EndAttackCallback = function()
-            attackAnimation:Stop();
-            creature.EndAttackCallback = nil;
-        end
-
-        attackAnimation.KeyframeReached:Connect(function(keyframeName)
-            if(keyframeName == "Hit") then
-                if(creature.HitTargetCallback ~= nil) then
-                    creature.HitTargetCallback();
-                end
+        if(creature.EndAttackCallback == nil) then
+            local attackAnimation = humanoid:LoadAnimation(creature.GameObject.Animations.Attack);
+            attackAnimation:Play();
+            
+            creature.EndAttackCallback = function()
+                attackAnimation:Stop();
+                creature.EndAttackCallback = nil;
             end
-        end);
-    end
+
+            attackAnimation.KeyframeReached:Connect(function(keyframeName)
+                if(keyframeName == "Hit") then
+                    if(creature.HitTargetCallback ~= nil) then
+                        creature.HitTargetCallback();
+                    end
+                end
+            end);
+        end
+    end);
 end
 
 function CreatureService.HandleMovement(creature)

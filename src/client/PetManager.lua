@@ -125,23 +125,25 @@ local function AttackTarget()
         setPetAnimation:FireServer(activePet.Animations.Attack);
         attackTrack.KeyframeReached:Connect(function(keyframeName)
             if(keyframeName == "Hit") then
-                    
-                -- local damageGUI = replicatedStorage.DamageBillboard:clone();
-                -- damageGUI.Frame.Damage.Text = math.floor(20 * attackTrack.Length);
-                -- damageGUI.Parent = workspace;
-
-                -- if(activeTarget == nil) then return end
                 
-                -- damageGUI.Adornee = activeTarget.Parent;
+                if(activeTarget == nil) then return end
+                local damageDefence = petAttackingEvent:InvokeServer(activePet, activePetData, activeTarget);
+                if(activeTarget == nil) then return end
 
-                -- damageGUI.ExtentsOffset = Vector3.new(RNG:NextNumber(-1.0, 1.0), 0, RNG:NextNumber(-1.0, 1.0));
-
-                -- table.insert(damages, {
-                --     GUI = damageGUI,
-                --     Time = 3
-                -- });
-
-                petAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+                pcall(function()
+                    local damageGUI = replicatedStorage.DamageBillboard:clone();
+                    damageGUI.Frame.Damage.Text = math.floor(damageDefence.Damage);
+                    damageGUI.Parent = workspace;
+    
+                    damageGUI.Adornee = activeTarget.Parent.Root;
+    
+                    damageGUI.ExtentsOffset = Vector3.new(RNG:NextNumber(-2.0, 2.0), RNG:NextNumber(-1.0, 1.0), RNG:NextNumber(-2.0, 2.0));
+    
+                    table.insert(damages, {
+                        GUI = damageGUI,
+                        Time = 3
+                    });
+                end);
             end
         end);
         attackTrack:Play();
@@ -192,10 +194,12 @@ end
 local function UpdatePet(delta)
     
     for _, damageGUI in pairs(damages) do
+        local selected = damageGUI.GUI.Frame:FindFirstChildWhichIsA("TextLabel");
+
         damageGUI.Time = damageGUI.Time - delta;
         damageGUI.GUI.ExtentsOffset = Vector3.new(damageGUI.GUI.ExtentsOffset.X, damageGUI.GUI.ExtentsOffset.Y + 2 * delta, damageGUI.GUI.ExtentsOffset.Z);
         damageGUI.GUI.Frame.ImageLabel.ImageTransparency = damageGUI.GUI.Frame.ImageLabel.ImageTransparency + delta;
-        damageGUI.GUI.Frame.Damage.TextTransparency = damageGUI.GUI.Frame.Damage.TextTransparency + delta;
+        selected.TextTransparency = selected.TextTransparency + delta;
     end
 
     for i, damageGUI in pairs(damages) do

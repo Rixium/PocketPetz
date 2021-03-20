@@ -33,7 +33,6 @@ function OnPlayerJoined(player)
 		end
 	end
 	
-	playerService.SetPlayerLocation(player, "The Spawn");
 	playerService.CreatePlayerInfo(player);
 
 	-- itemService.ClearItems(player);
@@ -82,7 +81,7 @@ getPlayerInfo.OnServerInvoke = function(player, otherPlayerId)
 end
 
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
-petAttackingEvent.OnServerEvent:Connect(activePetService.PetAttack);
+petAttackingEvent.OnServerInvoke = activePetService.PetAttack;
 
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 setPetAnimation.OnServerEvent:Connect(activePetService.PetAnimation);

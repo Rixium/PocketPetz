@@ -22,10 +22,10 @@ local function ShowZoneIntro(zoneName)
     local zoneBack = zoneIntro.ImageLabel;
     zoneBack.TextLabel.Text = zoneName;
     local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
-    local tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, 1, 0)})
+    local tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, 0, 0)})
     tween:Play()
     tween.Completed:Wait();
-    tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, 1.5, 0)})
+    tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, -0.5, 0)})
 
     if(music ~= nil) then
         spawn(function()

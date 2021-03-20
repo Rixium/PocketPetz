@@ -12,6 +12,8 @@ local tweenService = game:GetService("TweenService");
 local lockedTitleTemplate = replicatedStorage:WaitForChild("LockedTitleTemplate");
 
 local titlesGUI = game.Players.LocalPlayer.PlayerGui:WaitForChild("Titles GUI");
+local mainGui = game.Players.LocalPlayer.PlayerGui:WaitForChild("Main GUI");
+
 local titlesScrollingFrame = titlesGUI:WaitForChild("TitlesFrame").TitlesBack.InternalTitlesFrame.ScrollingFrame;
 local loadingFrame = titlesGUI:WaitForChild("TitlesFrame").TitlesBack.LoadingFrame;
 
@@ -22,6 +24,14 @@ local PADDING = Vector2.new(0.03, 1);
 local isRunning = false;
 
 local currentElements = {};
+
+local function ShowLegendsPopup()
+    local toTween = mainGui.LegendFrame
+    toTween.Visible = true;
+    local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    local tween = tweenService:Create(toTween, tweenInfo, {Position=UDim2.new(0.5, 0, 0.5, 0)})
+    tween:Play()
+end
 
 local function ResetScroll()
     local uiGridLayout = titlesScrollingFrame.UIGridLayout;
@@ -72,12 +82,18 @@ function TitlesMenu.SetupTitles()
         local newTitleLayout;
     
         local purchasable = false;
+
+        if(value.Name == "Legend") then
+            purchasable = true;
+        end
     
-        if(value.CanPurchase and not value.Owned) then
+        if((value.CanPurchase or value.Name == "Legend") and not value.Owned) then
             purchasable = true;
             newTitleLayout = buyTitleTemplate:Clone();
             newTitleLayout.PriceFrame.PriceLabel.Text = value.PurchasePrice .. " R$";
-    
+            if(value.Name == "Legend") then
+                newTitleLayout.PriceFrame.PriceLabel.Text = "REQUIRES LEGEND";
+            end
         elseif not value.Owned then
             newTitleLayout = lockedTitleTemplate:Clone();
         else
@@ -112,9 +128,16 @@ function TitlesMenu.SetupTitles()
                 Grow(currentActive.RadioBack.RadioSelect);
             end)
         elseif purchasable and not value.Owned then
-            newTitleLayout.MouseButton1Click:Connect(function ()
-                marketplaceService:PromptProductPurchase(players.LocalPlayer, value.ProductId);
-            end)
+            if(value.Name == "Legend") then
+                newTitleLayout.MouseButton1Click:Connect(function() 
+                    ShowLegendsPopup();
+                    TitlesMenu.Toggle();
+                end)
+            else
+                newTitleLayout.MouseButton1Click:Connect(function ()
+                    marketplaceService:PromptProductPurchase(players.LocalPlayer, value.ProductId);
+                end)
+            end
         end
     
         table.insert(currentElements, newTitleLayout);

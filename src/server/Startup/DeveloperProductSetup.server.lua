@@ -30,18 +30,21 @@ end
 -- 2-Hour Legend
 productFunctions[1158563777] = function(receipt, player)
 	playerService.MakeLegendForHours(player, 2);
+    titleService.UnlockTitle(player, "Legend");
 	return true;
 end
 
 -- 1-Day Legend
 productFunctions[1158563847] = function(receipt, player)
 	playerService.MakeLegendForDays(player, 3);
+    titleService.UnlockTitle(player, "Legend");
 	return true;
 end
 
 -- Lifetime Legend
 productFunctions[1158563952] = function(receipt, player)
 	playerService.MakeLegendForLife(player);
+    titleService.UnlockTitle(player, "Legend");
 	return true;
 end
 
