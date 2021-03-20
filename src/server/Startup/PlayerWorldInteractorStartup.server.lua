@@ -130,7 +130,7 @@ itemApprovePickupEvent.OnServerEvent:Connect(function(player, itemId)
     inProgress[player.UserId] = nil;
 
     if(verify) then
-        itemService.GiveItem(player, itemId);
+        itemService.GiveItem(player, itemId, true);
     end
 end)
 

@@ -10,6 +10,27 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 
+local doubleRaresGamePassId = 15999413;
+
+local Rarities = {
+    [1] = {
+        Name = "Bronze",
+        Chance = 100 
+    },
+    [2] = {
+        Name = "Silver",
+        Chance = 40
+    },
+    [3] = { 
+        Name = "Gold",
+        Chance = 20
+    },
+    [4] = {
+        Name = "Diamond",
+        Chance = 5
+    }
+}
+
 local function LevelUpPet(player, pet, itemData)
     local remaining = pet.Data.CurrentExperience - itemData.ExperienceToLevel;
     pet.Data.CurrentExperience = remaining;
@@ -76,14 +97,35 @@ function PetService.HealPet(player, guid)
     itemStore:Set(items);
 end
 
+function PetService.GetRarity(player)
+    local multiplier = 1;
+
+    if(player ~= nil) then
+        if game:GetService("MarketplaceService"):UserOwnsGamePassAsync(player.UserId, doubleRaresGamePassId) then
+            multiplier = multiplier * 2;
+        end
+    end
+    
+    local petRarity = nil;
+    local randomRarity = math.random(0, 100);
+
+    for _, rarity in ipairs(Rarities) do
+        -- If we've rolled lower than the required rarity, then we got it :)
+        local actualChance = rarity.Chance * multiplier;
+        if(randomRarity <= actualChance) then
+            petRarity = rarity;
+        end
+    end
+
+    return petRarity;
+end
+
 function PetService.AddExperience(player, guid, experienceAmount)
     local itemStore = dataStore2(itemsStore, player);
     local items = itemStore:Get({});
 
     for _, item in pairs(items) do
         if(item.Id == guid) then
-            local pet = item;
-
             local itemData = itemList.GetById(item.ItemId);
             if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
                 return;
@@ -97,15 +139,22 @@ function PetService.AddExperience(player, guid, experienceAmount)
                 LevelUpPet(player, item, itemData);
             end
         
-            
-            if(pet.Data.CurrentLevel == itemData.LevelToEvolve) then
-                pet.Data.CurrentExperience = 0;
+            -- Evolution
+            if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
+                
+                -- Only evolving seeds get a new item rarity
+                if(itemData.ItemType == "Seed") then
+                    local rarity = PetService.GetRarity(player);
+                    item.Data.Rarity = rarity.Name;
+                end
+
+                item.Data.CurrentExperience = 0;
         
                 local nextPetId = itemData.EvolvesTo;
                 local nextPet = itemList.GetById(nextPetId);
         
-                pet.ItemId = nextPetId;
-                pet.Data.CurrentHealth = nextPet.BaseHealth;
+                item.ItemId = nextPetId;
+                item.Data.CurrentHealth = nextPet.BaseHealth;
         
                 petEvolved:FireClient(player, nextPet);
             end
