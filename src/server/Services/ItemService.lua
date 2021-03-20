@@ -52,6 +52,7 @@ function ItemService.GiveItem(player, itemId, shouldNotify)
         Id = guid,
         ItemId = itemId,
         Data = {
+            InStorage = false,
             CurrentExperience = 0,
             CurrentLevel = 1,
             Nickname = ""

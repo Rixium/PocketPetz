@@ -3,6 +3,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local players = game:GetService("Players");
 local tweenService = game:GetService("TweenService");
 local gotItemEvent = replicatedStorage.Common.Events.PlayerGotItemEvent;
+local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 
 local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 
@@ -62,6 +63,8 @@ local function OnGotItem(itemData)
     local bagPopInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);
 	local bagPopTween = tweenService:Create(bagButton, bagPopInfo, {Size=UDim2.new(1.2, 0, 1.2, 0)})
     bagPopTween:Play();
+    
+    quickbarMenu.Setup();
 end
 
 gotItemEvent.OnClientEvent:Connect(OnGotItem);

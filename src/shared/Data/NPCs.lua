@@ -33,7 +33,7 @@ NPCs.Grey = {
         "Meh, your choice.."
     },
     SeeAnimation = 507770453,
-    ShirtId = 5774384277,
+    ShirtId = 3670737444,
     PantsId = 6335710383,
     SkinColor = Color3.fromRGB(234, 184, 146),
     Body = Templates.Man,

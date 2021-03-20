@@ -34,8 +34,6 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
-
-	-- itemService.ClearItems(player);
 end
 
 function OnPlayerLeaving(player)
@@ -97,7 +95,13 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 		return;
 	end
 
+	local playerCarrying = petService.GetPetsInBag(player);
+
 	local itemData = itemList.GetById(playerItem.ItemId);
+
+	if(itemData.ItemType == "Seed" and #playerCarrying == 3) then
+		return;
+	end
 
 	if(itemData.ItemType == "Pet" or itemData.ItemType == "Seed") then
 		local health = playerItem.Data.CurrentHealth or 1;

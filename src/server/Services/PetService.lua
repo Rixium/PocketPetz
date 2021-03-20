@@ -50,6 +50,34 @@ function PetService.GetPetByGuid(player, guid)
     return nil;
 end
 
+function PetService.GetPetsInBag(player)
+    local itemStore = dataStore2(itemsStore, player);
+    local items = itemStore:Get({});
+    local toReturn = {};
+
+    for _, item in pairs(items) do
+        if(not item.Data.InStorage) then
+            table.insert(toReturn, item);
+        end
+    end
+
+    return toReturn;
+end
+
+function PetService.GetPetsInStorage(player)
+    local itemStore = dataStore2(itemsStore, player);
+    local items = itemStore:Get({});
+    local toReturn = {};
+
+    for _, item in pairs(items) do
+        if(item.Data.InStorage) then
+            table.insert(toReturn, item);
+        end
+    end
+
+    return toReturn;
+end
+
 function PetService.UpdatePet(player, guid, data)
     local itemStore = dataStore2(itemsStore, player);
     local items = itemStore:Get({});
