@@ -86,6 +86,15 @@ function CreatureService.SetupCreature(creature)
         creature.GameObject = creature.GameObjectTemplate:clone();
         creature.GameObject.Parent = workspace;
     end
+
+    local creatureHitBox = replicatedStorage.CreatureHitbox:clone();
+    creatureHitBox.Parent = creature.GameObject;
+    creatureHitBox.CFrame = CFrame.new(creature.GameObject.HumanoidRootPart.CFrame.p);
+    local weld = Instance.new("WeldConstraint")
+    weld.Part0 = creature.GameObject.HumanoidRootPart;
+    weld.Part1 = creatureHitBox;
+    weld.Parent = creature.GameObject.HumanoidRootPart;
+    collectionService:AddTag(creatureHitBox, "Attackable");
     
 	physicsService:SetPartCollisionGroup(creature.GameObject.Root, "Pets");
 

@@ -288,10 +288,11 @@ function PetManager.SetTarget(target)
     -- Make sure that the player is trying to attack a valid target, also stores this data
     -- server side for subsequent requests :)
     requesting = true;
-    local targetIsValid = petRequestAttack:InvokeServer(target);
-    requesting = false;
-    
-    if not targetIsValid then return end
+
+    spawn(function() 
+        petRequestAttack:InvokeServer(target);
+        requesting = false;
+    end)
 
     nextTarget = target;
 

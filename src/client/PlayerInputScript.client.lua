@@ -31,7 +31,6 @@ local tagFunctions = {};
 
 tagFunctions["Attackable"] = function(obj)
     local playerActivePet = petManager.GetActivePet();
-
     if playerActivePet ~= nil then
         petManager.SetTarget(obj);
     end

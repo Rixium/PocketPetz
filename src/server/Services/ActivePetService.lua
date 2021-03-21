@@ -346,6 +346,11 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 		playersPet.PetData.ItemData,                     -- The Pet's Item (Holds important base stats)
 		creature.Item, 1);                                  -- The opponents item (Holds important base stats)
 
+
+	if(resultingDamages.FinalDamage < 2) then
+		resultingDamages.FinalDamage = 1;
+	end
+
 	local actualDamage = math.clamp(resultingDamages.FinalDamage - resultingDamages.FinalDefence, 1, resultingDamages.FinalDamage);
 
 	damageAmount = actualDamage;
