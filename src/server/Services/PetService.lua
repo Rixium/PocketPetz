@@ -57,7 +57,10 @@ function PetService.GetPetsInBag(player)
 
     for _, item in pairs(items) do
         if(not item.Data.InStorage) then
-            table.insert(toReturn, item);
+            local itemData = itemList.GetById(item.ItemId);
+            if(itemData.ItemType == "Pet") then
+                table.insert(toReturn, item);
+            end
         end
     end
 
