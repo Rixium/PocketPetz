@@ -15,6 +15,8 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local worldService = require(serverScriptService.Server.Services.WorldService);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local dropService = require(serverScriptService.Server.Services.DropService);
+local DataStoreService = game:GetService("DataStoreService");
+local logoutPositions = DataStoreService:GetDataStore("LogoutPositions");
 
 local currentEventTitle = "AlphaStar";
 
@@ -36,6 +38,23 @@ function OnPlayerJoined(player)
 	playerService.CreatePlayerInfo(player);
 	itemService.ClearItems(player);
 	itemService.GiveItem(player,1);
+
+	player.CharacterRemoving:Connect(function(c)
+		local logoutPosition= c.PrimaryPart.CFrame.p;
+		logoutPositions:SetAsync(player.UserId, {
+			X = logoutPosition.X,
+			Y = logoutPosition.Y,
+			Z = logoutPosition.Z
+		});
+	end);
+
+	local lastPosition = logoutPositions:GetAsync(player.UserId);
+	if(lastPosition ~= nil and lastPosition.X ~= nil) then
+		local newPosition = Vector3.new(lastPosition.X, lastPosition.Y, lastPosition.Z);
+		print(newPosition);
+		local char = player.Character or player.CharacterAdded:wait();
+		char.HumanoidRootPart.CFrame = CFrame.new(newPosition);
+	end
 end
 
 function OnPlayerLeaving(player)

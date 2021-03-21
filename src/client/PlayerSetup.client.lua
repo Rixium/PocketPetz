@@ -11,10 +11,6 @@ local playerInfo = getPlayerInfo:InvokeServer(players.LocalPlayer.UserId);
 local music = nil;
 local currentZone = nil;
 
-while not gameState.GetReady() do wait(0.1) end
-
--- Zone switch transition text
-
 local function ShowZoneIntro(zoneName)
     if(zoneName == currentZone) then return end
     currentZone = zoneName;
@@ -66,5 +62,3 @@ end
 playerSwitchedZone.OnClientEvent:Connect(function(zoneName)
     ShowZoneIntro(zoneName);
 end);
-
-ShowZoneIntro(playerInfo.CurrentZone);

@@ -7,7 +7,7 @@ local dataStoreGet = require(serverScriptService.Server.DataStoreGet);
 local dataStore2 = dataStoreGet.DataStore;
 
 local playerJoinedEvent = replicatedStorage.Common.Events.PlayerJoinedEvent;
-local playerLeftEvent = replicatedStorage.Common.Events.PlayerJoinedEvent;
+local playerLeftEvent = replicatedStorage.Common.Events.PlayerLeftEvent;
 
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 
@@ -55,7 +55,7 @@ function AddPlayerMoneyBasedOnLastLogin(player)
 	end
 end
 
-function PlayerTrackSet.RemovePlayer(player)
+function PlayerTrackSet.RemovePlayer(player)	
 	playerLeftEvent:Fire(player);
 	PlayerTrackSet.ActivePlayers[player.UserId] = nil;
 end
