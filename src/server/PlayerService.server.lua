@@ -12,6 +12,7 @@ local physicsService = game:GetService("PhysicsService");
 local players = game:GetService("Players");
 local collectionService  = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local playerSwitchedZone = replicatedStorage.Common.Events.PlayerSwitchedZone;
 local worldService = require(serverScriptService.Server.Services.WorldService);
 local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local dropService = require(serverScriptService.Server.Services.DropService);
@@ -54,6 +55,8 @@ function OnPlayerJoined(player)
 		local char = player.Character or player.CharacterAdded:wait();
 		char.HumanoidRootPart.CFrame = CFrame.new(newPosition);
 	end
+
+	playerSwitchedZone:FireClient(player, playerService.GetPlayerLocation(player));
 end
 
 function OnPlayerLeaving(player)

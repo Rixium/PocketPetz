@@ -83,7 +83,7 @@ function TitlesMenu.SetupTitles()
     
         local purchasable = false;
 
-        if(value.Name == "Legend") then
+        if(value.Name == "Legend" and not value.Owned) then
             purchasable = true;
         end
     

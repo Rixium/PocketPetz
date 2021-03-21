@@ -15,14 +15,6 @@ local function ShowZoneIntro(zoneName)
     if(zoneName == currentZone) then return end
     currentZone = zoneName;
 
-    local zoneBack = zoneIntro.ImageLabel;
-    zoneBack.TextLabel.Text = zoneName;
-    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
-    local tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, 0, 0)})
-    tween:Play()
-    tween.Completed:Wait();
-    tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, -0.5, 0)})
-
     if(music ~= nil) then
         spawn(function()
             repeat
@@ -43,17 +35,27 @@ local function ShowZoneIntro(zoneName)
             music.Volume = 0.1;
         end);
     else
-        music = replicatedStorage.Music:WaitForChild(zoneName);
-        music.Looped = true;
-        music.Volume = 0;
-        music:Play();
+        spawn(function()
+            music = replicatedStorage.Music:WaitForChild(zoneName);
+            music.Looped = true;
+            music.Volume = 0;
+            music:Play();
 
-        repeat
-            music.Volume = music.Volume + 0.005
-            wait(0.1);
-        until music.Volume >= 0.1
-        music.Volume = 0.1;
+            repeat
+                music.Volume = music.Volume + 0.005
+                wait(0.1);
+            until music.Volume >= 0.1
+            music.Volume = 0.1;
+        end);
     end
+
+    local zoneBack = zoneIntro.ImageLabel;
+    zoneBack.TextLabel.Text = zoneName;
+    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut)
+    local tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, 0, 0)})
+    tween:Play()
+    tween.Completed:Wait();
+    tween = tweenService:Create(zoneBack, tweenInfo, {Position=UDim2.new(0.5, 0, -0.5, 0)})
 
     wait(2);
     tween:Play();

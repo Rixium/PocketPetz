@@ -55,10 +55,22 @@ function PlayerService.SetPlayerLocation(player, locationName)
         CurrentZone = locationName
     });
 
+    local lastZone = playerInfo.CurrentZone;
+
     playerInfo.CurrentZone = locationName;
     playerInfoStore:Set(playerInfo);
 
-    playerSwitchedZone:FireClient(player, locationName);
+    if(lastZone ~= locationName) then
+        playerSwitchedZone:FireClient(player, locationName);
+    end
+end
+function PlayerService.GetPlayerLocation(player) 
+    local playerInfoStore = dataStore2(playerInfoData, player);
+    local playerInfo = playerInfoStore:Get({ 
+        CurrentZone = "The Spawn"
+    });
+
+    return playerInfo.CurrentZone;
 end
 
 function PlayerService.IsPlayerLegend(player) 
