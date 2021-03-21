@@ -76,6 +76,21 @@ function PlayerService.IsPlayerLegend(player)
     return (playerInfo.LegendExpiration == PERMENANT_LEGEND or playerInfo.LegendExpiration > os.time());
 end
 
+function PlayerService.IsPlayerLifetimeLegend(player) 
+    local playerInfoStore = dataStore2(playerInfoData, player);
+    local playerInfo = playerInfoStore:Get();
+
+    if(playerInfo == nil) then return false end
+
+    -- If they've never become a legend before, then we can set not legend here.
+    if(playerInfo.LegendExpiration == nil) then
+        playerInfo.LegendExpiration = NOT_LEGEND;
+        playerInfoStore:Set(playerInfo);
+    end
+
+    return playerInfo.LegendExpiration == PERMENANT_LEGEND;
+end
+
 function PlayerService.MakeLegendForHours(player, hours)
     local playerInfoStore = dataStore2(playerInfoData, player);
     local playerInfo = playerInfoStore:Get();

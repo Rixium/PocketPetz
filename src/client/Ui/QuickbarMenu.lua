@@ -11,6 +11,7 @@ local quickBar = mainGui:WaitForChild("Quickbar");
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local petFaintNotification = replicatedStorage.PetFaintNotification;
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
+local isPlayerLifetimeLegend = replicatedStorage.Common.Events.IsPlayerLifetimeLegend;
 
 local slots = {
     [1] = {
@@ -50,8 +51,25 @@ end
 
 function QuickbarMenu.Setup()
     local items = getItemsRequest:InvokeServer();
-    print(items);
     local curr = 1;
+    local maxCurr = 3;
+
+    local isLifetimeLegend = isPlayerLifetimeLegend:InvokeServer();
+
+    if(isLifetimeLegend) then
+        maxCurr = 5;
+    end
+
+    if(isLifetimeLegend) then
+        slots[1].Slot.Image = "rbxassetid://6545422916";
+        slots[2].Slot.Image = "rbxassetid://6545422916";
+        slots[3].Slot.Image = "rbxassetid://6545422916";
+        slots[4].Slot.Image = "rbxassetid://6545422916";
+        slots[5].Slot.Image = "rbxassetid://6545422916";
+    else
+        slots[4].Slot.ImageLabel.MouseButton1Click:Connect(ShowLegendsPopup);
+        slots[5].Slot.ImageLabel.MouseButton1Click:Connect(ShowLegendsPopup);
+    end
 
     for _, item in pairs(items) do
         if(item.ItemData.ItemType == "Pet") then
@@ -75,15 +93,14 @@ function QuickbarMenu.Setup()
                     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
                 end
             end);
-            curr = curr + 1;
-            if(curr == 4) then
+
+            if(curr == maxCurr) then
                 break;
             end
+
+            curr = curr + 1;
         end
     end
-
-    slots[4].Slot.ImageLabel.MouseButton1Click:Connect(ShowLegendsPopup);
-    slots[5].Slot.ImageLabel.MouseButton1Click:Connect(ShowLegendsPopup);
 end
 
 return QuickbarMenu;

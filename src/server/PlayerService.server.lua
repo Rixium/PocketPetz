@@ -88,6 +88,9 @@ setPetAnimation.OnServerEvent:Connect(activePetService.PetAnimation);
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 petStopAttackingEvent.OnServerEvent:Connect(activePetService.StopAttacking);
 
+local isPlayerLegend = replicatedStorage.Common.Events.IsPlayerLifetimeLegend;
+isPlayerLegend.OnServerInvoke = playerService.IsPlayerLifetimeLegend;
+
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 equipItemRequest.OnServerInvoke = function(player, item)
 	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
