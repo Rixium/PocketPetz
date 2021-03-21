@@ -130,7 +130,7 @@ equipItemRequest.OnServerInvoke = function(player, item)
 			Message = "That item is in storage!"
 		};
 	end
-	
+
 	local playerCarrying = petService.GetPetsInBag(player);
 
 	local itemData = itemList.GetById(playerItem.ItemId);
@@ -173,15 +173,21 @@ local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 petRequestAttack.OnServerInvoke = activePetService.RequestPetAttack;
 
 local healPet = replicatedStorage.Common.Events.HealPet;
-healPet.OnServerEvent:Connect(function(player, petId)
+healPet.OnServerInvoke = function(player, petId)
 	local didPay = moneyManager.RemoveMoney(player, 10);
 
 	if(not didPay) then
-		return;
+		return {
+			Success = false
+		};
 	end
 
 	activePetService.PetHealed(player, petId);
-end);
+
+	return {
+		Success = true
+	}
+end
 
 local itemPickedUp = replicatedStorage.Common.Events.ItemPickedUp;
 itemPickedUp.OnServerInvoke = function(player, itemId)

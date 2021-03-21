@@ -71,6 +71,12 @@ local function cleanup()
     slots[3].Slot.ImageLabel.Image = "";
     slots[4].Slot.ImageLabel.Image = "";
     slots[5].Slot.ImageLabel.Image = "";
+
+    slots[1].Slot.FaintedCover.Visible = false;
+    slots[2].Slot.FaintedCover.Visible = false;
+    slots[3].Slot.FaintedCover.Visible = false;
+    slots[4].Slot.FaintedCover.Visible = false;
+    slots[5].Slot.FaintedCover.Visible = false;
 end
 
 function QuickbarMenu.Setup()
@@ -119,6 +125,7 @@ function QuickbarMenu.Setup()
 
             if(item.PlayerItem.Data.CurrentHealth <= 0) then
                 faintedPets = faintedPets + 1;
+                currentSlot.Slot.FaintedCover.Visible = true;
             end
 
             currentSlot.Callback = currentSlot.Slot.ImageLabel.MouseButton1Click:Connect(function() 

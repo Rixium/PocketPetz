@@ -7,6 +7,7 @@ local players = game:GetService("Players");
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local healthCentrePet = replicatedStorage.HealthCentrePet;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 
 local healthTerminals = collectionService:GetTagged("HealthTerminal");
 local pets = {};
@@ -48,11 +49,15 @@ local function AddItem(itemToAdd, index)
     frame.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
 
     item.SendFrame.SendMessageButton.MouseButton1Click:Connect(function()
-        healPet:FireServer(itemToAdd.PlayerItem.Id);
-        item:Destroy();
-        table.remove(pets, index);
-        healthTerminalFrame.ImageLabel.PetsHealthy.Visible = (#pets == 0);
-        replicatedStorage.PaySound:Play();
+        local result = healPet:InvokeServer(itemToAdd.PlayerItem.Id);
+
+        if(result.Success) then
+            item:Destroy();
+            table.remove(pets, index);
+            healthTerminalFrame.ImageLabel.PetsHealthy.Visible = (#pets == 0);
+            replicatedStorage.PaySound:Play();
+            quickbarMenu:Setup();
+        end
     end);
     
     table.insert(pets, item);
@@ -78,7 +83,7 @@ for index, healthTerminal in pairs(healthTerminals) do
         
         spawn(function ()
             for _, item in pairs(items) do
-                if(item.ItemData.ItemType == "Pet") then
+                if(item.ItemData.ItemType == "Pet" and not item.PlayerItem.Data.InStorage) then
                     if(item.PlayerItem.Data.CurrentHealth ~= item.ItemData.BaseHealth) then 
                         AddItem(item, #pets + 1);
                     end
