@@ -15,7 +15,14 @@ local mainGUI = uiManager.GetUi("Main GUI");
 local healthTerminalFrame = mainGUI:WaitForChild("HealthTerminalFrame");
 
 local function AddItem(itemToAdd, index)
-    if(#pets >= 3) then return end
+    local isPlayerLifetimeLegend = replicatedStorage.Common.Events.IsPlayerLifetimeLegend:InvokeServer();
+    local maxPets = 3;
+
+    if(isPlayerLifetimeLegend) then
+        maxPets = 5;
+    end
+
+    if(#pets >= maxPets) then return end
     
     local item = healthCentrePet:clone();
     local frame = item.Frame.ItemBack;

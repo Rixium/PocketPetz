@@ -351,6 +351,8 @@ petFainted.OnClientEvent:Connect(function()
     StopCombat();
     PetManager.SetTarget(nil);
 
+    quickbarMenu.Setup();
+
     local messageUi = petFaintNotification:clone();
     messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";
     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);

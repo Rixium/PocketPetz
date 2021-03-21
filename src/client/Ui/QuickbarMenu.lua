@@ -53,6 +53,8 @@ function QuickbarMenu.Setup()
     local items = getItemsRequest:InvokeServer();
     local curr = 1;
     local maxCurr = 3;
+    local allPets = 0;
+    local faintedPets = 0;
 
     local isLifetimeLegend = isPlayerLifetimeLegend:InvokeServer();
 
@@ -73,6 +75,7 @@ function QuickbarMenu.Setup()
 
     for _, item in pairs(items) do
         if(item.ItemData.ItemType == "Pet") then
+            allPets = allPets + 1;
             local currentSlot = slots[curr];
             currentSlot.Item = item;
             currentSlot.Slot.ImageLabel.Image = "rbxthumb://type=Asset&id=" .. item.ItemData.ModelId .. "&w=420&h=420";
@@ -83,6 +86,10 @@ function QuickbarMenu.Setup()
                 currentSlot.Slot.Image = "rbxassetid://6545378437";
             else
                 currentSlot.Slot.Image = "rbxassetid://6545377628";
+            end
+
+            if(item.PlayerItem.Data.CurrentHealth <= 0) then
+                faintedPets = faintedPets + 1;
             end
 
             currentSlot.Slot.ImageLabel.MouseButton1Click:Connect(function() 
@@ -100,6 +107,17 @@ function QuickbarMenu.Setup()
 
             curr = curr + 1;
         end
+    end
+    
+    if(faintedPets == allPets and allPets > 0) then
+        mainGui.ImportantMessage.ImageLabel.TextLabel.Text = "Go to town to heal pets";
+        mainGui.ImportantMessage.Visible = true;
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+        local tween = tweenService:Create(mainGui.ImportantMessage.ImageLabel, tweenInfo, {Size=UDim2.new(1, 0, 0.9, 0)})
+        tween:Play()
+    else 
+        mainGui.ImportantMessage.Visible = false;
+        mainGui.ImportantMessage.ImageLabel.Size = UDim2.new(0,0,0,0);
     end
 end
 
