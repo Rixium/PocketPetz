@@ -8,6 +8,8 @@ local itemBack = replicatedStorage.ItemBack;
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local tweenService = game:GetService("TweenService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
+local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
+local petFaintNotification = replicatedStorage.PetFaintNotification;
 
 
 -- Variables
@@ -18,6 +20,7 @@ local SIZE = Vector2.new(0.21, 0.25);
 local PADDING = Vector2.new(0.03, 0.03);
 local activeTab = "Seed";
 local debounce = false;
+local petsCarrying = 0;
 
 BackpackMenu.Items = {};
 
@@ -61,6 +64,8 @@ local function SelectItem(selectedItem)
     itemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
 
     itemPopupFrame.Visible = true;
+    itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
+    itemPopup.CannotTrainContext.Visible = false;
 
     local health = selectedItem.PlayerItem.Data.CurrentHealth or 1;
 
@@ -68,13 +73,22 @@ local function SelectItem(selectedItem)
         local takeOutButton;
         itemPopup.ItemContextButtons.ContextButtonBack.Visible = true;
         takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
-            equipItemRequest:FireServer(selectedItem);
-            BackpackMenu.Toggle();
-            itemPopupFrame.Visible = false;
-            takeOutButton:Disconnect();
+            local result = equipItemRequest:InvokeServer(selectedItem);
+            if(result.Success) then
+                BackpackMenu.Toggle();
+                itemPopupFrame.Visible = false;
+                takeOutButton:Disconnect();
+            else
+                local messageUi = petFaintNotification:clone();
+                messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;
+                notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
+            end
         end);
-    else
+    end
+
+    if(petsCarrying == 3 and itemData.ItemType == "Seed") then
         itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
+        itemPopup.CannotTrainContext.Visible = true;
     end
 
     inventoryGUI.BackpackFrame.BackpackBack.InternalBackpackFrame.ItemGrid.Visible = false;
@@ -123,6 +137,7 @@ local function AddItem(itemToAdd)
 end
 
 function BackpackMenu.ShowInventory()
+    petsCarrying = 0;
     scrollingFrame.Visible = false;
 
     local items = getItemsRequest:InvokeServer();
@@ -143,6 +158,11 @@ function BackpackMenu.ShowInventory()
                     AddItem(item);
                     ResetScroll();
                 end
+
+                if(item.ItemData.ItemType == "Pet") then
+                    petsCarrying = petsCarrying + 1; 
+                end
+
                 continue;
             end
             

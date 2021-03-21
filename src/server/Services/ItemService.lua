@@ -20,8 +20,15 @@ function ItemService.GetPlayerItems(player)
     local items = itemStore:Get({});
 
     local items = itemList.GetAllById(items);
+    local itemsToSend = {};
 
-    return items;
+    for _, item in pairs(items) do
+        if(item.PlayerItem.Data.InStorage == false) then
+            table.insert(itemsToSend, item);
+        end
+    end
+
+    return itemsToSend;
 end
 
 function ItemService.ClearItems(player)

@@ -34,6 +34,7 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
+	itemService.GiveItem(player, 2);
 end
 
 function OnPlayerLeaving(player)
@@ -88,11 +89,14 @@ local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEv
 petStopAttackingEvent.OnServerEvent:Connect(activePetService.StopAttacking);
 
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
-equipItemRequest.OnServerEvent:Connect(function(player, item)
+equipItemRequest.OnServerInvoke = function(player, item)
 	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
 
 	if(playerItem == nil) then
-		return;
+		return {
+			Success = false,
+			Message = "You don't own that item!";
+		};
 	end
 
 	local playerCarrying = petService.GetPetsInBag(player);
@@ -100,7 +104,10 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 	local itemData = itemList.GetById(playerItem.ItemId);
 
 	if(itemData.ItemType == "Seed" and #playerCarrying == 3) then
-		return;
+		return {
+			Success = false,
+			Message = "You cannot train a seed when you're carrying 3 pets!"
+		};
 	end
 
 	if(itemData.ItemType == "Pet" or itemData.ItemType == "Seed") then
@@ -112,7 +119,12 @@ equipItemRequest.OnServerEvent:Connect(function(player, item)
 			});
 		end
 	end
-end);
+
+	return {
+		Success = true
+	};
+	
+end;
 
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 petRequestAttack.OnServerInvoke = activePetService.RequestPetAttack;

@@ -4,10 +4,12 @@ local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local tweenService = game:GetService("TweenService");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
 local mainGui = uiManager.GetUi("Main GUI");
 local quickBar = mainGui:WaitForChild("Quickbar");
 
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
+local petFaintNotification = replicatedStorage.PetFaintNotification;
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 
 local slots = {
@@ -48,6 +50,7 @@ end
 
 function QuickbarMenu.Setup()
     local items = getItemsRequest:InvokeServer();
+    print(items);
     local curr = 1;
 
     for _, item in pairs(items) do
@@ -65,7 +68,12 @@ function QuickbarMenu.Setup()
             end
 
             currentSlot.Slot.ImageLabel.MouseButton1Click:Connect(function() 
-                equipItemRequest:FireServer(currentSlot.Item);
+                local result = equipItemRequest:InvokeServer(currentSlot.Item);
+                if(not result.Success) then
+                    local messageUi = petFaintNotification:clone();
+                    messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;
+                    notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
+                end
             end);
             curr = curr + 1;
             if(curr == 4) then
