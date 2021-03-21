@@ -37,8 +37,8 @@ function OnPlayerJoined(player)
 	end
 	
 	playerService.CreatePlayerInfo(player);
-	itemService.ClearItems(player);
-	itemService.GiveItem(player,1);
+	-- itemService.ClearItems(player);
+	-- itemService.GiveItem(player,1);
 
 	player.CharacterRemoving:Connect(function(c)
 		local logoutPosition= c.PrimaryPart.CFrame.p;

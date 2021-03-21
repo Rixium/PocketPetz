@@ -36,7 +36,7 @@ local function ResetScroll()
     uiGridLayout.CellSize = UDim2.new(0, NewSize.X, 0, NewSize.Y);
 
     local NewPadding = PADDING * scrollingFrame.AbsoluteSize
-    uiGridLayout.CellPadding = UDim2.new(0, NewPadding .X, 0, NewPadding .Y)
+    uiGridLayout.CellPadding = UDim2.new(0, NewPadding.X, 0, NewPadding .Y)
     
     scrollingFrame.CanvasSize = UDim2.new(0, uiGridLayout.AbsoluteContentSize.X, 0, uiGridLayout.AbsoluteContentSize.Y);
 end
