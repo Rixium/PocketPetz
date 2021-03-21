@@ -51,7 +51,6 @@ function OnPlayerJoined(player)
 	local lastPosition = logoutPositions:GetAsync(player.UserId);
 	if(lastPosition ~= nil and lastPosition.X ~= nil) then
 		local newPosition = Vector3.new(lastPosition.X, lastPosition.Y, lastPosition.Z);
-		print(newPosition);
 		local char = player.Character or player.CharacterAdded:wait();
 		char.HumanoidRootPart.CFrame = CFrame.new(newPosition);
 	end
