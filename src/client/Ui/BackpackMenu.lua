@@ -160,6 +160,8 @@ function BackpackMenu.ShowInventory()
     
     spawn(function ()
         for _, item in pairs(items) do
+            if(item.PlayerItem.Data.InStorage) then continue end;
+            
             if(activeTab == "Seed") then
                 if(item.ItemData.ItemType == "Seed" or item.ItemData.ItemType == "Pet") then
                     AddItem(item);

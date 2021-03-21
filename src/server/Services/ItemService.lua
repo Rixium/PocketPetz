@@ -23,9 +23,7 @@ function ItemService.GetPlayerItems(player)
     local itemsToSend = {};
 
     for _, item in pairs(items) do
-        if(item.PlayerItem.Data.InStorage == false) then
-            table.insert(itemsToSend, item);
-        end
+        table.insert(itemsToSend, item);
     end
 
     return itemsToSend;
@@ -34,6 +32,32 @@ end
 function ItemService.ClearItems(player)
     local itemStore = dataStore2(itemsData, player);
     itemStore:Set(nil);
+end
+
+function ItemService.StoreItem(player, guid)
+    local itemStore = dataStore2(itemsData, player);
+    local items = itemStore:Get({});
+
+    for _, item in pairs(items) do
+        if(item.Id == guid) then
+            item.Data.InStorage = true;
+            itemStore:Set(items);
+            return;
+        end
+    end
+end
+
+function ItemService.WithdrawItem(player, guid)
+    local itemStore = dataStore2(itemsData, player);
+    local items = itemStore:Get({});
+
+    for _, item in pairs(items) do
+        if(item.Id == guid) then
+            item.Data.InStorage = false;
+            itemStore:Set(items);
+            return;
+        end
+    end
 end
 
 function ItemService.GetPlayerItemByGuid(player, guid) 

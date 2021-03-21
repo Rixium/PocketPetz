@@ -49,6 +49,30 @@ local function ShowLegendsPopup()
     tween:Play()
 end
 
+local function cleanup()
+    if(slots[1].Callback ~= nil) then
+        slots[1].Callback:Disconnect();
+    end
+    if(slots[2].Callback ~= nil) then
+        slots[2].Callback:Disconnect();
+    end
+    if(slots[3].Callback ~= nil) then
+        slots[3].Callback:Disconnect();
+    end
+    if(slots[4].Callback ~= nil) then
+        slots[4].Callback:Disconnect();
+    end
+    if(slots[5].Callback ~= nil) then
+        slots[5].Callback:Disconnect();
+    end
+
+    slots[1].Slot.ImageLabel.Image = "";
+    slots[2].Slot.ImageLabel.Image = "";
+    slots[3].Slot.ImageLabel.Image = "";
+    slots[4].Slot.ImageLabel.Image = "";
+    slots[5].Slot.ImageLabel.Image = "";
+end
+
 function QuickbarMenu.Setup()
     local items = getItemsRequest:InvokeServer();
     local curr = 1;
@@ -62,6 +86,8 @@ function QuickbarMenu.Setup()
         maxCurr = 5;
     end
 
+    cleanup();
+
     if(isLifetimeLegend) then
         slots[1].Slot.Image = "rbxassetid://6545422916";
         slots[2].Slot.Image = "rbxassetid://6545422916";
@@ -69,12 +95,15 @@ function QuickbarMenu.Setup()
         slots[4].Slot.Image = "rbxassetid://6545422916";
         slots[5].Slot.Image = "rbxassetid://6545422916";
     else
+        slots[1].Slot.Image = "rbxassetid://6545422916";
+        slots[2].Slot.Image = "rbxassetid://6545422916";
+        slots[3].Slot.Image = "rbxassetid://6545422916";
         slots[4].Slot.ImageLabel.MouseButton1Click:Connect(ShowLegendsPopup);
         slots[5].Slot.ImageLabel.MouseButton1Click:Connect(ShowLegendsPopup);
     end
 
     for _, item in pairs(items) do
-        if(item.ItemData.ItemType == "Pet") then
+        if(item.ItemData.ItemType == "Pet" and not item.PlayerItem.Data.InStorage) then
             allPets = allPets + 1;
             local currentSlot = slots[curr];
             currentSlot.Item = item;
@@ -92,7 +121,7 @@ function QuickbarMenu.Setup()
                 faintedPets = faintedPets + 1;
             end
 
-            currentSlot.Slot.ImageLabel.MouseButton1Click:Connect(function() 
+            currentSlot.Callback = currentSlot.Slot.ImageLabel.MouseButton1Click:Connect(function() 
                 local result = equipItemRequest:InvokeServer(currentSlot.Item);
                 if(not result.Success) then
                     local messageUi = petFaintNotification:clone();

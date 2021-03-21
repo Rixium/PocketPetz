@@ -124,6 +124,13 @@ equipItemRequest.OnServerInvoke = function(player, item)
 		};
 	end
 
+	if(playerItem.Data.InStorage) then
+		return {
+			Success = false,
+			Message = "That item is in storage!"
+		};
+	end
+	
 	local playerCarrying = petService.GetPetsInBag(player);
 
 	local itemData = itemList.GetById(playerItem.ItemId);
@@ -148,6 +155,11 @@ equipItemRequest.OnServerInvoke = function(player, item)
 				PlayerItem = playerItem,
 				ItemData = itemData
 			});
+		else 
+			return {
+				Success = false,
+				Message = "That pet needs healing!"
+			}
 		end
 	end
 
@@ -181,5 +193,21 @@ itemPickedUp.OnServerInvoke = function(player, itemId)
 
 	dropService.GetDrop(player, itemId);
 
+	return true;
+end
+
+local storeItem = replicatedStorage.Common.Events.StoreItem;
+storeItem.OnServerInvoke = function(player, item)
+	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
+	if(playerItem == nil) then return end
+	itemService.StoreItem(player, playerItem.Id);
+	return true;
+end
+
+local withdrawItem = replicatedStorage.Common.Events.WithdrawItem;
+withdrawItem.OnServerInvoke = function(player, item)
+	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
+	if(playerItem == nil) then return end
+	itemService.WithdrawItem(player, playerItem.Id);
 	return true;
 end

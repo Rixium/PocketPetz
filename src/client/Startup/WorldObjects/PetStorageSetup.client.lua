@@ -6,65 +6,68 @@ local itemBack = replicatedStorage.ItemBack;
 local players = game:GetService("Players");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
+local storeItem = replicatedStorage.Common.Events.StoreItem;
+local withdrawItem = replicatedStorage.Common.Events.WithdrawItem;
+local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 
 local petStorages = collectionService:GetTagged("PetStorage");
 local currentItems = {};
+local currentStored = {};
 
 local storageGUI = uiManager.GetUi("Storage GUI");
+local debounce = false;
 
--- local function SelectItem(selectedItem)
---     local itemData = selectedItem.ItemData;
+local storeCallback;
+local takeCallback;
+local refresh;
 
---     local itemPopupFrame = inventoryGUI.BackpackFrame.BackpackBack.ItemPopup;
---     local itemPopup = inventoryGUI.BackpackFrame.BackpackBack.ItemPopup.ImageLabel;
---     local itemHeader = itemPopup.ItemHeader;
---     itemHeader.TextLabel.Text = itemData.Name;
+local function SelectItem(selectedItem)
+    local itemData = selectedItem.ItemData;
+
+    local selectedFrame = storageGUI.ImageLabel.Frame.SelectedFrame;
     
---     local itemDescription = itemPopup.ItemDescription;
---     itemDescription.TextLabel.Text = itemData.Description or "Unknown description..";
-
---     local itemImage = itemPopup.ItemImage.ImageLabel.ItemImage;
+    local itemImage = selectedFrame.ImageFrame.ImageLabel;
     
---     itemPopup.ItemImage.ImageLabel.ThumbBack1.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack2.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack3.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack4.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack5.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack6.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack7.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemPopup.ItemImage.ImageLabel.ThumbBack8.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
---     itemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack2.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack1.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack3.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack4.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack5.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack6.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack7.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ThumbBack8.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
+    itemImage.ItemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
 
---     itemPopupFrame.Visible = true;
---     itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
---     itemPopup.CannotTrainContext.Visible = false;
+    local statFrame = selectedFrame.StatFrame.ImageLabel;
+    statFrame.LevelFrame.TextLabel.Text = selectedItem.PlayerItem.Data.CurrentLevel;
+    statFrame.AttackFrame.TextLabel.Text = itemData.BaseAttack;
+    statFrame.DefenceFrame.TextLabel.Text = itemData.BaseDefence;
 
---     local health = selectedItem.PlayerItem.Data.CurrentHealth or 1;
+    local storeButton = storageGUI.ImageLabel.Frame.CurrentFrame.ContextButtonFrame.ContextButtonBack.ContextButton;
+    local takeButton = storageGUI.ImageLabel.Frame.StoredFrame.ContextButtonFrame.ContextButtonBack.ContextButton;
 
---     if(health > 0) then
---         local takeOutButton;
---         itemPopup.ItemContextButtons.ContextButtonBack.Visible = true;
---         takeOutButton = itemPopup.ItemContextButtons.ContextButtonBack.ContextButton.MouseButton1Click:Connect(function()
---             local result = equipItemRequest:InvokeServer(selectedItem);
---             if(result.Success) then
---                 BackpackMenu.Toggle();
---                 itemPopupFrame.Visible = false;
---                 takeOutButton:Disconnect();
---             else
---                 local messageUi = petFaintNotification:clone();
---                 messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;
---                 notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
---             end
---         end);
---     end
+    if(not selectedItem.PlayerItem.Data.InStorage) then
+        if(storeCallback ~= nil) then
+            storeCallback:Disconnect();
+        end
 
---     if(petsCarrying == maxPetsAllowed and itemData.ItemType == "Seed") then
---         itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
---         itemPopup.CannotTrainContext.Visible = true;
---     end
+        storeCallback = storeButton.MouseButton1Click:Connect(function()
+            storeItem:InvokeServer(selectedItem);
+            refresh();
+            quickbarMenu.Setup();
+        end);
+    else
+        if(takeCallback ~= nil) then
+            takeCallback:Disconnect();
+        end
 
---     inventoryGUI.BackpackFrame.BackpackBack.InternalBackpackFrame.ItemGrid.Visible = false;
--- end
+        takeCallback = takeButton.MouseButton1Click:Connect(function()
+            withdrawItem:InvokeServer(selectedItem);
+            refresh();
+            quickbarMenu.Setup();
+        end)
+    end
+end
 
 local function AddItem(scrollingFrame, itemToAdd)
     local item = itemBack:clone();
@@ -83,7 +86,7 @@ local function AddItem(scrollingFrame, itemToAdd)
             return;
         end
 
-        -- SelectItem(itemToAdd);
+        SelectItem(itemToAdd);
 
         debounce = true;
         item.Click:Play();
@@ -108,12 +111,32 @@ local function AddItem(scrollingFrame, itemToAdd)
     table.insert(currentItems, item);
 end
 
-local function setupBackpack()
-    local scrollingFrame = storageGUI.ImageLabel.Frame.CurrentFrame.ImageLabel.InternalBackpackFrame.ItemGrid;
+local function setupStored(items)
+    local scrollingFrame = storageGUI.ImageLabel.Frame.StoredFrame.ImageLabel.InternalBackpackFrame.ItemGrid;
 
     scrollingFrame.Visible = true;
 
-    local items = getItemsRequest:InvokeServer();
+    -- Remove the old stuff from the friends list.
+    for index, oldItem in ipairs(currentStored) do
+        oldItem:Destroy();
+    end
+
+    for index, oldItem in ipairs(currentStored) do
+        table.remove(currentStored, index);
+    end
+    
+    spawn(function ()
+        for _, item in pairs(items) do
+            if(item.ItemData.ItemType == "Pet" and item.PlayerItem.Data.InStorage) then
+                AddItem(scrollingFrame, item);
+            end
+        end
+    end);
+end
+
+local function setupBackpack(items)
+    local scrollingFrame = storageGUI.ImageLabel.Frame.CurrentFrame.ImageLabel.InternalBackpackFrame.ItemGrid;
+    scrollingFrame.Visible = true;
 
     -- Remove the old stuff from the friends list.
     for index, oldItem in ipairs(currentItems) do
@@ -133,6 +156,19 @@ local function setupBackpack()
     end);
 end
 
+local function show()
+    storageGUI.Enabled = true;
+
+    local items = getItemsRequest:InvokeServer();
+
+    setupBackpack(items);
+    setupStored(items);
+
+    local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
+    local tween = tweenService:Create(storageGUI.ImageLabel, tweenInfo, {Size=UDim2.new(0.8, 0, 0.7, 0)});
+    tween:Play()
+end
+
 for index, petStorage in pairs(petStorages) do
 
     local interactGUI = replicatedStorage["Interact GUI"]:Clone();
@@ -141,13 +177,7 @@ for index, petStorage in pairs(petStorages) do
     local button = interactGUI:WaitForChild("ImageButton");
 
     button.MouseButton1Click:Connect(function ()
-        storageGUI.Enabled = true;
-
-        setupBackpack();
-
-        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
-        local tween = tweenService:Create(storageGUI.ImageLabel, tweenInfo, {Size=UDim2.new(0.8, 0, 0.7, 0)});
-        tween:Play()
+        show();
     end)
 
     game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
@@ -169,3 +199,5 @@ for index, petStorage in pairs(petStorages) do
     end);
 
 end
+
+refresh = show;
