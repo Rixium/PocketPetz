@@ -208,7 +208,7 @@ function CreatureService.HandleMovement(creature)
     local x = xChange;
     local z = zChange;
 
-    creature.LastMove = math.random(1, 3);
+    creature.LastMove = math.random(3, 5);
 
     creature.NextPosition = Vector3.new(x, creature.StartPosition.Y, z);
 
