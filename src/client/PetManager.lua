@@ -49,19 +49,23 @@ local TweenService = game:GetService("TweenService")
 local GUI = stopCombatFrame;
 
 local function Shrink()
-	local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
-	local tween = TweenService:Create(GUI, tweenInfo, {Size=UDim2.new(0, 0, 0, 0)})
-	tween:Play()
-    tween.Completed:Wait();
-    stopCombatFrame.Visible = false;
+    spawn(function()
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(GUI, tweenInfo, {Size=UDim2.new(0, 0, 0, 0)})
+        tween:Play()
+        tween.Completed:Wait();
+        stopCombatFrame.Visible = false;
+    end);
 end
 
 local function Grow()
-    stopCombatFrame.Visible = true;
-	local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
-	local tween = TweenService:Create(GUI, tweenInfo, {Size=UDim2.new(0.1, 0, 0.1, 0)})
-	tween:Play()
-    tween.Completed:Wait();
+    spawn(function()
+        stopCombatFrame.Visible = true;
+        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
+        local tween = TweenService:Create(GUI, tweenInfo, {Size=UDim2.new(0.1, 0, 0.1, 0)})
+        tween:Play()
+        tween.Completed:Wait();
+    end);
 end
 
  -- End of UI Stuff
@@ -209,7 +213,7 @@ local function UpdatePet(delta)
             table.remove(damages, i);
         end
     end
-
+    
     CheckForCleanup();
 
     if(activePet == nil) then
@@ -266,7 +270,7 @@ local function StopCombat()
     if(targetHitAnimation ~= nil) then
         targetHitAnimation:Stop();
     end
-
+    
     Shrink();
 
     if(activePet ~= nil and activeTarget ~= nil) then
@@ -295,8 +299,8 @@ function PetManager.SetTarget(target)
     end)
 
     nextTarget = target;
-
     StopCombat();
+
     activeTarget = target;
     nextTarget = nil;
 
