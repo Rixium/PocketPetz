@@ -105,8 +105,14 @@ equipItemRequest.OnServerInvoke = function(player, item)
 	local playerCarrying = petService.GetPetsInBag(player);
 
 	local itemData = itemList.GetById(playerItem.ItemId);
+	local isLifetimeLegend = playerService.IsPlayerLifetimeLegend(player);
+	local maxPetsAllowed = 3;
 
-	if(itemData.ItemType == "Seed" and #playerCarrying == 3) then
+	if(isLifetimeLegend) then
+		maxPetsAllowed = 5;
+	end
+
+	if(itemData.ItemType == "Seed" and #playerCarrying == maxPetsAllowed) then
 		return {
 			Success = false,
 			Message = "You cannot train a seed when you're carrying 3 pets!"

@@ -21,6 +21,7 @@ local PADDING = Vector2.new(0.03, 0.03);
 local activeTab = "Seed";
 local debounce = false;
 local petsCarrying = 0;
+local maxPetsAllowed = 3;
 
 BackpackMenu.Items = {};
 
@@ -86,7 +87,7 @@ local function SelectItem(selectedItem)
         end);
     end
 
-    if(petsCarrying == 3 and itemData.ItemType == "Seed") then
+    if(petsCarrying == maxPetsAllowed and itemData.ItemType == "Seed") then
         itemPopup.ItemContextButtons.ContextButtonBack.Visible = false;
         itemPopup.CannotTrainContext.Visible = true;
     end
@@ -137,6 +138,12 @@ local function AddItem(itemToAdd)
 end
 
 function BackpackMenu.ShowInventory()
+    if(replicatedStorage.Common.Events.IsPlayerLifetimeLegend:InvokeServer() == true) then
+        maxPetsAllowed = 5;
+    else
+        maxPetsAllowed = 3;
+    end
+
     petsCarrying = 0;
     scrollingFrame.Visible = false;
 
