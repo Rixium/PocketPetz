@@ -258,8 +258,6 @@ local function SetupPet(pet, petData)
 end
 
 local function StopCombat()
-    if(activePet == nil) then return end
-    if(activeTarget == nil) then return end
 
     if(attackTrack ~= nil) then
         attackTrack:Stop();
@@ -270,7 +268,11 @@ local function StopCombat()
     end
 
     Shrink();
-    petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+
+    if(activePet ~= nil and activeTarget ~= nil) then
+        petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
+    end
+    
     activeTarget = nil;
 
     toldServer = false;

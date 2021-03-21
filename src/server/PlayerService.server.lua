@@ -21,6 +21,15 @@ local logoutPositions = DataStoreService:GetDataStore("LogoutPositions");
 
 local currentEventTitle = "AlphaStar";
 
+local function SetupCollision(player)
+	local char = player.Character or player.CharacterAdded:Wait();
+	for i,v in pairs(char:GetChildren()) do
+		if v:IsA("BasePart") then
+			physicsService:SetPartCollisionGroup(v, "Players");
+		end
+	end
+end
+
 function OnPlayerJoined(player)
 	playerTracker.Login(player);
 	moneyManager.PlayerJoined(player);
@@ -28,19 +37,14 @@ function OnPlayerJoined(player)
 	local isFirstTime = playerTracker.FirstTime(player);
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);
-
-	local char = player.Character or player.CharacterAdded:Wait();
-	for i,v in pairs(char:GetChildren()) do
-		if v:IsA("BasePart") then
-			physicsService:SetPartCollisionGroup(v, "Players");
-		end
-	end
 	
 	playerService.CreatePlayerInfo(player);
-	-- itemService.ClearItems(player);
-	-- itemService.GiveItem(player,1);
+	
+	SetupCollision(player);
+	player.CharacterAdded:Connect(SetupCollision);
 
 	player.CharacterRemoving:Connect(function(c)
+		if(c.PrimaryPart == nil) then return end
 		local logoutPosition= c.PrimaryPart.CFrame.p;
 		logoutPositions:SetAsync(player.UserId, {
 			X = logoutPosition.X,
@@ -207,6 +211,7 @@ storeItem.OnServerInvoke = function(player, item)
 	local playerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
 	if(playerItem == nil) then return end
 	itemService.StoreItem(player, playerItem.Id);
+	activePetService.PetStored(player, playerItem);
 	return true;
 end
 

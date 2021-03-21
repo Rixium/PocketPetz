@@ -46,13 +46,13 @@ function PlayerTrackSet.Logout(player)
 end
 
 function AddPlayerMoneyBasedOnLastLogin(player)
-	local lastLogin = GetLastLogin(player);
-	local differenceFromNow = os.difftime(os.time(), lastLogin);
+	-- local lastLogin = GetLastLogin(player);
+	-- local differenceFromNow = os.difftime(os.time(), lastLogin);
 
-	if(differenceFromNow > secondsToPassForLoginMoney) then
-		print("Player last logged in over " .. secondsToPassForLoginMoney .. " seconds ago, adding " .. loginRewardMoney .. " gold.");
-		moneyManager.AddMoney(player, loginRewardMoney);
-	end
+	-- if(differenceFromNow > secondsToPassForLoginMoney) then
+	-- 	print("Player last logged in over " .. secondsToPassForLoginMoney .. " seconds ago, adding " .. loginRewardMoney .. " gold.");
+	-- 	moneyManager.AddMoney(player, loginRewardMoney);
+	-- end
 end
 
 function PlayerTrackSet.RemovePlayer(player)	
