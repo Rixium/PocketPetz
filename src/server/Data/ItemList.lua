@@ -165,6 +165,8 @@ ItemList.Items = {
         ModelId = 6500864818,
         BaseHealth = 10,
         ExperienceToLevel = 200,
+        LevelToEvolve = 3,
+        EvolvesTo = 19, --Bawful
         BaseAttack = 10,
         BaseDefence = 5
     },
@@ -177,7 +179,7 @@ ItemList.Items = {
         ModelId = 6504277287,
         ExperienceToLevel = 10,
         LevelToEvolve = 2,
-        EvolvesTo = 13,
+        EvolvesTo = 13, --Pigzee
         Value = 10
     },
     [15] = {
@@ -221,6 +223,19 @@ ItemList.Items = {
         Description = "I can hear it buzzing..",
         ModelId = 6514406633,
         Value = 10
+    },
+    [19] = {
+        ItemId = 19,
+        ItemType = "Pet",
+        Name = "Bawful",
+        Type = "Brute",
+        Description = "Not so cute no more..",
+        ModelId = 6551640772,
+        BaseHealth = 20,
+        ExperienceToLevel = 300,
+        BaseAttack = 20,
+        BaseDefence = 10,
+        GuiOffset = Vector3.new(0, 8, 0)
     },
 };
 

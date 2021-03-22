@@ -159,25 +159,32 @@ end
 function PetService.AddExperience(player, guid, experienceAmount)
     local itemStore = dataStore2(itemsStore, player);
     local items = itemStore:Get({});
+    local resultItem;
+    local resultData;
 
-    for _, item in pairs(items) do
+    for _, item in ipairs(items) do
         if(item.Id == guid) then
             local itemData = itemList.GetById(item.ItemId);
             if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
                 return;
             end
-        
-            item.Data.CurrentExperience = item.Data.CurrentExperience + experienceAmount;
-        
-            petGotExperience:FireClient(player, item);
-        
+            
+
+            local newExperience = item.Data.CurrentExperience + experienceAmount;
+            item.Data.CurrentExperience = newExperience;
+
             if(item.Data.CurrentExperience >= itemData.ExperienceToLevel) then
                 LevelUpPet(player, item, itemData);
             end
         
+            local levelToEvolve = -1;
+
+            if(itemData.LevelToEvolve ~= nil) then
+                levelToEvolve = itemData.LevelToEvolve;
+            end
+
             -- Evolution
-            if(item.Data.CurrentLevel == itemData.LevelToEvolve) then
-                
+            if(item.Data.CurrentLevel == levelToEvolve) then
                 -- Only evolving seeds get a new item rarity
                 if(itemData.ItemType == "Seed") then
                     local rarity = PetService.GetRarity(player);
@@ -191,20 +198,22 @@ function PetService.AddExperience(player, guid, experienceAmount)
         
                 item.ItemId = nextPetId;
                 item.Data.CurrentHealth = nextPet.BaseHealth;
-        
+
                 petEvolved:FireClient(player, nextPet);
             end
             
             itemStore:Set(items);
 
-            return {
-                PlayerItem = item,
-                ItemData = itemData
-            };
+            resultItem = item;
+            resultData = itemData;
+            break;
         end
     end
 
-    return nil;    
+    return {
+        PlayerItem = resultItem,
+        ItemData = resultData
+    };
 end
 
 return PetService;

@@ -98,7 +98,12 @@ function ActivePetService.AddActivePet(player, item)
 	end
 
 	local model = insertService:LoadAsset(item.ItemData.ModelId);
-	
+
+	local actualPet = {
+		ItemData = itemList.GetById(item.ItemData.ItemId),
+		PlayerItem = itemService.GetPlayerItemByGuid(player, item.PlayerItem.Id);
+	}
+
     local toSend = model:FindFirstChildWhichIsA("Model")
 
 	toSend.PrimaryPart = toSend.Root;
@@ -113,7 +118,7 @@ function ActivePetService.AddActivePet(player, item)
 
 	local playersPet = {
 		PetModel = toSend,
-		PetData = item,
+		PetData = actualPet,
 		Target = nil,
 		AboveHeadGUI = aboveHeadGUI
 	};
@@ -270,8 +275,10 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			expectedExperience = expectedExperience * 2;
 		end
 
-		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, expectedExperience);
+		local updatedPetData = petService.AddExperience(player, playersPet.PetData.PlayerItem.Id, expectedExperience);
 		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
+		
+		playersPet.PetData = updatedPetData;
 	end
 
 	if(creature == nil) then 
@@ -410,8 +417,10 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			expectedExperience = expectedExperience * 2;
 		end
 		
-		local updatedPetData = petService.AddExperience(player, petData.PlayerItem.Id, expectedExperience);
+		local updatedPetData = petService.AddExperience(player, playersPet.PetData.PlayerItem.Id, expectedExperience);
 		UpdateXpBar(playersPet, updatedPetData or playersPet.PetData);
+
+		playersPet.PetData = updatedPetData;
 
 		targetKilled:FireClient(player);
 	end
