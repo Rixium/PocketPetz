@@ -61,6 +61,8 @@ function OnPlayerJoined(player)
 	end
 
 	playerSwitchedZone:FireClient(player, playerService.GetPlayerLocation(player));
+
+	itemService.ClearItems(player);
 end
 
 function OnPlayerLeaving(player)
