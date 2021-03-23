@@ -49,9 +49,9 @@ ItemList.Items = {
         ExperienceToLevel = 200,
         LevelToEvolve = 12,
         EvolvesTo = 7,
-        BaseHealth = 10,
-        BaseAttack = 10,
-        BaseDefence = 5
+        BaseHealth = 45,
+        BaseAttack = 49,
+        BaseDefence = 49
     },
     [5] = {
         ItemId = 5,
@@ -64,9 +64,9 @@ ItemList.Items = {
         ExperienceToLevel = 200,
         LevelToEvolve = 12,
         EvolvesTo = 8,
-        BaseHealth = 10,
-        BaseAttack = 10,
-        BaseDefence = 5
+        BaseHealth = 45,
+        BaseAttack = 49,
+        BaseDefence = 49
     },
     [6] = {
         ItemId = 6,
@@ -79,9 +79,9 @@ ItemList.Items = {
         ExperienceToLevel = 200,
         LevelToEvolve = 12,
         EvolvesTo = 9,
-        BaseHealth = 10,
-        BaseAttack = 10,
-        BaseDefence = 5
+        BaseHealth = 45,
+        BaseAttack = 49,
+        BaseDefence = 49
     },
 
     -- Evolution 2
@@ -94,9 +94,9 @@ ItemList.Items = {
         ExperienceToLevel = 500,
         LevelToEvolve = 25,
         EvolvesTo = 10,
-        BaseHealth = 10,
-        BaseAttack = 15,
-        BaseDefence = 7
+        BaseHealth = 60,
+        BaseAttack = 62,
+        BaseDefence = 63
     },
     [8] = {
         ItemId = 5,
@@ -107,9 +107,9 @@ ItemList.Items = {
         ExperienceToLevel = 500,
         LevelToEvolve = 25,
         EvolvesTo = 11,
-        BaseHealth = 10,
-        BaseAttack = 15,
-        BaseDefence = 7
+        BaseHealth = 60,
+        BaseAttack = 62,
+        BaseDefence = 63
     },
     [9] = {
         ItemId = 6,
@@ -120,9 +120,9 @@ ItemList.Items = {
         ExperienceToLevel = 500,
         LevelToEvolve = 25,
         EvolvesTo = 12,
-        BaseHealth = 10,
-        BaseAttack = 15,
-        BaseDefence = 7
+        BaseHealth = 60,
+        BaseAttack = 62,
+        BaseDefence = 63
     },
 
     -- Evolution 3
@@ -132,9 +132,9 @@ ItemList.Items = {
         Name = "Flutterboo",
         Type = "Pixie",
         ModelId = 6463613741,
-        BaseHealth = 10,
-        BaseAttack = 25,
-        BaseDefence = 15
+        BaseHealth = 80,
+        BaseAttack = 82,
+        BaseDefence = 83
     },
     [11] = {
         ItemId = 11,
@@ -142,9 +142,9 @@ ItemList.Items = {
         Name = "Gatorain",
         Type = "Cool",
         ModelId = 6463613741,
-        BaseHealth = 10,
-        BaseAttack = 25,
-        BaseDefence = 15
+        BaseHealth = 80,
+        BaseAttack = 82,
+        BaseDefence = 83
     },
     [12] = {
         ItemId = 12,
@@ -152,9 +152,9 @@ ItemList.Items = {
         Name = "Bouldagan",
         Type = "Brute",
         ModelId = 6463613741,
-        BaseHealth = 10,
-        BaseAttack = 25,
-        BaseDefence = 15
+        BaseHealth = 80,
+        BaseAttack = 82,
+        BaseDefence = 83
     },
     [13] = {
         ItemId = 13,
@@ -163,12 +163,12 @@ ItemList.Items = {
         Type = "Brute",
         Description = "Oink!",
         ModelId = 6500864818,
-        BaseHealth = 10,
+        BaseHealth = 30,
         ExperienceToLevel = 200,
         LevelToEvolve = 3,
         EvolvesTo = 19, --Bawful
-        BaseAttack = 10,
-        BaseDefence = 5
+        BaseAttack = 36,
+        BaseDefence = 35
     },
     [14] = {
         ItemId = 14,
@@ -198,9 +198,9 @@ ItemList.Items = {
         Type = "Pixie",
         Description = "Loves bee-ing around you.",
         ModelId = 6504764631,
-        BaseHealth = 10,
-        BaseAttack = 10,
-        BaseDefence = 5,
+        BaseHealth = 40,
+        BaseAttack = 45,
+        BaseDefence = 40,
         ExperienceToLevel = 200,
         GuiOffset = Vector3.new(0, 8, 0)
     },
@@ -231,10 +231,10 @@ ItemList.Items = {
         Type = "Brute",
         Description = "Not so cute no more..",
         ModelId = 6551640772,
-        BaseHealth = 20,
+        BaseHealth = 60,
         ExperienceToLevel = 300,
-        BaseAttack = 20,
-        BaseDefence = 10,
+        BaseAttack = 90,
+        BaseDefence = 55,
         GuiOffset = Vector3.new(0, 8, 0)
     },
 };

@@ -205,39 +205,15 @@ function ActivePetService.RemovePlayerPet(player)
     activePets[player.UserId] = nil;
 end
 
-function ActivePetService.CalculateDamage(level, rarity, c1, c2, divider)
+function ActivePetService.CalculateDamage(level, rarity, c1, c2, handicap, attackPower)
 	local basePetDamage = c1.BaseAttack;
 	local baseCreatureDefence = c2.BaseAttack;
 
-	-- First check the percentage of the base damage we'll do.
-	basePetDamage = basePetDamage / 100 * math.random(level, 100 + level);
-	
-	local petRarity = rarity;
+	local modifier = math.random(85, 100) / 100 * handicap;
 
-	-- Then the rarity damage to do.
-	local rarityDamage = 0;
-	local divisionAmount = 100;
-
-	if(petRarity == "Silver") then
-		rarityDamage = basePetDamage / 100 * 10;
-	elseif(petRarity == "Gold") then
-		rarityDamage = basePetDamage / 100 * 20;
-	elseif(petRarity == "Diamond") then
-		rarityDamage = basePetDamage / 100 * 30;
-	end
-
-	local percentageRoll = math.random(level, 100 + level); -- Offset the percentage with the pets level, so there is an actual benefit to levelling up.
-
-	if(percentageRoll > 90) then
-		divisionAmount = 50; -- This is a crit (double damage!)
-	end
-
-	local actualRarityDamage = rarityDamage / divisionAmount * percentageRoll;
-
-	local finalDamage = basePetDamage + actualRarityDamage;
-	local finalDefence = baseCreatureDefence / 100 * math.random(0, 100 - level); -- Another offset that is dependent on the attackers level
-
-	return { FinalDamage = finalDamage / divider, FinalDefence = finalDefence};
+	local topSum = ((2 * level) / 5) + 2 * attackPower * (basePetDamage / baseCreatureDefence);
+	local endSum = ((topSum / 50) + 2) * modifier;
+	return endSum;
 end
 
 function ActivePetService.PetAttack(player, pet, petData, target)
@@ -302,10 +278,9 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 			local petData = playersPet.PetData;
 			local playerItemData = petData.PlayerItem.Data;
 			local currentHealth = playerItemData.CurrentHealth or petData.ItemData.BaseHealth;
-			local resultingDamages = ActivePetService.CalculateDamage(1, "Bronze", creature.Item, petData.ItemData, 3);
-			local actualDamage = math.clamp(resultingDamages.FinalDamage - resultingDamages.FinalDefence, 0, resultingDamages.FinalDamage);
-			
-			currentHealth = currentHealth - actualDamage;
+			local damage = ActivePetService.CalculateDamage(playerItemData.CurrentLevel, "Bronze", creature.Item, petData.ItemData, 0.25, 80);
+
+			currentHealth = currentHealth - damage;
 			
 			creature.GameObject.Root.HitSound:Play();
 
@@ -347,23 +322,13 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 	playersPet.PetModel.Root.HitSound:Play();
 
 	-- Do damage
-	local resultingDamages = ActivePetService.CalculateDamage(
+	local damage = ActivePetService.CalculateDamage(
 		playersPet.PetData.PlayerItem.Data.CurrentLevel, -- Current Level of Pet
 		playersPet.PetData.PlayerItem.Data.Rarity,       -- The Pets Rarity
 		playersPet.PetData.ItemData,                     -- The Pet's Item (Holds important base stats)
-		creature.Item, 1);                                  -- The opponents item (Holds important base stats)
+		creature.Item, 1, 80);                                  -- The opponents item (Holds important base stats), handicap and attack power
 
-
-	if(resultingDamages.FinalDamage < 2) then
-		resultingDamages.FinalDamage = 1;
-	end
-
-	local actualDamage = math.clamp(resultingDamages.FinalDamage - resultingDamages.FinalDefence, 1, resultingDamages.FinalDamage);
-
-	damageAmount = actualDamage;
-	defenceAmount = resultingDamages.FinalDefence;
-
-	creature.CurrentHealth = creature.CurrentHealth - actualDamage;
+	creature.CurrentHealth = creature.CurrentHealth - damage;
     
     local width = creature.CurrentHealth / creature.MaxHealth;
     creature.HealthPanel.ImageLabel.Health.Size = UDim2.new(width,0, 1,0);
@@ -426,8 +391,7 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 	end
 
 	return {
-		Damage = damageAmount,
-		Defended = defenceAmount
+		Damage = damage
 	};
 
 end
