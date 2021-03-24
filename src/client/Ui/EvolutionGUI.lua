@@ -2,6 +2,7 @@ local EvolutionGUI = {};
 
 local players = game:GetService("Players");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 local evolutionGui = uiManager.GetUi("Evolution GUI");
 local TweenService = game:GetService("TweenService")
 local connect;
@@ -21,9 +22,20 @@ local function Transition()
     local frame = evolutionGui:WaitForChild("EvolveFrame");
     image = frame:WaitForChild("Frame"):WaitForChild("Image");
     local text = frame:WaitForChild("TextFrame"):WaitForChild("TextLabel");
-    text.Text = "It evolved in to " .. nextPet.Name .. "!"
-    local tweenInfo = TweenInfo.new(speed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(image, tweenInfo, {Size = UDim2.new(0, 0, 0, 0), Rotation = 360})
+    local color;
+
+    if(nextPet.ItemData.Type == "Brute") then
+        color = "#c6fb64"; -- Green
+    elseif(nextPet.ItemData.Type == "Pixie") then
+        color = "#ff5ca8"; -- Pink
+    else 
+        color = "#2dc8ed"; -- Blue
+    end
+
+    text.Text = "It evolved in to <font color=\"" .. color .. "\">" .. nextPet.ItemData.Name .. "</font>!"
+
+    local tweenInfo = TweenInfo.new(speed, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(image, tweenInfo, {Size = UDim2.new(0, 0, 0, 0), Rotation = 0})
 
     image.Success:Play();
     tween:Play()
@@ -39,8 +51,8 @@ local function Transition()
     tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
     tween = TweenService:Create(image, tweenInfo, {Size = UDim2.new(0.8, 0, 0.8, 0), Rotation = 0})
 
-    local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
-    local textTween = TweenService:Create(text, textTweenInfo, {Size = UDim2.new(0.8, 0, 0.5, 0), TextTransparency = 0})
+    local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    local textTween = TweenService:Create(text, textTweenInfo, {Size = UDim2.new(0.8, 0, 0.5, 0), TextTransparency = 0, TextStrokeTransparency = 0})
 
     local spinnerRenderStep;
     spinnerRenderStep = game:GetService("RunService").RenderStepped:Connect(function()
@@ -52,6 +64,7 @@ local function Transition()
 
     wait(3);
 
+    quickbarMenu.Setup();
     spinnerInfo = TweenInfo.new(speed, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
     spinnerTween = TweenService:Create(spinner, spinnerInfo, {ImageTransparency = 1})
     spinnerTween:Play();
@@ -73,8 +86,8 @@ local function Transition()
 	local bagPopTween = TweenService:Create(bagButton, bagPopInfo, {Size=UDim2.new(1.2, 0, 1.2, 0)})
     bagPopTween:Play();
     
-    textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
-    textTween = TweenService:Create(text, textTweenInfo, {Size = UDim2.new(0, 0, 0, 0), TextTransparency = 1})
+    textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    textTween = TweenService:Create(text, textTweenInfo, {Size = UDim2.new(0.8, 0, 0, 0), TextTransparency = 1, TextStrokeTransparency = 1})
     textTween:Play();
 
     image.Position = UDim2.new(0.5, 0, 0.5, 0);
@@ -114,13 +127,13 @@ end
 function EvolutionGUI.Setup(current, next)
     evolutionGui.Enabled = true;
     nextPet = next;
-    nextModelId = next.ModelId;
+    nextModelId = next.ItemData.ModelId;
     
     local frame = evolutionGui:WaitForChild("EvolveFrame");
     image = frame:WaitForChild("Frame"):WaitForChild("Image");
     image.Image = "rbxthumb://type=Asset&id=" .. current.ItemData.ModelId .. "&w=420&h=420";
 
-    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.In)
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
     local tween = TweenService:Create(image, tweenInfo, {Size=UDim2.new(0.8, 0,0.8, 0)})
     tween:Play()
     tween.Completed:Wait();

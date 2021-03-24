@@ -350,8 +350,6 @@ petEvolved.OnClientEvent:Connect(function(next)
     
     PetManager.SetTarget(nil);
     PetManager.SetActivePet(nil, nil);
-    
-    quickbarMenu.Setup();
 end);
 
 petFainted.OnClientEvent:Connect(function()

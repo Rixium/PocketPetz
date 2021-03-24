@@ -199,7 +199,10 @@ function PetService.AddExperience(player, guid, experienceAmount)
                 item.ItemId = nextPetId;
                 item.Data.CurrentHealth = nextPet.BaseHealth;
 
-                petEvolved:FireClient(player, nextPet);
+                petEvolved:FireClient(player, {
+                    PlayerItem = item.Data,
+                    ItemData = nextPet
+                });
             end
             
             itemStore:Set(items);
