@@ -20,18 +20,33 @@ local bagButton = mainGui:WaitForChild("Buttons").BagButton.BagButton;
 local function OnGotItem(itemData)
     local newPopup = gotItemPopup:clone();
     newPopup.Parent = mainGui;
-    newPopup.Size = UDim2.new(0, 0, 0, 0);
-    
+
     newPopup.Award:Play();
 
-    local tweenInfo = TweenInfo.new(2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out, 0, false, 0);
-    local tween = tweenService:Create(newPopup, tweenInfo, { Size = UDim2.new(0.5, 0, 0.5, 0) });
+    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out, 0, false, 0);
+    local tweenInfo2 = TweenInfo.new(2, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out, 0, false, 0);
+    local tween = tweenService:Create(newPopup.TextLabel, tweenInfo, { Position = UDim2.new(0.5, 0, 1, 0), TextTransparency = 0, TextStrokeTransparency = 0 });
+    local tween2 = tweenService:Create(newPopup.Image, tweenInfo2, { Size = UDim2.new(0.4, 0, 0.4, 0) });
     tween:Play();
+    tween2:Play();
 
-    newPopup.TextLabel.Text = "You got " .. itemData.Name;
+    local color;
+
+    if(itemData.Type == "Brute") then
+        color = "#c6fb64"; -- Green
+    elseif(itemData.Type == "Pixie") then
+        color = "#ff5ca8"; -- Pink
+    elseif(itemData.Type == "Cool") then
+        color = "#2dc8ed"; -- Blue
+    else
+        color = "#FFFFFF";
+    end
+
+    newPopup.TextLabel.Text = "You found a <font color=\"" .. color .. "\">" .. itemData.Name .. "</font>!"
+
     newPopup.Image.ItemImage.Image = "rbxthumb://type=Asset&id=" .. itemData.ModelId .. "&w=420&h=420";
 
-    tween.Completed:Wait()
+    tween2.Completed:Wait()
 
     local abs = {
         X = bagButton.AbsolutePosition.X + bagButton.AbsoluteSize.X / 2,
@@ -41,10 +56,9 @@ local function OnGotItem(itemData)
     local fadeTextInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.In);
     
     tweenService:Create(newPopup.TextLabel, fadeTextInfo, { 
-        Size = UDim2.new(0, 0, 0, 0),
+        Size = UDim2.new(0.5, 0, 0, 0),
         TextTransparency = 1,
-        TextStrokeTransparency = 1,
-        Rotation = 360
+        TextStrokeTransparency = 1
     }):Play();
 
     newPopup.Image.ZIndex = -10;
