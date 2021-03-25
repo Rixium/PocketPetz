@@ -15,13 +15,11 @@ local nextModelId;
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local mainGui = uiManager.GetUi("Main GUI");
 local bagButton = mainGui:WaitForChild("Buttons").BagButton.BagButton;
-local spinner = evolutionGui.Spinner;
 
 local function Transition()
 
     local frame = evolutionGui:WaitForChild("EvolveFrame");
-    image = frame:WaitForChild("Frame"):WaitForChild("Image");
-    local text = frame:WaitForChild("TextFrame"):WaitForChild("TextLabel");
+    image = frame:WaitForChild("ImageLabel"):WaitForChild("Frame").Image;
     local color;
 
     if(nextPet.ItemData.Type == "Brute") then
@@ -32,7 +30,19 @@ local function Transition()
         color = "#2dc8ed"; -- Blue
     end
 
-    text.Text = "It evolved in to <font color=\"" .. color .. "\">" .. nextPet.ItemData.Name .. "</font>!"
+    local textFrame = frame.ImageLabel.Frame.TextFrame;
+
+    for _, t in pairs(textFrame:GetChildren()) do
+
+        if(t.Name == "Front") then
+            t.Text = "<font color=\"" .. color .. "\">" .. nextPet.ItemData.Name .. "</font>";
+            continue;
+        end
+
+        t.Text = nextPet.ItemData.Name;
+    end
+
+    local tweenInfo = TweenInfo.new(speed, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
 
     local tweenInfo = TweenInfo.new(speed, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
     local tween = TweenService:Create(image, tweenInfo, {Size = UDim2.new(0, 0, 0, 0), Rotation = 0})
@@ -41,33 +51,54 @@ local function Transition()
     tween:Play()
     tween.Completed:Wait();
 
-    spinner.Visible = true;
-    local spinnerInfo = TweenInfo.new(speed, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-    local spinnerTween = TweenService:Create(spinner, spinnerInfo, {ImageTransparency = 0.3})
-    spinnerTween:Play();
+    local tweenInfoEvolveText = TweenInfo.new(1, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out)
+    local evolveIn = frame.ImageLabel.Frame.Frame.evolveIn;
+    local bronze = frame.ImageLabel.Frame.Frame.bronze;
+    local silver = frame.ImageLabel.Frame.Frame.silver;
+    local gold = frame.ImageLabel.Frame.Frame.gold;
+    local diamond = frame.ImageLabel.Frame.Frame.diamond;
+
+    -- It evolved in to a..
+    local evolveTween = TweenService:Create(evolveIn, tweenInfoEvolveText, {Size = UDim2.new(1.5, 0, 0.5, 0), Rotation = 0});
+    evolveTween:Play();
+    evolveTween.Completed:Wait();
+
+    local selected = diamond;
+
+    if(nextPet.PlayerItem.Rarity == "Bronze") then
+        selected = bronze;
+    elseif(nextPet.PlayerItem.Rarity == "Silver") then
+        selected = silver;
+    elseif(nextPet.PlayerItem.Rarity == "Gold") then
+        selected = gold;
+    end
+
+    -- Rarity!!
+    TweenService:Create(selected, tweenInfoEvolveText, {Size = UDim2.new(0.5, 0, 1, 0), Rotation = 0}):Play();
 
     image.Image = "rbxthumb://type=Asset&id=" .. nextModelId .. "&w=420&h=420";
     
+    -- Make the image bigger!
     tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
-    tween = TweenService:Create(image, tweenInfo, {Size = UDim2.new(0.8, 0, 0.8, 0), Rotation = 0})
+    tween = TweenService:Create(image, tweenInfo, { Size = UDim2.new(0.5, 0, 0.5, 0) })
 
+    -- Make the text BIGGER
     local textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-    local textTween = TweenService:Create(text, textTweenInfo, {Size = UDim2.new(0.8, 0, 0.5, 0), TextTransparency = 0, TextStrokeTransparency = 0})
+    local textTween = TweenService:Create(textFrame, textTweenInfo, { Size = UDim2.new(1, 0, 0.2, 0) })
 
-    local spinnerRenderStep;
-    spinnerRenderStep = game:GetService("RunService").RenderStepped:Connect(function()
-        spinner.Rotation = spinner.Rotation + 1;
-    end)
-    
     tween:Play()
     textTween:Play();
 
+    spawn(function()
+        for _, t in pairs(textFrame:GetChildren()) do
+            -- Make the text visible
+            TweenService:Create(t, textTweenInfo, { TextTransparency = 0, TextStrokeTransparency = 0 }):Play();
+        end
+    end)
+    
     wait(3);
 
     quickbarMenu.Setup();
-    spinnerInfo = TweenInfo.new(speed, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-    spinnerTween = TweenService:Create(spinner, spinnerInfo, {ImageTransparency = 1})
-    spinnerTween:Play();
 
     local abs = {
         X = bagButton.AbsolutePosition.X + bagButton.AbsoluteSize.X / 2,
@@ -80,6 +111,14 @@ local function Transition()
         Size = UDim2.new(0, 0, 0, 0)
     });
     toBagTween:Play();
+    
+    local text = TweenService:Create(textFrame, textTweenInfo, { Size = UDim2.new(0.8, 0, 0, 0) });
+    tweenInfoEvolveText = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    TweenService:Create(evolveIn, tweenInfoEvolveText, {Size = UDim2.new(0, 0, 0, 0)}):Play();
+    TweenService:Create(selected, tweenInfoEvolveText, {Size = UDim2.new(0, 0, 0, 0)}):Play();
+
+    text:Play();
+
     toBagTween.Completed:Wait();
     bagButton.Pickup:Play();
     local bagPopInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);
@@ -87,30 +126,27 @@ local function Transition()
     bagPopTween:Play();
     
     textTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-    textTween = TweenService:Create(text, textTweenInfo, {Size = UDim2.new(0.8, 0, 0, 0), TextTransparency = 1, TextStrokeTransparency = 1})
-    textTween:Play();
 
-    image.Position = UDim2.new(0.5, 0, 0.5, 0);
-    image.Size = UDim2.new(0,0,0,0);
-    
+    -- Make our text small now!
     clicks = 0;
-    
-    textTween.Completed:Wait();
-    spinnerTween.Completed:Wait();
-    spinnerRenderStep:Disconnect();
-    spinner.Visible = false;
+
+    -- Reset our image position to the center of  the screen for later
+    image.Position = UDim2.new(0.5, 0, 0.35, 0);
+    image.Size = UDim2.new(0,0,0,0);
+
+    bagPopTween.Completed:Wait();
 
     evolutionGui.Enabled = false;
 end
 
 local function Grow()
-    connect:Disconnect();
+    connect:Disconnect(); -- Disconnect so that we can't click until we've finished animating. :)
     local tweenInfo = TweenInfo.new(speed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(image, tweenInfo, {Rotation=20})
+    local tween = TweenService:Create(image, tweenInfo, { Rotation=20 })
     image.Tap1:Play();
     tween:Play()
     tween.Completed:Wait();
-    tween = TweenService:Create(image, tweenInfo, {Rotation=0})
+    tween = TweenService:Create(image, tweenInfo, { Rotation=0 })
     tween:Play()
 
     image.Size = UDim2.new(image.Size.X.Scale + 0.1, 0, image.Size.Y.Scale + 0.1, 0);
@@ -118,6 +154,7 @@ local function Grow()
     clicks = clicks + 1;
 
     if(clicks == 5) then
+        -- Once we reach 5 clicks, we can transition it to the next pet!
         Transition();
     else
         connect = image.MouseButton1Click:Connect(Grow);
@@ -130,14 +167,16 @@ function EvolutionGUI.Setup(current, next)
     nextModelId = next.ItemData.ModelId;
     
     local frame = evolutionGui:WaitForChild("EvolveFrame");
-    image = frame:WaitForChild("Frame"):WaitForChild("Image");
+    image = frame:WaitForChild("ImageLabel"):WaitForChild("Frame").Image;
     image.Image = "rbxthumb://type=Asset&id=" .. current.ItemData.ModelId .. "&w=420&h=420";
 
     local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-    local tween = TweenService:Create(image, tweenInfo, {Size=UDim2.new(0.8, 0,0.8, 0)})
+    -- Make the image bigger so we can click it!
+    local tween = TweenService:Create(image, tweenInfo, { Size=UDim2.new(0.5, 0, 0.5, 0) })
     tween:Play()
     tween.Completed:Wait();
 
+    -- Clicking on the image to grow it
     connect = image.MouseButton1Click:Connect(Grow);
 end
 
