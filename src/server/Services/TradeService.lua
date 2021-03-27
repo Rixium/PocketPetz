@@ -100,6 +100,7 @@ function TradeService.DeclineTrade(player)
     if(playersTrade == nil) then return end
 
     activeTrades[player.UserId] = nil;
+    activeTrades[playersTrade.Other.UserId] = nil;
     print("Player declined trade");
 
     tradeDeclined:FireClient(playersTrade.Other);
