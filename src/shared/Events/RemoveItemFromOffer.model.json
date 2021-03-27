@@ -1,4 +1,4 @@
 {
     "Name": "RemoveItemFromOffer",
-    "ClassName": "RemoteEvent"
+    "ClassName": "RemoteFunction"
 }

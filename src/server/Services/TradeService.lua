@@ -25,6 +25,8 @@ function TradeService.Setup()
     -- Set up all the event callbacks :)
     requestTrade.OnServerInvoke = TradeService.TradeRequested;
     offerItem.OnServerInvoke = TradeService.OfferItem;
+    removeItemFromOffer.OnServerInvoke = TradeService.RemoveItemFromOffer;
+    acceptTrade.OnServerEvent:Connect(TradeService.AcceptTrade);
 end
 
 --  Called when a player requests to trade another player
@@ -71,12 +73,14 @@ function TradeService.TradeRequested(requestingPlayer, requestedPlayer)
     -- We add both the requested and the requesting to the tracked trades
     activeTrades[requestedPlayerId] = {
             Other = requestingPlayer,
-            Offered = {}
+            Offered = {},
+            Accepted = false
     };
 
     activeTrades[requestingPlayerId] = {
         Other = requestedPlayer,
-        Offered = {}
+        Offered = {},
+        Accepted = false
     };
 
     return {
@@ -123,6 +127,46 @@ function TradeService.OfferItem(player, itemToOffer)
     });
 
     return true;
+end
+
+function TradeService.RemoveItemFromOffer(player, itemToRemove)
+    local playersTrade = activeTrades[player.UserId];
+
+    if(playersTrade == nil) then return end -- Player isn't actually trading ??
+
+    -- An item needs all these to actually exist, instead of a pcall?
+    if(itemToRemove == nil) then return end
+    if(itemToRemove.PlayerItem == nil) then return end
+    if(itemToRemove.PlayerItem.Id == nil) then return end
+
+    local id = itemToRemove.PlayerItem.Id;
+    local indexToRemove = 0;
+
+    for i, v in ipairs(playersTrade.Offered) do
+        if(v == id) then
+            indexToRemove = i;
+            break;
+        end
+    end
+
+    if indexToRemove ~= 0 then
+        table.remove(playersTrade.Offered, indexToRemove);
+        activeTrades[player.UserId] = playersTrade;
+        itemRemovedFromOffer:FireClient(playersTrade.Other, id);
+        return true;
+    end
+
+    return false;
+end
+
+function TradeService.AcceptTrade(player)
+    local playersTrade = activeTrades[player.UserId];
+    playersTrade.Accepted = true;
+
+    
+    activeTrades[player.UserId] = playersTrade;
+
+    print(playersTrade);
 end
 
 return TradeService;

@@ -32,12 +32,14 @@ local declineTradeButton = contentFrame.ButtonFrame.DeclineButtonBack.DeclineBut
 
 -- For backpack resizing and stuff
 local backPackItems = {};
+local theirOffers = {};
+local yourOffers = {};
 
 local startSize = tradeFrame.Size;
 local trading = false;
 
 -- Utility function for adding an item to a given scrolling frame
-local function AddItem(scrollingFrame, itemToAdd)
+local function AddItem(scrollingFrame, itemToAdd, itemSet)
     local item = itemBack:clone();
     item.Parent = scrollingFrame;
 
@@ -59,16 +61,52 @@ local function AddItem(scrollingFrame, itemToAdd)
     item.ThumbBack8.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
     item.ItemThumbnail.Image = "rbxthumb://type=Asset&id=" .. itemToAdd.ItemData.ModelId .. "&w=420&h=420";
     
-    table.insert(backPackItems, item);
+    table.insert(itemSet, {
+        Id = itemToAdd.PlayerItem.Id,
+        Gui = item
+    });
 
     return item;
+end
+
+-- Utility function for removing an item to a given scrolling frame
+local function RemoveItem(scrollingFrame, itemToRemove, itemSet)
+    local indexToRemove = 0;
+    for i, v in ipairs(itemSet) do
+        if(v.Id == itemToRemove.PlayerItem.Id) then
+            indexToRemove = i;
+            v.Gui:Destroy();
+            break;
+        end
+    end
+
+    if(indexToRemove == 0) then return end
+    table.remove(itemSet, indexToRemove);
+end
+
+-- Utility function for removing an item to a given scrolling frame
+local function RemoveItemById(scrollingFrame, idOfItem, itemSet)
+    local indexToRemove = 0;
+    for i, v in ipairs(itemSet) do
+        if(v.Id == idOfItem) then
+            indexToRemove = i;
+            v.Gui:Destroy();
+            break;
+        end
+    end
+
+    if(indexToRemove == 0) then return end
+    table.remove(itemSet, indexToRemove);
 end
 
 local function SetupOfferItem(item, itemData)
     -- When we click the item, then we want to 
     -- send this data to the server and notify other player
     local clickFunction; -- We can detach this from the item image once we've offered it
-    clickFunction = item.ImageButton.MouseButton1Click:Connect(function()
+    local removeOfferFunction;
+    local current;
+
+    clickFunction = function()
         if(debounce) then
             return;
         end
@@ -76,9 +114,10 @@ local function SetupOfferItem(item, itemData)
         debounce = true;
 
         -- Tell the server we're offering something
-        offerItem:InvokeServer(itemData);
+        Trade.OfferItem(item, itemData);
         -- Can't offer the same item again, so disconnect
-        clickFunction:Disconnect();
+        current:Disconnect();
+        current = item.ImageButton.MouseButton1Click:Connect(removeOfferFunction);
 
         item.Click:Play();
         local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);
@@ -87,7 +126,31 @@ local function SetupOfferItem(item, itemData)
 
         tween.Completed:Wait();
         debounce = false;
-    end)
+    end
+
+    removeOfferFunction = function()
+        if(debounce) then
+            return;
+        end
+        
+        debounce = true;
+
+        -- Tell the server we're offering something
+        Trade.RemoveItemFromOffer(item, itemData);
+        -- Can't remove the same item from offer until it's offered again
+        current:Disconnect();
+        current = item.ImageButton.MouseButton1Click:Connect(clickFunction);
+
+        item.Click:Play();
+        local tweenInfo = TweenInfo.new(0.05, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, 0, true);
+        local tween = tweenService:Create(item.ImageButton, tweenInfo, {Size=UDim2.new(0.8, 0, 0.8, 0)})
+        tween:Play();
+
+        tween.Completed:Wait();
+        debounce = false;
+    end
+
+    current = item.ImageButton.MouseButton1Click:Connect(clickFunction);
 end
 
 function Trade.SetupButtonBar() 
@@ -114,7 +177,7 @@ function Trade.SetupBackpack()
             if(item.PlayerItem.Data.InStorage) then continue end;
             
             -- We're trading, so we add every item here
-            local addedItem = AddItem(playersBackpack, item);
+            local addedItem = AddItem(playersBackpack, item, backPackItems);
             SetupOfferItem(addedItem, item);
         end
     end);
@@ -147,6 +210,9 @@ function Trade.Show(otherPlayer)
 
     Trade.SetupButtonBar();
     Trade.SetupBackpack();
+    
+    itemOffered.OnClientEvent:Connect(Trade.ItemOfferedByOther); -- When an item is offered by the other player
+    itemRemovedFromOffer.OnClientEvent:Connect(Trade.ItemRemovedByOther); -- When an item is removed from trade by other
 end
 
 function Trade.Hide()
@@ -159,30 +225,42 @@ function Trade.Hide()
     tween:Play()
 end
 
-function Trade.OfferItem()
+function Trade.OfferItem(itemBack, itemOffered)
     -- THIS WILL SEND SOMETHING TO THE SERVER TO SAY WHAT YOURE OFFERING,
     -- SERVER WILL REPLY WHETHER IT IS A VALID OFFERING,
     -- THEN WE ADD IT TO OUR OFFER LIST.
+    offerItem:InvokeServer(itemOffered);
+    AddItem(yourOffer, itemOffered, yourOffers);
+
+    local tick = replicatedStorage.ItemOfferedTick:clone();
+    tick.Parent = itemBack;
 end
 
-function Trade.RemoveItemFromOffer()
+function Trade.RemoveItemFromOffer(itemBack, itemToRemove)
     -- THIS WILL TELL THE SERVER YOURE REMOVING FROM OFFER
-    -- THEN WE REMOVE IT FROM OUR OFFER LIST.
+    -- THEN WE REMOVE IT FROM OUR OFFER LIST.    
+    local removed = removeItemFromOffer:InvokeServer(itemToRemove);
+    RemoveItem(yourOffer, itemToRemove, yourOffers);
+
+    itemBack.ItemOfferedTick:Destroy();
 end
 
-function Trade.ItemOfferedByOther()
+function Trade.ItemOfferedByOther(itemOffered)
     -- TODO WHEN PLAYER OFFERS ITEM, THIS IS GOING TO ADD IT TO THEIR OFFER LIST.
     -- IT WILL ALSO CANCEL YOUR ACCEPT SO YOU CAN DOUBLE CHECK OFFER
+    AddItem(theirOffer, itemOffered, theirOffers);
 end
 
-function Trade.ItemRemovedByOther()
+function Trade.ItemRemovedByOther(itemToRemove)
     -- TODO WHEN PLAYER OFFERS ITEM, THIS IS GOING TO REMOVE IT FROM THEIR OFFER LIST.
     -- IT WILL ALSO CANCEL YOUR ACCEPT SO YOU CAN DOUBLE CHECK OFFER
+    RemoveItemById(theirOffer, itemToRemove, theirOffers);
 end
 
 function Trade.AcceptTrade()
     -- TODO TELL SERVER YOU ACCEPTED, SO OTHER PLAYER CAN BE NOTIFIED, 
     -- OR THE TRADE CAN BE FINALIZED DEPENDING ON BOTH PLAYERS ACCEPT STATE
+    acceptTrade:FireServer();
 end
 
 function Trade.DeclineTrade()
