@@ -47,6 +47,33 @@ function ItemService.StoreItem(player, guid)
     end
 end
 
+function ItemService.TransferItem(player, other, guid)
+    local pStore = dataStore2(itemsData, player);
+    local pItems = pStore:Get({});
+
+    local oStore = dataStore2(itemsData, other);
+    local oItems = oStore:Get({});
+
+    local toGive = nil;
+    local toRemove = 0;
+
+    for index, item in pairs(pItems) do
+        if(item.Id == guid) then
+            toGive = item;
+            toRemove = index;
+            break;
+        end
+    end
+
+    if(toGive == nil) then return end
+
+    table.insert(oItems, toGive);
+    table.remove(pItems, index);
+
+    pStore:Set(pItems);
+    oStore:Set(oItems);
+end
+
 function ItemService.WithdrawItem(player, guid)
     local itemStore = dataStore2(itemsData, player);
     local items = itemStore:Get({});

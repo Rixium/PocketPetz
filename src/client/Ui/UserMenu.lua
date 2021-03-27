@@ -17,9 +17,9 @@ local clickedPlayer = nil;
 function UserMenu.Show(character, adornee)
     local player = players:GetPlayerFromCharacter(character);
 
-    -- if(player.UserId == players.LocalPlayer.UserId) then
-    --     return
-    -- end
+    if(player.UserId == players.LocalPlayer.UserId) then
+        return
+    end
 
     clickedCharacter = character;
     clickedPlayer = player;

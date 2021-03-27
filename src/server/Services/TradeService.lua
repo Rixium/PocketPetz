@@ -73,6 +73,13 @@ function TradeService.TradeRequested(requestingPlayer, requestedPlayer)
             Message = "The other player is already trading!"
         };
     end
+
+    if(requestedPlayerId == requestedPlayerId) then
+        return {
+            Success = false,
+            Message = "You can't trade yourself!"
+        };
+    end
     
     -- We add both the requested and the requesting to the tracked trades
     activeTrades[requestedPlayerId] = {
@@ -130,7 +137,7 @@ function TradeService.OfferItem(player, itemToOffer)
     -- Checking if they're already offered it
     for _, v in pairs(playersTrade) do
         if v == actualPlayerItem.Id then 
-            return true; 
+            return false; 
         end
     end
 
@@ -200,6 +207,16 @@ function TradeService.AcceptTrade(player)
 
     if(otherPlayer.Accepted and playersTrade.Accepted) then
         -- TODO ITEM TRANSFER
+        local others = otherPlayer.Offered;
+        local yours = playersTrade.Offered;
+        
+        for _, v in pairs(others) do
+           itemService.TransferItem(playersTrade.Other, player, v); 
+        end
+
+        for _, v in pairs(yours) do
+           itemService.TransferItem(player, playersTrade.Other, v); 
+        end
 
         -- Tell they the trade is over
         tradeFinalized:FireClient(player);

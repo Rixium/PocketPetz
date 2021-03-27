@@ -229,6 +229,7 @@ function Trade.Show(otherPlayer)
     backPackItems = {};
     theirOffers = {};
     yourOffers = {};
+    acceptedText.Text = ""
 
     -- We can't initialize trades if we're already trading.
 
@@ -257,7 +258,10 @@ function Trade.OfferItem(itemBack, itemOffered)
     -- THIS WILL SEND SOMETHING TO THE SERVER TO SAY WHAT YOURE OFFERING,
     -- SERVER WILL REPLY WHETHER IT IS A VALID OFFERING,
     -- THEN WE ADD IT TO OUR OFFER LIST.
-    offerItem:InvokeServer(itemOffered);
+    local offered = offerItem:InvokeServer(itemOffered);
+
+    if not offered then return end
+    
     AddItem(yourOffer, itemOffered, yourOffers);
 
     local tick = replicatedStorage.ItemOfferedTick:clone();
