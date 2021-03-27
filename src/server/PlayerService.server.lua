@@ -109,6 +109,9 @@ end
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
 petAttackingEvent.OnServerInvoke = activePetService.PetAttack;
 
+local removePet = replicatedStorage.Common.Events.RemovePet;
+removePet.OnServerEvent:Connect(activePetService.RemovePlayerPet);
+
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 setPetAnimation.OnServerEvent:Connect(activePetService.PetAnimation);
 

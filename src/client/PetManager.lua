@@ -19,6 +19,7 @@ local stopAttacking = replicatedStorage.Common.Events.StopAttacking;
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local petFaintNotification = replicatedStorage.PetFaintNotification;
+local removePet = replicatedStorage.Common.Events.RemovePet;
 
 -- Variables
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
@@ -301,7 +302,8 @@ end
 function PetManager.SetActivePet(pet, petData)
     petSpawning = true;
 
-    if(activePet ~= null) then
+    if(activePet ~= nil) then
+        removePet:FireServer();
         activePet:Destroy();
         activePet = nil;
     end
