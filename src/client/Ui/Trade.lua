@@ -205,6 +205,24 @@ function Trade.ClearAll()
 end
 
 -- Functions
+
+function Trade.Begin(otherPlayer)
+    if trading then return end
+    trading = true;
+
+    local tradeRequest = requestTrade:InvokeServer(otherPlayer);
+    if(tradeRequest.Success) then
+        Trade.Show(otherPlayer);
+    else
+        trading = false;
+        local messageUi = petFaintNotification:clone();
+        messageUi.MessageBack.Frame.MessageLabel.Text = tradeRequest.Message;
+        notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
+        return;
+    end
+end
+
+
 function Trade.Show(otherPlayer)
     Trade.ClearAll();
     backPackItems = {};
@@ -212,19 +230,7 @@ function Trade.Show(otherPlayer)
     yourOffers = {};
 
     -- We can't initialize trades if we're already trading.
-    if trading then return end
-    trading = true;
-
-    local tradeRequest = requestTrade:InvokeServer(otherPlayer);
-
-    if not tradeRequest.Success then
-        trading = false;
-        local messageUi = petFaintNotification:clone();
-        messageUi.MessageBack.Frame.MessageLabel.Text = tradeRequest.Message;
-        notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
-        return;
-    end
-
+    
     tradeFrame.Size = UDim2.new(0, 0, 0, 0);
     tradeGUI.Enabled = true;
 

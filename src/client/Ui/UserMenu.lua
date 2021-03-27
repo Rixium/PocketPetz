@@ -60,7 +60,7 @@ players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.Mo
 end)
 
 players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.TradeButton.MouseButton1Click:Connect(function ()
-    trade.Show(clickedPlayer);
+    trade.Begin(clickedPlayer);
     UserMenu.Hide();
     clickedPlayer = nil;
     clickedCharacter = nil;
