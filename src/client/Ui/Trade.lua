@@ -12,6 +12,7 @@ local itemBack = replicatedStorage.ItemBack;
 -- Events
 local requestTrade = replicatedStorage.Common.Events.RequestTrade;
 local acceptTrade = replicatedStorage.Common.Events.AcceptTrade;
+local acceptStatusChanged = replicatedStorage.Common.Events.AcceptStatusChanged;
 local declineTrade = replicatedStorage.Common.Events.DeclineTrade;
 local itemOffered = replicatedStorage.Common.Events.ItemOffered;
 local itemRemovedFromOffer = replicatedStorage.Common.Events.ItemRemovedFromOffer;
@@ -213,6 +214,8 @@ function Trade.Show(otherPlayer)
     
     itemOffered.OnClientEvent:Connect(Trade.ItemOfferedByOther); -- When an item is offered by the other player
     itemRemovedFromOffer.OnClientEvent:Connect(Trade.ItemRemovedByOther); -- When an item is removed from trade by other
+    tradeFinalized.OnClientEvent:Connect(Trade.CompletedTrade);
+    acceptStatusChanged.OnClientEvent:Connect(Trade.AcceptStatusChanged);
 end
 
 function Trade.Hide()
@@ -234,6 +237,7 @@ function Trade.OfferItem(itemBack, itemOffered)
 
     local tick = replicatedStorage.ItemOfferedTick:clone();
     tick.Parent = itemBack;
+    Trade.AcceptStatusChanged(false, yourOffer);
 end
 
 function Trade.RemoveItemFromOffer(itemBack, itemToRemove)
@@ -243,24 +247,28 @@ function Trade.RemoveItemFromOffer(itemBack, itemToRemove)
     RemoveItem(yourOffer, itemToRemove, yourOffers);
 
     itemBack.ItemOfferedTick:Destroy();
+    Trade.AcceptStatusChanged(false, yourOffer);
 end
 
 function Trade.ItemOfferedByOther(itemOffered)
     -- TODO WHEN PLAYER OFFERS ITEM, THIS IS GOING TO ADD IT TO THEIR OFFER LIST.
     -- IT WILL ALSO CANCEL YOUR ACCEPT SO YOU CAN DOUBLE CHECK OFFER
     AddItem(theirOffer, itemOffered, theirOffers);
+    Trade.AcceptStatusChanged(false);
 end
 
 function Trade.ItemRemovedByOther(itemToRemove)
     -- TODO WHEN PLAYER OFFERS ITEM, THIS IS GOING TO REMOVE IT FROM THEIR OFFER LIST.
     -- IT WILL ALSO CANCEL YOUR ACCEPT SO YOU CAN DOUBLE CHECK OFFER
     RemoveItemById(theirOffer, itemToRemove, theirOffers);
+    Trade.AcceptStatusChanged(false);
 end
 
 function Trade.AcceptTrade()
     -- TODO TELL SERVER YOU ACCEPTED, SO OTHER PLAYER CAN BE NOTIFIED, 
     -- OR THE TRADE CAN BE FINALIZED DEPENDING ON BOTH PLAYERS ACCEPT STATE
     acceptTrade:FireServer();
+    Trade.AcceptStatusChanged(true, yourOffer);
 end
 
 function Trade.DeclineTrade()
@@ -273,6 +281,23 @@ end
 function Trade.CompletedTrade()
     -- THIS WILL BE CALLED BY THE SERVER WHEN A TRADE HAS BEEN ACCEPTED ON BOTH SIDES
     -- AND ITEMS HAVE ACTUALLY BEEN TRANSFERED (We need to update our local UI to reflect these changes).
+    Trade.Hide();
+    trading = false;
+end
+
+function Trade.AcceptStatusChanged(newStatus, frame)
+    if(frame == nil) then
+        frame = theirOffer;
+    end
+
+    if(newStatus) then
+        local tick = replicatedStorage.ItemOfferedTick:clone();
+        tick.Parent = frame;
+    else
+        pcall(function()
+            frame.ItemOfferedTick:Destroy();
+        end);
+    end
 end
 
 return Trade;

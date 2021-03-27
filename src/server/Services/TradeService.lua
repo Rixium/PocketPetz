@@ -14,6 +14,7 @@ local acceptTrade = replicatedStorage.Common.Events.AcceptTrade;
 local declineTrade = replicatedStorage.Common.Events.DeclineTrade;
 local itemOffered = replicatedStorage.Common.Events.ItemOffered;
 local itemRemovedFromOffer = replicatedStorage.Common.Events.ItemRemovedFromOffer;
+local acceptStatusChanged = replicatedStorage.Common.Events.AcceptStatusChanged;
 local offerItem = replicatedStorage.Common.Events.OfferItem;
 local removeItemFromOffer = replicatedStorage.Common.Events.RemoveItemFromOffer;
 local tradeFinalized = replicatedStorage.Common.Events.TradeFinalized;
@@ -126,6 +127,11 @@ function TradeService.OfferItem(player, itemToOffer)
         ItemData = actualItem
     });
 
+    -- Accepted status changes when the trade changes
+    playersTrade.Accepted = false;
+    activeTrades[playersTrade.Other.UserId].Accepted = false;
+    activeTrades[player.UserId] = playersTrade;
+
     return true;
 end
 
@@ -151,8 +157,14 @@ function TradeService.RemoveItemFromOffer(player, itemToRemove)
 
     if indexToRemove ~= 0 then
         table.remove(playersTrade.Offered, indexToRemove);
+        -- Accepted changes when trade changes
+        playersTrade.Accepted = false;
         activeTrades[player.UserId] = playersTrade;
         itemRemovedFromOffer:FireClient(playersTrade.Other, id);
+
+        -- TODO Notify player that item was removed!!
+        activeTrades[playersTrade.Other.UserId].Accepted = false;
+
         return true;
     end
 
@@ -166,7 +178,23 @@ function TradeService.AcceptTrade(player)
     
     activeTrades[player.UserId] = playersTrade;
 
-    print(playersTrade);
+    -- TODO Notify other player that they accepted! OR FINALISE TRADE
+
+    local otherPlayer = activeTrades[playersTrade.Other.UserId];
+
+    if(otherPlayer.Accepted and playersTrade.Accepted) then
+        -- TODO ITEM TRANSFER
+
+        -- Remove the trading state
+        activeTrades[player.UserId] = nil;
+        activeTrades[playersTrade.Other.UserId] = nil;
+
+        -- Tell they the trade is over
+        tradeFinalized:FireClient(player);
+        tradeFinalized:FireClient(playersTrade.Other);
+    else
+        acceptStatusChanged:FireClient(playersTrade.Other, true);
+    end
 end
 
 return TradeService;

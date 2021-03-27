@@ -1,0 +1,4 @@
+{
+    "Name": "AcceptStatusChanged",
+    "ClassName": "RemoteEvent"
+}
