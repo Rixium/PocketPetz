@@ -20,6 +20,8 @@ local offerItem = replicatedStorage.Common.Events.OfferItem;
 local removeItemFromOffer = replicatedStorage.Common.Events.RemoveItemFromOffer;
 local tradeFinalized = replicatedStorage.Common.Events.TradeFinalized;
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
+local tradeRequested = replicatedStorage.Common.Events.TradeRequested;
+local tradeDeclined = replicatedStorage.Common.Events.TradeDeclined;
 
 -- Variables
 local tradeGUI = players.LocalPlayer.PlayerGui:WaitForChild("Trade GUI");
@@ -165,10 +167,6 @@ function Trade.SetupBackpack()
 
     -- Remove the old stuff
     for index, oldItem in ipairs(backPackItems) do
-        oldItem:Destroy();
-    end
-
-    for index, oldItem in ipairs(backPackItems) do
         table.remove(backPackItems, index);
     end
     
@@ -184,8 +182,35 @@ function Trade.SetupBackpack()
     end);
 end
 
+function Trade.Setup()
+    tradeRequested.OnClientEvent:Connect(Trade.Show);
+    
+    itemOffered.OnClientEvent:Connect(Trade.ItemOfferedByOther); -- When an item is offered by the other player
+    itemRemovedFromOffer.OnClientEvent:Connect(Trade.ItemRemovedByOther); -- When an item is removed from trade by other
+    tradeFinalized.OnClientEvent:Connect(Trade.CompletedTrade);
+    acceptStatusChanged.OnClientEvent:Connect(Trade.AcceptStatusChanged);
+    tradeDeclined.OnClientEvent:Connect(Trade.Hide);
+end
+
+function Trade.ClearAll()
+    for index, oldItem in ipairs(backPackItems) do
+        oldItem.Gui:Destroy();
+    end
+    for index, oldItem in ipairs(theirOffers) do
+        oldItem.Gui:Destroy();
+    end
+    for index, oldItem in ipairs(yourOffers) do
+        oldItem.Gui:Destroy();
+    end
+end
+
 -- Functions
 function Trade.Show(otherPlayer)
+    Trade.ClearAll();
+    backPackItems = {};
+    theirOffers = {};
+    yourOffers = {};
+
     -- We can't initialize trades if we're already trading.
     if trading then return end
     trading = true;
@@ -211,11 +236,6 @@ function Trade.Show(otherPlayer)
 
     Trade.SetupButtonBar();
     Trade.SetupBackpack();
-    
-    itemOffered.OnClientEvent:Connect(Trade.ItemOfferedByOther); -- When an item is offered by the other player
-    itemRemovedFromOffer.OnClientEvent:Connect(Trade.ItemRemovedByOther); -- When an item is removed from trade by other
-    tradeFinalized.OnClientEvent:Connect(Trade.CompletedTrade);
-    acceptStatusChanged.OnClientEvent:Connect(Trade.AcceptStatusChanged);
 end
 
 function Trade.Hide()
@@ -274,6 +294,7 @@ end
 function Trade.DeclineTrade()
     -- TODO TELL SERVER YOU CANCELLED, SO OTHER PLAYER TRADE WINDOW CAN CLOSE TOO
     -- ALSO LINK THIS UP WITH A SERVER EVENT FOR TRADE CANCELLED :)
+    declineTrade:FireServer();
     Trade.Hide();
     trading = false;
 end

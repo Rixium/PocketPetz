@@ -12,12 +12,14 @@ local itemList = require(serverScriptService.Server.Data.ItemList);
 local requestTrade = replicatedStorage.Common.Events.RequestTrade;
 local acceptTrade = replicatedStorage.Common.Events.AcceptTrade;
 local declineTrade = replicatedStorage.Common.Events.DeclineTrade;
+local tradeDeclined = replicatedStorage.Common.Events.TradeDeclined;
 local itemOffered = replicatedStorage.Common.Events.ItemOffered;
 local itemRemovedFromOffer = replicatedStorage.Common.Events.ItemRemovedFromOffer;
 local acceptStatusChanged = replicatedStorage.Common.Events.AcceptStatusChanged;
 local offerItem = replicatedStorage.Common.Events.OfferItem;
 local removeItemFromOffer = replicatedStorage.Common.Events.RemoveItemFromOffer;
 local tradeFinalized = replicatedStorage.Common.Events.TradeFinalized;
+local tradeRequested = replicatedStorage.Common.Events.TradeRequested;
 
 -- Variables
 local activeTrades = {};
@@ -28,6 +30,7 @@ function TradeService.Setup()
     offerItem.OnServerInvoke = TradeService.OfferItem;
     removeItemFromOffer.OnServerInvoke = TradeService.RemoveItemFromOffer;
     acceptTrade.OnServerEvent:Connect(TradeService.AcceptTrade);
+    declineTrade.OnServerEvent:Connect(TradeService.DeclineTrade);
 end
 
 --  Called when a player requests to trade another player
@@ -84,9 +87,22 @@ function TradeService.TradeRequested(requestingPlayer, requestedPlayer)
         Accepted = false
     };
 
+    tradeRequested:FireClient(requestedPlayer);
+
     return {
         Success = true
     };
+end
+
+function TradeService.DeclineTrade(player)
+    local playersTrade = activeTrades[player.UserId];
+
+    if(playersTrade == nil) then return end
+
+    activeTrades[player.UserId] = nil;
+    print("Player declined trade");
+
+    tradeDeclined:FireClient(playersTrade.Other);
 end
 
 -- A player will offer an item. We need to make sure that item is VALID, AND IN THEIR INVENTORY.

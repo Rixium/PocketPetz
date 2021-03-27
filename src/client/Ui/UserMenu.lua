@@ -4,7 +4,7 @@ local UserMenu = {};
 
 local players = game:GetService("Players");
 local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProfile);
-local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.Trade);
+local trade = require(players.LocalPlayer.PlayerScripts.Client.Ui.Trade);
 local tweenService = game:GetService("TweenService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 
@@ -17,9 +17,9 @@ local clickedPlayer = nil;
 function UserMenu.Show(character, adornee)
     local player = players:GetPlayerFromCharacter(character);
 
-    if(player.UserId == players.LocalPlayer.UserId) then
-        return
-    end
+    -- if(player.UserId == players.LocalPlayer.UserId) then
+    --     return
+    -- end
 
     clickedCharacter = character;
     clickedPlayer = player;
@@ -59,8 +59,8 @@ players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.Mo
     clickedCharacter = nil;
 end)
 
-players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
-    trade.Show(clickedPlayer, clickedCharacter);
+players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.TradeButton.MouseButton1Click:Connect(function ()
+    trade.Show(clickedPlayer);
     UserMenu.Hide();
     clickedPlayer = nil;
     clickedCharacter = nil;

@@ -66,10 +66,4 @@ playerSwitchedZone.OnClientEvent:Connect(function(zoneName)
     ShowZoneIntro(zoneName);
 end);
 
--- TODO JUST TESTING TRADE
-spawn(function()
-    wait(3);
-    trade.Show(players.LocalPlayer);
-    wait(10);
-    trade.Show(players.LocalPlayer);
-end);
+trade.Setup();
