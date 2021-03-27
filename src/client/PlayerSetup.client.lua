@@ -70,4 +70,6 @@ end);
 spawn(function()
     wait(3);
     trade.Show();
+    wait(10);
+    trade.Show();
 end);

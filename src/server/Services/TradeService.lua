@@ -1,0 +1,121 @@
+local TradeService = {};
+
+-- Imports
+local players = game:GetService("Players");
+local replicatedStorage = game:GetService("ReplicatedStorage");
+local serverScriptService = game:GetService("ServerScriptService");
+local playerService = require(serverScriptService.Server.Services.PlayerService);
+local itemService = require(serverScriptService.Server.Services.ItemService);
+local itemList = require(serverScriptService.Server.Data.ItemList);
+
+-- Events
+local requestTrade = replicatedStorage.Common.Events.RequestTrade;
+local acceptTrade = replicatedStorage.Common.Events.AcceptTrade;
+local declineTrade = replicatedStorage.Common.Events.DeclineTrade;
+local itemOffered = replicatedStorage.Common.Events.ItemOffered;
+local itemRemovedFromOffer = replicatedStorage.Common.Events.ItemRemovedFromOffer;
+local offerItem = replicatedStorage.Common.Events.OfferItem;
+local removeItemFromOffer = replicatedStorage.Common.Events.RemoveItemFromOffer;
+local tradeFinalized = replicatedStorage.Common.Events.TradeFinalized;
+
+-- Variables
+local activeTrades = {};
+
+function TradeService.Setup()
+    -- Set up all the event callbacks :)
+    requestTrade.OnServerInvoke = TradeService.TradeRequested;
+    offerItem.OnServerInvoke = TradeService.OfferItem;
+end
+
+--  Called when a player requests to trade another player
+-- Checks if the requestedPlayer is trading - returns false if they are
+-- Checks if the requestingPlayer is a legend - returns false if not
+-- Otherwise it'll return true, and the trade will be added to the active list.
+function TradeService.TradeRequested(requestingPlayer, requestedPlayer)
+    local requestingPlayerId = requestingPlayer.UserId;
+
+    -- If the player requesting is not a legend
+    if(not playerService.IsPlayerLegend(requestingPlayer)) then
+        return {
+            Success = false,
+            Message = "You need to be a legend to trade!"
+        };
+    end
+
+    -- If the player requesting is already trading
+    if(activeTrades[requestingPlayerId] ~= nil) then
+        return {
+            Success = false,
+            Message = "You're already trading!"
+        };
+    end
+
+    -- If they've passed an unknown player
+    -- if(requestedPlayer == nil or requestedPlayer.UserId == nil) then
+    --     return {
+    --         Success = false,
+    --         Message = "That player cannot be found!"
+    --     };
+    -- end
+
+    -- local requestedPlayerId = requestedPlayer.UserId or nil;
+
+    -- -- If the player requested is already trading
+    -- if(activeTrades[requestedPlayerId] ~= nil) then
+    --     return {
+    --         Success = false,
+    --         Message = "The other player is already trading!"
+    --     };
+    -- end
+    
+    -- -- We add both the requested and the requesting to the tracked trades
+    -- activeTrades[requestedPlayerId] = {
+        
+    -- };
+
+    activeTrades[requestingPlayerId] = {
+        
+    };
+
+    return {
+        Success = true
+    };
+end
+
+-- A player will offer an item. We need to make sure that item is VALID, AND IN THEIR INVENTORY.
+function TradeService.OfferItem(player, itemToOffer)
+    local playersTrade = activeTrades[player.UserId];
+
+    if(playersTrade == nil) then return end -- Player isn't actually trading ??
+
+    -- An item needs all these to actually exist, instead of a pcall?
+    if(itemToOffer == nil) then return end
+    if(itemToOffer.PlayerItem == nil) then return end
+    if(itemToOffer.PlayerItem.Id == nil) then return end
+
+    -- Get both actual database stored items, so they can't hack it
+    local actualPlayerItem = itemService.GetPlayerItemByGuid(player, itemToOffer.PlayerItem.Id);
+
+    -- It doesn't exist :o
+    if(actualPlayerItem == nil) then return end
+    -- You can't trade an item in storage
+    if(actualPlayerItem.Data.InStorage) then return end
+
+    local actualItem = itemList.GetById(actualPlayerItem.ItemId);
+
+    -- Checking if they're already offered it
+    for _, v in pairs(playersTrade) do
+        if v == actualPlayerItem.Id then 
+            return true; 
+        end
+    end
+
+    print("Player offered: " .. actualPlayerItem.Id);
+
+    -- We add it to the current trade for that player!
+    table.insert(playersTrade, actualPlayerItem.Id);
+
+    return true;
+end
+
+return TradeService;

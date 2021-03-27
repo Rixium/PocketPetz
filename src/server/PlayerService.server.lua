@@ -6,6 +6,7 @@ local itemService = require(serverScriptService.Server.Services.ItemService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
 local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
+local tradeService = require(serverScriptService.Server.Services.TradeService);
 local activePetService = require(serverScriptService.Server.Services.ActivePetService);
 local activePetService = require(serverScriptService.Server.Services.ActivePetService);
 local physicsService = game:GetService("PhysicsService");
@@ -229,3 +230,5 @@ withdrawItem.OnServerInvoke = function(player, item)
 	itemService.WithdrawItem(player, playerItem.Id);
 	return true;
 end
+
+tradeService.Setup();
