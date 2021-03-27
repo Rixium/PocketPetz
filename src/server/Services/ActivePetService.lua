@@ -68,7 +68,7 @@ end
 local function AddAboveHeadGUI(model, itemData)
     local npcAboveHeadGUI = replicatedStorage.PetGUI;
     board = npcAboveHeadGUI:Clone()
-    board.Parent = workspace;
+    board.Parent = model.Root;
     board.Adornee = model.Root;
 
 	local offset = itemData.ItemData.GuiOffset;
