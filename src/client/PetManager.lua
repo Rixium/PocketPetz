@@ -41,6 +41,9 @@ local damages = {};
 local RNG = Random.new()
 local bodyPosition = nil
 local bodyGyro = nil
+local YPoint = 0
+local Addition = 0.01;
+local YDrift = .5;
 
 -- Functions
 
@@ -70,32 +73,28 @@ end
 
  -- End of UI Stuff
 
+ function getXAndZPositions(Angle, Radius)
+	local x = math.cos(Angle) * Radius
+	local z = math.sin(Angle) * Radius
+	
+	return x, z
+end
+
 local function MoveTo(target, targetCFrame, shouldTeleport)
     if(activePet == nil) then return end
     if(nextPet ~= nil) then return end
     if(petSpawning) then return end
 
-    if(activePet.Parent == nil) then
-        activePet.AncestryChanged:wait()
-    end
-
-    local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
-
-    if(shouldTeleport) then
-        if(distance > 30) then
-            activePet:SetPrimaryPartCFrame(targetCFrame:ToWorldSpace(CFrame.new(3,1,3)));
-        end
-    end
-
-    if(distance < 5) then
-        return false;
-    end 
-
-    local model = activePet;
-    local petCframe = activePet.Root.CFrame.p;
-
-    bodyPosition.Position = activePet.Root.CFrame:Lerp(targetCFrame, 0.15).p;
-    bodyGyro.CFrame = CFrame.new(model.Root.CFrame.Position, targetCFrame.Position);
+	YPoint = YPoint + Addition
+    if YPoint > YDrift or YPoint < -1 * YDrift then Addition = -1 * Addition end 
+	
+    local X, Z = getXAndZPositions(10, 10);
+    local LookAt = targetCFrame.p;
+    local TargetCFrame = CFrame.new(targetCFrame.p, LookAt)
+                
+    local NewCFrame = activePet.PrimaryPart.CFrame:Lerp(TargetCFrame, .02)
+    NewCFrame = CFrame.new(NewCFrame.p, LookAt);
+    activePet:SetPrimaryPartCFrame(NewCFrame)
 
     if not animationPlaying then
         animationPlaying = true;
@@ -109,7 +108,7 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
 
     end
 
-    return (petCframe - bodyPosition.Position).magnitude > 0.001;
+    return (NewCFrame.p - TargetCFrame.p).magnitude > 0.001;
 end
 
 local function AttackTarget()
@@ -243,20 +242,10 @@ local function UpdatePet(delta)
 end
 
 local function SetupPet(pet, petData)
-    bodyPosition = Instance.new("BodyPosition", pet.Root);
-    bodyPosition.D = 700;
-
-    bodyGyro = Instance.new("BodyGyro", pet.Root);
-
-    bodyPosition.MaxForce = Vector3.new(math.huge, 50, math.huge);
-    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
-    bodyGyro.D = 10;
-    
     activePetData = petData;
     activePet = pet;
     
 	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
-    bodyPosition.Position = players.LocalPlayer.Character:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,3)).p;
 
     petSpawning = false;
 end
