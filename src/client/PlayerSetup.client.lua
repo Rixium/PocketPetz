@@ -69,7 +69,7 @@ end);
 -- TODO JUST TESTING TRADE
 spawn(function()
     wait(3);
-    trade.Show();
+    trade.Show(players.LocalPlayer);
     wait(10);
-    trade.Show();
+    trade.Show(players.LocalPlayer);
 end);

@@ -51,30 +51,32 @@ function TradeService.TradeRequested(requestingPlayer, requestedPlayer)
     end
 
     -- If they've passed an unknown player
-    -- if(requestedPlayer == nil or requestedPlayer.UserId == nil) then
-    --     return {
-    --         Success = false,
-    --         Message = "That player cannot be found!"
-    --     };
-    -- end
+    if(requestedPlayer == nil or requestedPlayer.UserId == nil) then
+        return {
+            Success = false,
+            Message = "That player cannot be found!"
+        };
+    end
 
-    -- local requestedPlayerId = requestedPlayer.UserId or nil;
+    local requestedPlayerId = requestedPlayer.UserId or nil;
 
     -- -- If the player requested is already trading
-    -- if(activeTrades[requestedPlayerId] ~= nil) then
-    --     return {
-    --         Success = false,
-    --         Message = "The other player is already trading!"
-    --     };
-    -- end
+    if(activeTrades[requestedPlayerId] ~= nil) then
+        return {
+            Success = false,
+            Message = "The other player is already trading!"
+        };
+    end
     
-    -- -- We add both the requested and the requesting to the tracked trades
-    -- activeTrades[requestedPlayerId] = {
-        
-    -- };
+    -- We add both the requested and the requesting to the tracked trades
+    activeTrades[requestedPlayerId] = {
+            Other = requestingPlayer,
+            Offered = {}
+    };
 
     activeTrades[requestingPlayerId] = {
-        
+        Other = requestedPlayer,
+        Offered = {}
     };
 
     return {
@@ -113,7 +115,12 @@ function TradeService.OfferItem(player, itemToOffer)
     print("Player offered: " .. actualPlayerItem.Id);
 
     -- We add it to the current trade for that player!
-    table.insert(playersTrade, actualPlayerItem.Id);
+    table.insert(playersTrade.Offered, actualPlayerItem.Id);
+
+    itemOffered:FireClient(playersTrade.Other, {
+        PlayerItem = actualPlayerItem,
+        ItemData = actualItem
+    });
 
     return true;
 end

@@ -121,12 +121,12 @@ function Trade.SetupBackpack()
 end
 
 -- Functions
-function Trade.Show(player, character)
+function Trade.Show(otherPlayer)
     -- We can't initialize trades if we're already trading.
     if trading then return end
     trading = true;
 
-    local tradeRequest = requestTrade:InvokeServer();
+    local tradeRequest = requestTrade:InvokeServer(otherPlayer);
 
     if not tradeRequest.Success then
         trading = false;
