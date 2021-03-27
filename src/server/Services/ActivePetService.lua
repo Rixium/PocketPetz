@@ -93,8 +93,17 @@ end
 function ActivePetService.AddActivePet(player, item)
 	if(activePets[player.UserId] ~= nil) then
 		local playersCurrentPet = activePets[player.UserId];
+
+		local currentId = playersCurrentPet.PetData.PlayerItem.Id;
+		local nextId = item.PlayerItem.Id;
+
 		ActivePetService.StopAttacking(player, playersCurrentPet.PetData);
 		playersCurrentPet.PetModel:Destroy();
+
+		if(currentId == nextId) then
+			activePets[player.UserId] = nil;
+			return nil;
+		end
 	end
 
 	local model = insertService:LoadAsset(item.ItemData.ModelId);

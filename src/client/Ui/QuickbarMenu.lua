@@ -138,6 +138,12 @@ function QuickbarMenu.Setup()
                     messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;
                     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
                 else
+                    
+                    if(result.Model == nil) then 
+                        petManager.SetActivePet(nil);
+                        return 
+                    end;
+
                     local playerCharacter = players.LocalPlayer.Character;
 
                     local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))

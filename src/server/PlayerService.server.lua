@@ -161,7 +161,12 @@ equipItemRequest.OnServerInvoke = function(player, item)
 				ItemData = itemData
 			});
 
-			print("SENDING");
+			if(petStuff == nil) then
+				return {
+					Success = true;
+				};
+			end
+
 			return {
 				Success = true,
 				Model = petStuff.Model,

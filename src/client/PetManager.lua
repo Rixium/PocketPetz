@@ -338,6 +338,7 @@ end);
 
 petFainted.OnClientEvent:Connect(function()
     StopCombat();
+    PetManager.SetActivePet(nil);
     PetManager.SetTarget(nil);
 
     local messageUi = petFaintNotification:clone();

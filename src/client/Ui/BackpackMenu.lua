@@ -81,6 +81,11 @@ local function SelectItem(selectedItem)
                 itemPopupFrame.Visible = false;
                 takeOutButton:Disconnect();
 
+                if(result.Model == nil) then 
+                    petManager.SetActivePet(nil)
+                    return 
+                end;
+
                 local playerCharacter = players.LocalPlayer.Character;
 
                 local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
