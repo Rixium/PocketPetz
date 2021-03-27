@@ -74,7 +74,7 @@ function TradeService.TradeRequested(requestingPlayer, requestedPlayer)
         };
     end
 
-    if(requestedPlayerId == requestedPlayerId) then
+    if(requestedPlayerId == requestingPlayerId) then
         return {
             Success = false,
             Message = "You can't trade yourself!"

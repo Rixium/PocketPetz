@@ -62,6 +62,7 @@ function OnPlayerJoined(player)
 	end
 
 	playerSwitchedZone:FireClient(player, playerService.GetPlayerLocation(player));
+
 end
 
 function OnPlayerLeaving(player)
