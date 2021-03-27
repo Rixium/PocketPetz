@@ -30,6 +30,7 @@ local contentFrame = tradeFrame.ContentFrame;
 local playersBackpack = contentFrame.TopFrame.BackpackFrame.BackpackBack.ItemGrid;
 local yourOffer = contentFrame.TopFrame.OfferFrame.YourOfferFrame.ImageLabel.ItemGrid;
 local theirOffer = contentFrame.TopFrame.OfferFrame.TheirOfferFrame.ImageLabel.ItemGrid;
+local acceptedText = contentFrame.ButtonFrame.Message.TextLabel;
 local acceptTradeButton = contentFrame.ButtonFrame.AcceptButtonBack.AcceptButton;
 local declineTradeButton = contentFrame.ButtonFrame.DeclineButtonBack.DeclineButton;
 
@@ -315,13 +316,18 @@ function Trade.AcceptStatusChanged(newStatus, frame)
         frame = theirOffer;
     end
 
-    if(newStatus) then
-        local tick = replicatedStorage.ItemOfferedTick:clone();
-        tick.Parent = frame;
+    if(frame == theirOffer) then
+        if(newStatus) then
+            acceptedText.Text = "They accepted!"
+        else
+            acceptedText.Text = ""
+        end
     else
-        pcall(function()
-            frame.ItemOfferedTick:Destroy();
-        end);
+        if(newStatus) then
+            acceptedText.Text = "You accepted!"
+        else
+            acceptedText.Text = ""
+        end
     end
 end
 
