@@ -148,7 +148,7 @@ function ActivePetService.AddActivePet(player, item)
 end
 
 function ActivePetService.PetStored(player, pet)
-	local playerActivePet = ActivePetService.GetActivePet(player);
+	local playerActivePet = activePets[player.UserId];
 	if(playerActivePet == nil) then return end;
 
 	if(playerActivePet.PetData.PlayerItem.Id == pet.Id) then
@@ -161,7 +161,7 @@ function ActivePetService.StopAttacking(player, petData)
 		return
 	end
 
-    local playersActivePet = ActivePetService.GetActivePet(player);
+    local playersActivePet = activePets[player.UserId];
     local pet = playersActivePet;
     local target = nil;
 
@@ -190,12 +190,8 @@ function ActivePetService.StopAttacking(player, petData)
 	end
 end
 
-function ActivePetService.GetActivePet(player)
-    return activePets[player.UserId];
-end
-
 function ActivePetService.RemovePlayerPet(player)
-    local playersPet = ActivePetService.GetActivePet(player);
+    local playersPet = activePets[player.UserId];
 
     if(playersPet == nil) then
         return;
@@ -217,7 +213,7 @@ function ActivePetService.CalculateDamage(level, rarity, c1, c2, handicap, attac
 end
 
 function ActivePetService.PetAttack(player, pet, petData, target)
-    local playersPet = ActivePetService.GetActivePet(player);
+    local playersPet = activePets[player.UserId];
 
 	local damageAmount;
 	local defenceAmount;
@@ -228,6 +224,12 @@ function ActivePetService.PetAttack(player, pet, petData, target)
     end
 
 	local playersActiveTarget = playersPet.Target;
+
+	if(os.time() < playersPet.LastAttack + 1) then 
+		return;
+	end
+
+	playersPet.LastAttack = os.time();
 
     -- The players target isn't known, must be hacker :(
 	if(playersActiveTarget == nil) then
@@ -397,7 +399,7 @@ function ActivePetService.PetAttack(player, pet, petData, target)
 end
 
 function ActivePetService.PetAnimation(player, animation)
-	local playerPet = ActivePetService.GetActivePet(player);
+	local playerPet = activePets[player.UserId];
 
 	if(playerPet == nil) then 
         return;
@@ -421,30 +423,30 @@ function ActivePetService.PetAnimation(player, animation)
 end
 
 function ActivePetService.RequestPetAttack(player, target)
-	local playersPet = ActivePetService.GetActivePet(player);
+	local playersPet = activePets[player.UserId];
 
+	-- Does the player actually have an active pet
     if(playersPet == nil) then 
 		return false;
 	end
 
-	local petData = petService.GetPetByGuid(player, playersPet.PetData.PlayerItem.Id);
-
-	if(petData == nil) then
-		return false;
-	end
-
+	-- Is this target already getting attacked by something else
 	for _, obj in pairs(activePets) do
 		if(obj.Target == target) then
 			return false;
 		end
 	end
 
-	ActivePetService.StopAttacking(player, playersPet.PetData);
-
+	local petData = playersPet.PetData.PlayerItem;
+	
+	-- If they're dead, then they can't attack
 	local currentHealth = petData.Data.CurrentHealth or 1;
 	if(currentHealth <= 0) then
 		return false;
 	end
+
+	-- Stop attacking if they already are
+	ActivePetService.StopAttacking(player, playersPet.PetData);
 
 	local itemData = itemList.GetById(petData.ItemId);
 
@@ -466,7 +468,10 @@ function ActivePetService.RequestPetAttack(player, target)
 		return false;
 	end
 
+	playersPet.LastAttack = os.time();
 	playersPet.Target = target;
+
+	activePets[player.UserId] = playersPet;
 
 	return true;
 end
@@ -474,7 +479,7 @@ end
 function ActivePetService.PetHealed(player, petId) 
 	petService.HealPet(player, petId);
 
-	local playersActivePet = ActivePetService.GetActivePet(player);
+	local playersActivePet = activePets[player.UserId];
 	if(playersActivePet == nil) then
 		return;
 	end

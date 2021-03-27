@@ -282,16 +282,12 @@ function PetManager.SetTarget(target)
     -- server side for subsequent requests :)
     requesting = true;
 
-    spawn(function() 
-        petRequestAttack:InvokeServer(target);
-        requesting = false;
-    end)
+    local canAttack = petRequestAttack:InvokeServer(target);
+    requesting = false;
 
-    nextTarget = target;
-    StopCombat();
+    if not canAttack then return end
 
     activeTarget = target;
-    nextTarget = nil;
 
     local targetKilledEvent;
 
