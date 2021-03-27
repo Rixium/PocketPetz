@@ -5,6 +5,10 @@ local players = game:GetService("Players");
 local pathfindingService = game:GetService("PathfindingService");
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
+
+-- Events
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
@@ -12,18 +16,15 @@ local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
 local stopAttacking = replicatedStorage.Common.Events.StopAttacking;
-local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.EvolutionGUI);
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
-local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
-local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
-local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 local petFaintNotification = replicatedStorage.PetFaintNotification;
+
+-- Variables
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
 local physicsService = game:GetService("PhysicsService");
 
--- Variables
 local board = nil;
 local activePet = nil;
 local activePetData = nil;
@@ -330,9 +331,7 @@ petEvolved.OnClientEvent:Connect(function(next)
     replicatedStorage.LevelUp:Play();
 
     StopCombat();
-    
-    evolutionGui.Setup(activePetData, next);
-    
+
     PetManager.SetTarget(nil);
     PetManager.SetActivePet(nil, nil);
 end);
@@ -340,8 +339,6 @@ end);
 petFainted.OnClientEvent:Connect(function()
     StopCombat();
     PetManager.SetTarget(nil);
-
-    quickbarMenu.Setup();
 
     local messageUi = petFaintNotification:clone();
     messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";

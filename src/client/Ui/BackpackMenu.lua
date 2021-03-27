@@ -9,6 +9,7 @@ local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local tweenService = game:GetService("TweenService");
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
+local petManager = require(players.LocalPlayer.PlayerScripts.Client.PetManager);
 local petFaintNotification = replicatedStorage.PetFaintNotification;
 
 
@@ -79,6 +80,16 @@ local function SelectItem(selectedItem)
                 BackpackMenu.Toggle();
                 itemPopupFrame.Visible = false;
                 takeOutButton:Disconnect();
+
+                local playerCharacter = players.LocalPlayer.Character;
+
+                local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
+                local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
+            
+                result.Model:SetPrimaryPartCFrame(startFrame);
+                result.Model.Name = "Pet";
+            
+                petManager.SetActivePet(result.Model, result.Item);
             else
                 local messageUi = petFaintNotification:clone();
                 messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;

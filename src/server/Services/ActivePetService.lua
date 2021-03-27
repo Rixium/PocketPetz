@@ -120,6 +120,7 @@ function ActivePetService.AddActivePet(player, item)
 		PetModel = toSend,
 		PetData = actualPet,
 		Target = nil,
+		LastAttack = os.time() - 1,
 		AboveHeadGUI = aboveHeadGUI
 	};
 
@@ -144,7 +145,10 @@ function ActivePetService.AddActivePet(player, item)
     hitSound.RollOffMaxDistance = 50;
     hitSound.RollOffMode = Enum.RollOffMode.LinearSquare;
 
-	playerEquipped:FireClient(player, toSend, item);
+	return {
+		Item = item,
+		Model = toSend
+	};
 end
 
 function ActivePetService.PetStored(player, pet)

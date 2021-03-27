@@ -156,10 +156,17 @@ equipItemRequest.OnServerInvoke = function(player, item)
 	if(itemData.ItemType == "Pet" or itemData.ItemType == "Seed") then
 		local health = playerItem.Data.CurrentHealth or 1;
 		if(health > 0) then
-			activePetService.AddActivePet(player, {
+			local petStuff = activePetService.AddActivePet(player, {
 				PlayerItem = playerItem,
 				ItemData = itemData
 			});
+
+			print("SENDING");
+			return {
+				Success = true,
+				Model = petStuff.Model,
+				Item = petStuff.Item
+			};
 		else 
 			return {
 				Success = false,

@@ -16,6 +16,9 @@ local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager)
 local mainGui = uiManager.GetUi("Main GUI");
 local bagButton = mainGui:WaitForChild("Buttons").BagButton.BagButton;
 
+local petEvolved = replicatedStorage.Common.Events.PetEvolved;
+local callback;
+
 local function Transition()
 
     local frame = evolutionGui:WaitForChild("EvolveFrame");
@@ -178,6 +181,12 @@ function EvolutionGUI.Setup(current, next)
 
     -- Clicking on the image to grow it
     connect = image.MouseButton1Click:Connect(Grow);
+
+    if(callback ~= nil) then 
+        callback:Disconnect(); 
+    end
+
+    callback = petEvolved.OnClientEvent(EvolutionGUI.Setup);
 end
 
 
