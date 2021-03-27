@@ -109,7 +109,7 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
 
     end
 
-    return (NewCFrame.p - TargetCFrame.p).magnitude > 0.001;
+    return (NewCFrame.p - TargetCFrame.p).magnitude > 0.1;
 end
 
 local function AttackTarget()
