@@ -117,7 +117,12 @@ function ActivePetService.AddActivePet(player, item)
 
 	toSend.PrimaryPart = toSend.Root;
 	toSend.Parent = workspace;
-	toSend.PrimaryPart:SetNetworkOwner(player);
+
+	for _, part in pairs(toSend:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part:SetNetworkOwner(player);
+		end
+	end
 
 	model:Destroy();
 
