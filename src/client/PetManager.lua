@@ -43,7 +43,7 @@ local bodyPosition = nil
 local bodyGyro = nil
 local YPoint = 0
 local Addition = 0.01;
-local YDrift = .5;
+local YDrift = .01;
 
 -- Functions
 
@@ -88,7 +88,7 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
 	YPoint = YPoint + Addition
     if YPoint > YDrift or YPoint < -1 * YDrift then Addition = -1 * Addition end 
 	
-    local X, Z = getXAndZPositions(10, 10);
+    local X, Z = getXAndZPositions(2, 2);
     local LookAt = targetCFrame.p;
     local TargetCFrame = CFrame.new(targetCFrame.p, LookAt)
                 
