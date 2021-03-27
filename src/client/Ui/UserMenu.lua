@@ -4,6 +4,7 @@ local UserMenu = {};
 
 local players = game:GetService("Players");
 local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.UserProfile);
+local userProfile = require(players.LocalPlayer.PlayerScripts.Client.Ui.Trade);
 local tweenService = game:GetService("TweenService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 
@@ -53,6 +54,13 @@ end
 
 players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
     userProfile.Show(clickedPlayer, clickedCharacter);
+    UserMenu.Hide();
+    clickedPlayer = nil;
+    clickedCharacter = nil;
+end)
+
+players.LocalPlayer.PlayerGui:WaitForChild("Main GUI").UserMenu.ProfileButton.MouseButton1Click:Connect(function ()
+    trade.Show(clickedPlayer, clickedCharacter);
     UserMenu.Hide();
     clickedPlayer = nil;
     clickedCharacter = nil;

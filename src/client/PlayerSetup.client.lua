@@ -3,6 +3,7 @@ local getPlayerInfo = replicatedStorage.Common.Events.GetPlayerInfo;
 local players = game:GetService("Players");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local gameState = require(players.LocalPlayer.PlayerScripts.Client.GameState);
+local trade = require(players.LocalPlayer.PlayerScripts.Client.Ui.Trade);
 local playerSwitchedZone = replicatedStorage.Common.Events.PlayerSwitchedZone;
 local zoneIntro = uiManager.GetUi("Zone Intro");
 local tweenService = game:GetService("TweenService");
@@ -63,4 +64,10 @@ end
 
 playerSwitchedZone.OnClientEvent:Connect(function(zoneName)
     ShowZoneIntro(zoneName);
+end);
+
+-- TODO JUST TESTING TRADE
+spawn(function()
+    wait(3);
+    trade.Show();
 end);
