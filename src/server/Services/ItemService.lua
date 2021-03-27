@@ -57,7 +57,7 @@ function ItemService.TransferItem(player, other, guid)
     local toGive = nil;
     local toRemove = 0;
 
-    for index, item in pairs(pItems) do
+    for index, item in ipairs(pItems) do
         if(item.Id == guid) then
             toGive = item;
             toRemove = index;
