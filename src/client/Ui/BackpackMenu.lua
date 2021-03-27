@@ -137,16 +137,7 @@ local function AddItem(itemToAdd)
     table.insert(BackpackMenu.Items, item);
 end
 
-function BackpackMenu.ShowInventory()
-    if(replicatedStorage.Common.Events.IsPlayerLifetimeLegend:InvokeServer() == true) then
-        maxPetsAllowed = 5;
-    else
-        maxPetsAllowed = 3;
-    end
-
-    petsCarrying = 0;
-    scrollingFrame.Visible = false;
-
+function BackpackMenu.Refresh()
     local items = getItemsRequest:InvokeServer();
 
     -- Remove the old stuff from the friends list.
@@ -181,6 +172,19 @@ function BackpackMenu.ShowInventory()
             end
         end
     end);
+end
+
+function BackpackMenu.ShowInventory()
+    if(replicatedStorage.Common.Events.IsPlayerLifetimeLegend:InvokeServer() == true) then
+        maxPetsAllowed = 5;
+    else
+        maxPetsAllowed = 3;
+    end
+
+    petsCarrying = 0;
+    scrollingFrame.Visible = false;
+
+    BackpackMenu.Refresh();
 
     scrollingFrame.Visible = true;
 end

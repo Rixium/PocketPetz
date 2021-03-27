@@ -5,6 +5,8 @@ local players = game:GetService("Players");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local starterGuiService = game:GetService("StarterGui")
 local tweenService = game:GetService("TweenService")
+local backpackMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.BackpackMenu);
+local quickBar = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
 local petFaintNotification = replicatedStorage.PetFaintNotification;
 local itemBack = replicatedStorage.ItemBack;
@@ -313,6 +315,9 @@ function Trade.CompletedTrade()
     -- AND ITEMS HAVE ACTUALLY BEEN TRANSFERED (We need to update our local UI to reflect these changes).
     Trade.Hide();
     trading = false;
+
+    backpackMenu.Refresh();
+    quickBar.Setup();
 end
 
 function Trade.AcceptStatusChanged(newStatus, frame)
