@@ -191,7 +191,6 @@ function TradeService.AcceptTrade(player)
     local playersTrade = activeTrades[player.UserId];
     playersTrade.Accepted = true;
 
-    
     activeTrades[player.UserId] = playersTrade;
 
     -- TODO Notify other player that they accepted! OR FINALISE TRADE
@@ -201,13 +200,13 @@ function TradeService.AcceptTrade(player)
     if(otherPlayer.Accepted and playersTrade.Accepted) then
         -- TODO ITEM TRANSFER
 
-        -- Remove the trading state
-        activeTrades[player.UserId] = nil;
-        activeTrades[playersTrade.Other.UserId] = nil;
-
         -- Tell they the trade is over
         tradeFinalized:FireClient(player);
         tradeFinalized:FireClient(playersTrade.Other);
+
+        -- Remove the trading state
+        activeTrades[player.UserId] = nil;
+        activeTrades[playersTrade.Other.UserId] = nil;
     else
         acceptStatusChanged:FireClient(playersTrade.Other, true);
     end

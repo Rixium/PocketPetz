@@ -230,7 +230,7 @@ function Trade.Show(otherPlayer)
     yourOffers = {};
 
     -- We can't initialize trades if we're already trading.
-    
+
     tradeFrame.Size = UDim2.new(0, 0, 0, 0);
     tradeGUI.Enabled = true;
 
@@ -245,8 +245,6 @@ function Trade.Show(otherPlayer)
 end
 
 function Trade.Hide()
-    if not trading then return end -- We cant end trading if we're not trading already
-    
     replicatedStorage.ClickSound:Play();
     
     local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
