@@ -8,6 +8,9 @@ local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Cre
 local petManager = require(players.LocalPlayer.PlayerScripts.Client.PetManager);
 local mainGui = uiManager.GetUi("Main GUI");
 local quickBar = mainGui:WaitForChild("Quickbar");
+local director = require(players.LocalPlayer.PlayerScripts.Client.Director);
+local collectionService = game:GetService("CollectionService");
+local tagged = collectionService:GetTagged("HealthTerminal");
 
 local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local petFaintNotification = replicatedStorage.PetFaintNotification;
@@ -53,19 +56,19 @@ local function ShowLegendsPopup()
 end
 
 local function cleanup()
-    if(slots[1].Callback ~= nil) then
+    if slots[1].Callback ~= nil then
         slots[1].Callback:Disconnect();
     end
-    if(slots[2].Callback ~= nil) then
+    if slots[2].Callback ~= nil then
         slots[2].Callback:Disconnect();
     end
-    if(slots[3].Callback ~= nil) then
+    if slots[3].Callback ~= nil then
         slots[3].Callback:Disconnect();
     end
-    if(slots[4].Callback ~= nil) then
+    if slots[4].Callback ~= nil then
         slots[4].Callback:Disconnect();
     end
-    if(slots[5].Callback ~= nil) then
+    if slots[5].Callback ~= nil then
         slots[5].Callback:Disconnect();
     end
 
@@ -91,13 +94,13 @@ function QuickbarMenu.Setup()
 
     local isLifetimeLegend = isPlayerLifetimeLegend:InvokeServer();
 
-    if(isLifetimeLegend) then
+    if isLifetimeLegend then
         maxCurr = 5;
     end
 
     cleanup();
 
-    if(isLifetimeLegend) then
+    if isLifetimeLegend then
         slots[1].Slot.Image = "rbxassetid://6545422916";
         slots[2].Slot.Image = "rbxassetid://6545422916";
         slots[3].Slot.Image = "rbxassetid://6545422916";
@@ -112,34 +115,34 @@ function QuickbarMenu.Setup()
     end
 
     for _, item in pairs(items) do
-        if(item.ItemData.ItemType == "Pet" and not item.PlayerItem.Data.InStorage) then
+        if item.ItemData.ItemType == "Pet" and not item.PlayerItem.Data.InStorage then
             allPets = allPets + 1;
             local currentSlot = slots[curr];
             currentSlot.Item = item;
             currentSlot.Slot.ImageLabel.Image = "rbxthumb://type=Asset&id=" .. item.ItemData.ModelId .. "&w=420&h=420";
 
-            if(item.ItemData.Type == "Pixie") then
+            if item.ItemData.Type == "Pixie" then
                 currentSlot.Slot.Image = "rbxassetid://6545376359";
-            elseif(item.ItemData.Type == "Brute") then
+            elseif item.ItemData.Type == "Brute" then
                 currentSlot.Slot.Image = "rbxassetid://6545378437";
             else
                 currentSlot.Slot.Image = "rbxassetid://6545377628";
             end
 
-            if(item.PlayerItem.Data.CurrentHealth <= 0) then
+            if item.PlayerItem.Data.CurrentHealth <= 0 then
                 faintedPets = faintedPets + 1;
                 currentSlot.Slot.FaintedCover.Visible = true;
             end
 
             currentSlot.Callback = currentSlot.Slot.ImageLabel.MouseButton1Click:Connect(function() 
                 local result = equipItemRequest:InvokeServer(currentSlot.Item);
-                if(not result.Success) then
+                if not result.Success then
                     local messageUi = petFaintNotification:clone();
                     messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;
                     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
                 else
                     
-                    if(result.Model == nil) then 
+                    if result.Model == nil then 
                         petManager.SetActivePet(nil);
                         return 
                     end;
@@ -147,8 +150,7 @@ function QuickbarMenu.Setup()
                     local playerCharacter = players.LocalPlayer.Character;
 
                     local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
-                    local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
-                
+
                     result.Model:SetPrimaryPartCFrame(startFrame);
                     result.Model.Name = "Pet";
                 
@@ -156,23 +158,26 @@ function QuickbarMenu.Setup()
                 end
             end);
 
-            if(curr == maxCurr) then
+            if curr == maxCurr then
                 break;
             end
 
             curr = curr + 1;
         end
 
-        if(connection ~= nil) then
+        if connection ~= nil then
             connection:Disconnect();
         end
 
         connection = petFainted.OnClientEvent:Connect(QuickbarMenu.Setup);
     end
     
-    if(faintedPets == allPets and allPets > 0) then
+    if faintedPets == allPets and allPets > 0 then
         mainGui.ImportantMessage.ImageLabel.TextLabel.Text = "Go to town to heal pets";
         mainGui.ImportantMessage.Visible = true;
+
+        director.SetGPS(tagged[1]:FindFirstChildWhichIsA("BasePart"));
+
         local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
         local tween = tweenService:Create(mainGui.ImportantMessage.ImageLabel, tweenInfo, {Size=UDim2.new(1, 0, 0.9, 0)})
         tween:Play()

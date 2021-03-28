@@ -9,6 +9,7 @@
         "TweenInfo",
         "Enum",
         "UDim2",
-        "Random"
+        "Random",
+        "script"
     ]
 }
