@@ -5,6 +5,10 @@ local players = game:GetService("Players");
 local pathfindingService = game:GetService("PathfindingService");
 local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider");
 local replicatedStorage = game:GetService("ReplicatedStorage");
+local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
+local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
+
+-- Events
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
 local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
@@ -12,18 +16,16 @@ local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
 local stopAttacking = replicatedStorage.Common.Events.StopAttacking;
-local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.EvolutionGUI);
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
-local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
-local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
-local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 local petFaintNotification = replicatedStorage.PetFaintNotification;
+local removePet = replicatedStorage.Common.Events.RemovePet;
+
+-- Variables
 local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame");
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
 local physicsService = game:GetService("PhysicsService");
 
--- Variables
 local board = nil;
 local activePet = nil;
 local activePetData = nil;
@@ -43,7 +45,7 @@ local bodyPosition = nil
 local bodyGyro = nil
 local YPoint = 0
 local Addition = 0.01;
-local YDrift = .5;
+local YDrift = .01;
 
 -- Functions
 
@@ -85,30 +87,27 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
     if(nextPet ~= nil) then return end
     if(petSpawning) then return end
 
-	YPoint = YPoint + Addition
-    if YPoint > YDrift or YPoint < -1 * YDrift then Addition = -1 * Addition end 
-	
-    local X, Z = getXAndZPositions(10, 10);
-    local LookAt = targetCFrame.p;
-    local TargetCFrame = CFrame.new(targetCFrame.p, LookAt)
-                
-    local NewCFrame = activePet.PrimaryPart.CFrame:Lerp(TargetCFrame, .02)
-    NewCFrame = CFrame.new(NewCFrame.p, LookAt);
-    activePet:SetPrimaryPartCFrame(NewCFrame)
+    local model = activePet;
+    local petCframe = activePet.Root.CFrame.p;
 
-    if not animationPlaying then
-        animationPlaying = true;
+    bodyPosition.Position = activePet.Root.CFrame:Lerp(targetCFrame, 0.5).p;
+    bodyGyro.CFrame = CFrame.new(model.Root.CFrame.Position, targetCFrame.Position);
 
-        local animator = activePet:WaitForChild("Humanoid");
-        if animator then
-            track = animator:LoadAnimation(activePet.Animations.Walk)
-            track:Play()
-            setPetAnimation:FireServer(activePet.Animations.Walk);
+    pcall(function()
+        if not animationPlaying then
+            animationPlaying = true;
+    
+            local animator = activePet:WaitForChild("Humanoid");
+            if animator then
+                track = animator:LoadAnimation(activePet.Animations.Walk)
+                track:Play()
+                setPetAnimation:FireServer(activePet.Animations.Walk);
+            end
+    
         end
+    end);
 
-    end
-
-    return (NewCFrame.p - TargetCFrame.p).magnitude > 0.001;
+    return (petCframe - bodyPosition.Position).magnitude > 0.5;
 end
 
 local function AttackTarget()
@@ -227,7 +226,7 @@ local function UpdatePet(delta)
         local moved = false;
 
         if(distance > 4 and distance > 6) then
-            moved = MoveTo(players.LocalPlayer.Character.Head, targetCFrame, true);
+            moved = MoveTo(players.LocalPlayer.Character.RightFoot, targetCFrame, true);
         end
 
         if not moved then
@@ -246,6 +245,13 @@ local function SetupPet(pet, petData)
     activePet = pet;
     
 	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
+
+    pet.PrimaryPart.CanCollide = false;
+    bodyPosition = Instance.new("BodyPosition", pet.Root);
+    bodyPosition.MaxForce = Vector3.new(10000, 10000, 10000);
+    bodyGyro = Instance.new("BodyGyro", pet.Root);
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
+    bodyGyro.D = 100;
 
     petSpawning = false;
 end
@@ -300,7 +306,7 @@ end
 function PetManager.SetActivePet(pet, petData)
     petSpawning = true;
 
-    if(activePet ~= null) then
+    if(activePet ~= nil) then
         activePet:Destroy();
         activePet = nil;
     end
@@ -328,20 +334,18 @@ cancelCombatButton.MouseButton1Click:Connect(StopCombat);
 
 petEvolved.OnClientEvent:Connect(function(next)
     replicatedStorage.LevelUp:Play();
+    removePet:InvokeServer();
 
     StopCombat();
-    
-    evolutionGui.Setup(activePetData, next);
-    
+
     PetManager.SetTarget(nil);
     PetManager.SetActivePet(nil, nil);
 end);
 
 petFainted.OnClientEvent:Connect(function()
     StopCombat();
+    PetManager.SetActivePet(nil);
     PetManager.SetTarget(nil);
-
-    quickbarMenu.Setup();
 
     local messageUi = petFaintNotification:clone();
     messageUi.MessageBack.Frame.MessageLabel.Text = activePetData.ItemData.Name .. " has fainted!";

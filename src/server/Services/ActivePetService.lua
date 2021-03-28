@@ -67,7 +67,7 @@ end
 local function AddAboveHeadGUI(model, itemData)
     local npcAboveHeadGUI = replicatedStorage.PetGUI;
     board = npcAboveHeadGUI:Clone()
-    board.Parent = workspace;
+    board.Parent = model.Root;
     board.Adornee = model.Root;
 
 	local offset = itemData.ItemData.GuiOffset;
@@ -92,8 +92,17 @@ end
 function ActivePetService.AddActivePet(player, item)
 	if(activePets[player.UserId] ~= nil) then
 		local playersCurrentPet = activePets[player.UserId];
+
+		local currentId = playersCurrentPet.PetData.PlayerItem.Id;
+		local nextId = item.PlayerItem.Id;
+
 		ActivePetService.StopAttacking(player, playersCurrentPet.PetData);
 		playersCurrentPet.PetModel:Destroy();
+
+		if(currentId == nextId) then
+			activePets[player.UserId] = nil;
+			return nil;
+		end
 	end
 
 	local model = insertService:LoadAsset(item.ItemData.ModelId);
@@ -107,7 +116,12 @@ function ActivePetService.AddActivePet(player, item)
 
 	toSend.PrimaryPart = toSend.Root;
 	toSend.Parent = workspace;
-	toSend.PrimaryPart:SetNetworkOwner(player);
+
+	for _, part in pairs(toSend:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part:SetNetworkOwner(player);
+		end
+	end
 
 	model:Destroy();
 
@@ -119,6 +133,7 @@ function ActivePetService.AddActivePet(player, item)
 		PetModel = toSend,
 		PetData = actualPet,
 		Target = nil,
+		LastAttack = os.time() - 1,
 		AboveHeadGUI = aboveHeadGUI
 	};
 
@@ -143,7 +158,10 @@ function ActivePetService.AddActivePet(player, item)
     hitSound.RollOffMaxDistance = 50;
     hitSound.RollOffMode = Enum.RollOffMode.LinearSquare;
 
-	playerEquipped:FireClient(player, toSend, item);
+	return {
+		Item = item,
+		Model = toSend
+	};
 end
 
 function ActivePetService.PetStored(player, pet)
@@ -193,11 +211,13 @@ function ActivePetService.RemovePlayerPet(player)
     local playersPet = activePets[player.UserId];
 
     if(playersPet == nil) then
-        return;
+        return false;
     end
 
     playersPet.PetModel:Destroy();
     activePets[player.UserId] = nil;
+
+	return true;
 end
 
 function ActivePetService.CalculateDamage(level, rarity, c1, c2, handicap, attackPower)

@@ -107,6 +107,9 @@ end
 local petAttackingEvent = replicatedStorage.Common.Events:WaitForChild("PetAttackingEvent");
 petAttackingEvent.OnServerInvoke = activePetService.PetAttack;
 
+local removePet = replicatedStorage.Common.Events.RemovePet;
+removePet.OnServerInvoke = activePetService.RemovePlayerPet;
+
 local setPetAnimation = replicatedStorage.Common.Events.SetPetAnimation;
 setPetAnimation.OnServerEvent:Connect(activePetService.PetAnimation);
 
@@ -154,10 +157,22 @@ equipItemRequest.OnServerInvoke = function(player, item)
 	if(itemData.ItemType == "Pet" or itemData.ItemType == "Seed") then
 		local health = playerItem.Data.CurrentHealth or 1;
 		if(health > 0) then
-			activePetService.AddActivePet(player, {
+			local petStuff = activePetService.AddActivePet(player, {
 				PlayerItem = playerItem,
 				ItemData = itemData
 			});
+
+			if(petStuff == nil) then
+				return {
+					Success = true;
+				};
+			end
+
+			return {
+				Success = true,
+				Model = petStuff.Model,
+				Item = petStuff.Item
+			};
 		else 
 			return {
 				Success = false,

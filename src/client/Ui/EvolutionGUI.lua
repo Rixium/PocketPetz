@@ -1,6 +1,7 @@
 local EvolutionGUI = {};
 
 local players = game:GetService("Players");
+local replicatedStorage = game:GetService("ReplicatedStorage");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
 local evolutionGui = uiManager.GetUi("Evolution GUI");
@@ -16,6 +17,12 @@ local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager)
 local mainGui = uiManager.GetUi("Main GUI");
 local bagButton = mainGui:WaitForChild("Buttons").BagButton.BagButton;
 
+local petEvolved = replicatedStorage.Common.Events.PetEvolved;
+local callback;
+
+function EvolutionGUI.Init()
+    callback = petEvolved.OnClientEvent:Connect(EvolutionGUI.Setup);
+end
 local function Transition()
 
     local frame = evolutionGui:WaitForChild("EvolveFrame");
@@ -161,8 +168,12 @@ local function Grow()
     end
 end
 
-function EvolutionGUI.Setup(current, next)
+function EvolutionGUI.Setup(data)
     evolutionGui.Enabled = true;
+    
+    local current = data.Current;
+    local next = data.Next;
+
     nextPet = next;
     nextModelId = next.ItemData.ModelId;
     

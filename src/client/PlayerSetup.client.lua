@@ -4,6 +4,7 @@ local players = game:GetService("Players");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local gameState = require(players.LocalPlayer.PlayerScripts.Client.GameState);
 local trade = require(players.LocalPlayer.PlayerScripts.Client.Ui.Trade);
+local evolutionGui = require(players.LocalPlayer.PlayerScripts.Client.Ui.EvolutionGUI);
 local playerSwitchedZone = replicatedStorage.Common.Events.PlayerSwitchedZone;
 local zoneIntro = uiManager.GetUi("Zone Intro");
 local tweenService = game:GetService("TweenService");
@@ -67,3 +68,4 @@ playerSwitchedZone.OnClientEvent:Connect(function(zoneName)
 end);
 
 trade.Setup();
+evolutionGui.Init();

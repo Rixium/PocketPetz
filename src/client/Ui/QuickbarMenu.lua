@@ -5,6 +5,7 @@ local replicatedStorage = game:GetService("ReplicatedStorage");
 local tweenService = game:GetService("TweenService");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
+local petManager = require(players.LocalPlayer.PlayerScripts.Client.PetManager);
 local mainGui = uiManager.GetUi("Main GUI");
 local quickBar = mainGui:WaitForChild("Quickbar");
 
@@ -12,6 +13,8 @@ local getItemsRequest = replicatedStorage.Common.Events.GetItemsRequest;
 local petFaintNotification = replicatedStorage.PetFaintNotification;
 local equipItemRequest = replicatedStorage.Common.Events.EquipItemRequest;
 local isPlayerLifetimeLegend = replicatedStorage.Common.Events.IsPlayerLifetimeLegend;
+local petFainted = replicatedStorage.Common.Events.PetFainted;
+local connection;
 
 local slots = {
     [1] = {
@@ -134,6 +137,22 @@ function QuickbarMenu.Setup()
                     local messageUi = petFaintNotification:clone();
                     messageUi.MessageBack.Frame.MessageLabel.Text = result.Message;
                     notificationCreator.CreateNotification(messageUi, messageUi.MessageBack);
+                else
+                    
+                    if(result.Model == nil) then 
+                        petManager.SetActivePet(nil);
+                        return 
+                    end;
+
+                    local playerCharacter = players.LocalPlayer.Character;
+
+                    local startFrame = playerCharacter:GetPrimaryPartCFrame():ToWorldSpace(CFrame.new(3,1,0))
+                    local characterCframe = playerCharacter:GetPrimaryPartCFrame()        
+                
+                    result.Model:SetPrimaryPartCFrame(startFrame);
+                    result.Model.Name = "Pet";
+                
+                    petManager.SetActivePet(result.Model, result.Item);
                 end
             end);
 
@@ -143,6 +162,12 @@ function QuickbarMenu.Setup()
 
             curr = curr + 1;
         end
+
+        if(connection ~= nil) then
+            connection:Disconnect();
+        end
+
+        connection = petFainted.OnClientEvent:Connect(QuickbarMenu.Setup);
     end
     
     if(faintedPets == allPets and allPets > 0) then

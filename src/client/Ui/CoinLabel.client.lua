@@ -6,7 +6,7 @@ local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiMan
 
 local function UpdateCoins(value)
     local mainGui = uiManager.GetUi("Main GUI");
-    local coinBackground = mainGui.CurrencyFrame.CoinFrame.CoinBackground;
+    local coinBackground = mainGui.CurrencyFrame.CoinBackground;
     local coinCountFront = coinBackground.CoinCountFront;
     local coinCountBack = coinBackground.CoinCountBack;
     coinCountBack.Text = value;
