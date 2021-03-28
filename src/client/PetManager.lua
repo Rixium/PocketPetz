@@ -2,15 +2,12 @@ local PetManager = {};
 
 -- Imports
 local players = game:GetService("Players");
-local pathfindingService = game:GetService("PathfindingService");
-local keyframeSequenceProvider = game:GetService("KeyframeSequenceProvider");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local uiManager = require(players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 local notificationCreator = require(players.LocalPlayer.PlayerScripts.Client.Creators.NotificationCreator);
 
 -- Events
 local petAttackingEvent = replicatedStorage.Common.Events.PetAttackingEvent;
-local petGotExperience = replicatedStorage.Common.Events.PetGotExperience;
 local petStopAttackingEvent = replicatedStorage.Common.Events.PetStopAttackingEvent;
 local petRequestAttack = replicatedStorage.Common.Events.PetRequestAttack;
 local petEvolved = replicatedStorage.Common.Events.PetEvolved;
@@ -26,12 +23,10 @@ local stopCombatFrame = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFram
 local cancelCombatButton = uiManager.GetUi("Main GUI"):WaitForChild("StopCombatFrame").CancelButton;
 local physicsService = game:GetService("PhysicsService");
 
-local board = nil;
 local activePet = nil;
 local activePetData = nil;
 local activeTarget = nil;
 local nextTarget = nil;
-local runner = nil;
 local toldServer = false;
 local animationPlaying = false;
 local track = nil;
@@ -43,9 +38,6 @@ local damages = {};
 local RNG = Random.new()
 local bodyPosition = nil
 local bodyGyro = nil
-local YPoint = 0
-local Addition = 0.01;
-local YDrift = .01;
 
 -- Functions
 
@@ -75,17 +67,9 @@ end
 
  -- End of UI Stuff
 
- function getXAndZPositions(Angle, Radius)
-	local x = math.cos(Angle) * Radius
-	local z = math.sin(Angle) * Radius
-	
-	return x, z
-end
-
-local function MoveTo(target, targetCFrame, shouldTeleport)
-    if(activePet == nil) then return end
-    if(nextPet ~= nil) then return end
-    if(petSpawning) then return end
+local function MoveTo(targetCFrame)
+    if activePet == nil  then return end
+    if petSpawning then return end
 
     local model = activePet;
     local petCframe = activePet.Root.CFrame.p;
@@ -111,11 +95,11 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
 end
 
 local function AttackTarget()
-    if(activeTarget == nil) then return end
-    if(activePet == nil) then return end
-    if(toldServer) then return end
+    if activeTarget == nil then return end
+    if activePet == nil then return end
+    if toldServer then return end
 
-    if(activePet.Parent == nil) then
+    if activePet.Parent == nil then
         activePet.AncestryChanged:wait()
     end
 
@@ -127,11 +111,11 @@ local function AttackTarget()
         attackTrack = petAnimator:LoadAnimation(activePet.Animations.Attack);
         setPetAnimation:FireServer(activePet.Animations.Attack);
         attackTrack.KeyframeReached:Connect(function(keyframeName)
-            if(keyframeName == "Hit") then
+            if keyframeName == "Hit" then
                 
-                if(activeTarget == nil) then return end
+                if activeTarget == nil then return end
                 local damageDefence = petAttackingEvent:InvokeServer(activePet, activePetData, activeTarget);
-                if(activeTarget == nil) then return end
+                if activeTarget == nil then return end
 
                 pcall(function()
                     local damageGUI = replicatedStorage.DamageBillboard:clone();
@@ -154,19 +138,19 @@ local function AttackTarget()
 end
 
 local function DoCombat()
-    if(activeTarget == nil) then return end
-    if(activePet == nil) then return end
+    if activeTarget == nil then return end
+    if activePet == nil then return end
 
     local targetCFrame = activeTarget.Parent.Root.CFrame:ToWorldSpace();
     local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
     local moved = false;
 
-    if(distance > 3 and distance > 4) then
-        moved = MoveTo(activeTarget, targetCFrame);
+    if distance > 3 and distance > 4 then
+        moved = MoveTo(targetCFrame);
     end 
 
     if not moved then
-        if (track ~= nil and animationPlaying) then
+        if track ~= nil and animationPlaying then
             animationPlaying = false;
             track:Stop();
             track = nil;
@@ -178,7 +162,7 @@ local function DoCombat()
 end
 
 local function CheckForCleanup()
-    if(activePet == nil) then return end
+    if activePet == nil then return end
 
     local model = activePet;
     local playerCharacter = players.LocalPlayer.Character;
@@ -206,7 +190,7 @@ local function UpdatePet(delta)
     end
 
     for i, damageGUI in pairs(damages) do
-        if(damageGUI.Time <= 0) then
+        if damageGUI.Time <= 0 then
             damageGUI.GUI:Destroy();
             table.remove(damages, i);
         end
@@ -214,23 +198,23 @@ local function UpdatePet(delta)
     
     CheckForCleanup();
 
-    if(activePet == nil) then
+    if activePet == nil then
         return;
     end
 
-    if(activeTarget ~= nil) then
+    if activeTarget ~= nil then
         DoCombat();
     else
         local targetCFrame = players.LocalPlayer.Character:WaitForChild("RightFoot").CFrame:ToWorldSpace(CFrame.new(3,0,3));
         local distance = (targetCFrame.p - activePet.Root.CFrame.p).magnitude;
         local moved = false;
 
-        if(distance > 4 and distance > 6) then
-            moved = MoveTo(players.LocalPlayer.Character.RightFoot, targetCFrame, true);
+        if distance > 4 and distance > 6 then
+            moved = MoveTo(targetCFrame);
         end
 
         if not moved then
-            if (track ~= nil and animationPlaying) then
+            if track ~= nil and animationPlaying then
                 animationPlaying = false;
                 track:Stop();
                 track = nil;
@@ -247,9 +231,11 @@ local function SetupPet(pet, petData)
 	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
 
     pet.PrimaryPart.CanCollide = false;
-    bodyPosition = Instance.new("BodyPosition", pet.Root);
+    bodyPosition = Instance.new("BodyPosition");
+    bodyPosition.Parent = pet.Root;
     bodyPosition.MaxForce = Vector3.new(10000, 10000, 10000);
-    bodyGyro = Instance.new("BodyGyro", pet.Root);
+    bodyGyro = Instance.new("BodyGyro");
+    bodyGyro.Parent = pet.Root;
     bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
     bodyGyro.D = 100;
 
@@ -258,17 +244,17 @@ end
 
 local function StopCombat()
 
-    if(attackTrack ~= nil) then
+    if attackTrack ~= nil then
         attackTrack:Stop();
     end
 
-    if(targetHitAnimation ~= nil) then
+    if targetHitAnimation ~= nil then
         targetHitAnimation:Stop();
     end
     
     Shrink();
 
-    if(activePet ~= nil and activeTarget ~= nil) then
+    if activePet ~= nil and activeTarget ~= nil then
         petStopAttackingEvent:FireServer(activePet, activePetData, activeTarget);
     end
     
@@ -280,9 +266,9 @@ local function StopCombat()
 end
 
 function PetManager.SetTarget(target)
-    if(activeTarget == target) then return end
-    if(nextTarget == target) then return end
-    if(requesting) then return end
+    if activeTarget == target then return end
+    if nextTarget == target then return end
+    if requesting then return end
 
     -- Make sure that the player is trying to attack a valid target, also stores this data
     -- server side for subsequent requests :)
@@ -306,12 +292,12 @@ end
 function PetManager.SetActivePet(pet, petData)
     petSpawning = true;
 
-    if(activePet ~= nil) then
+    if activePet ~= nil then
         activePet:Destroy();
         activePet = nil;
     end
 
-    if(pet == nil or petData == nil) then 
+    if pet == nil or petData == nil then 
         petSpawning = false;    
         return 
     end
@@ -332,7 +318,7 @@ end
 
 cancelCombatButton.MouseButton1Click:Connect(StopCombat);
 
-petEvolved.OnClientEvent:Connect(function(next)
+petEvolved.OnClientEvent:Connect(function()
     replicatedStorage.LevelUp:Play();
     removePet:InvokeServer();
 

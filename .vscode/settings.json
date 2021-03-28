@@ -1,5 +1,14 @@
 {
     "Lua.diagnostics.globals": [
-        "game"
+        "game",
+        "CFrame",
+        "Vector3",
+        "Instance",
+        "workspace",
+        "spawn",
+        "TweenInfo",
+        "Enum",
+        "UDim2",
+        "Random"
     ]
 }
