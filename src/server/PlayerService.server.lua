@@ -1,6 +1,5 @@
 local serverScriptService = game:GetService("ServerScriptService");
 local playerTracker = require(serverScriptService.Server.PlayerTracker);
-local moneyManager = require(serverScriptService.Server.Statistics.MoneyManager);
 local titleService = require(serverScriptService.Server.Services.TitleService);
 local itemService = require(serverScriptService.Server.Services.ItemService);
 local itemList = require(serverScriptService.Server.Data.ItemList);
@@ -8,10 +7,8 @@ local petService = require(serverScriptService.Server.Services.PetService);
 local playerService = require(serverScriptService.Server.Services.PlayerService);
 local tradeService = require(serverScriptService.Server.Services.TradeService);
 local activePetService = require(serverScriptService.Server.Services.ActivePetService);
-local activePetService = require(serverScriptService.Server.Services.ActivePetService);
 local physicsService = game:GetService("PhysicsService");
 local players = game:GetService("Players");
-local collectionService  = game:GetService("CollectionService");
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local playerSwitchedZone = replicatedStorage.Common.Events.PlayerSwitchedZone;
 local worldService = require(serverScriptService.Server.Services.WorldService);
@@ -30,6 +27,7 @@ local function SetupCollision(player)
 		end
 	end
 end
+
 
 function OnPlayerJoined(player)
 	playerTracker.Login(player);

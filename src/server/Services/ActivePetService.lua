@@ -14,7 +14,6 @@ local worldService = require(serverScriptService.Server.Services.WorldService);
 local playerEquipped = replicatedStorage.Common.Events.PlayerEquippedItem;
 local targetKilled = replicatedStorage.Common.Events.TargetKilled;
 local petFainted = replicatedStorage.Common.Events.PetFainted;
-local petsHealed = replicatedStorage.Common.Events.PetsHealed;
 local stopAttacking = replicatedStorage.Common.Events.StopAttacking;
 
 -- Variables
@@ -32,16 +31,16 @@ local doubleExperienceGamePassId = 15821713;
 -- Functions
 
 local function UpdateXpBar(pet, petData)
-	if(petData == nil) then return end
+	if petData == nil then return end
 
 	local currentExperience = petData.PlayerItem.Data.CurrentExperience or 1;
 	local experienceToLevel = petData.ItemData.ExperienceToLevel or 1;
 
     local width = currentExperience / experienceToLevel;
     
-    if(width > 1) then
+    if width > 1 then
         width = 1;
-	elseif(width < 0) then
+	elseif width < 0 then
 		width = 0;
 	end
 
