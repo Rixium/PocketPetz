@@ -2,8 +2,10 @@
 local replicatedStorage = game:GetService("ReplicatedStorage");
 local players = game:GetService("Players");
 local tweenService = game:GetService("TweenService");
+local collectionService = game:GetService("CollectionService");
 local gotItemEvent = replicatedStorage.Common.Events.PlayerGotItemEvent;
 local quickbarMenu = require(players.LocalPlayer.PlayerScripts.Client.Ui.QuickbarMenu);
+local director = require(players.LocalPlayer.PlayerScripts.Client.Director);
 
 local uiManager = require(game.Players.LocalPlayer.PlayerScripts.Client.Ui.UiManager);
 
@@ -17,10 +19,17 @@ local bagButton = mainGui:WaitForChild("Buttons").BagButton.BagButton;
 
 -- Functions
 
-local function OnGotItem(itemData)
+local function OnGotItem(itemResult)
     local newPopup = gotItemPopup:clone();
     newPopup.Parent = mainGui;
 
+    if itemResult.Data ~= nil then
+        local theData = itemResult.Data;
+        if theData.Tutorial then
+            local tagged = collectionService:GetTagged(theData.GpsTarget);
+            director.SetGPS(theData.Message, tagged[1]:FindFirstChildWhichIsA("BasePart"));
+        end
+    end
     newPopup.Award:Play();
 
     local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quart, Enum.EasingDirection.Out, 0, false, 0);
@@ -31,6 +40,8 @@ local function OnGotItem(itemData)
     tween2:Play();
 
     local color;
+
+    local itemData = itemResult.ItemData;
 
     if(itemData.Type == "Brute") then
         color = "#c6fb64"; -- Green

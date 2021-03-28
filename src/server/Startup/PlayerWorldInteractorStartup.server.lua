@@ -23,39 +23,54 @@ local inProgress = {};
 itemChecks[1] = function(player)
     local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
     
-    if(hasItem) then
+    if hasItem then
         return nil;
     end
     
     return {
         Body = "Are you sure? There's no turning back.",
-        Item = itemList.GetById(1)
+        Item = itemList.GetById(1),
+        Data = {
+            Tutorial = true,
+            Message = "Train the Seed!",
+            GpsTarget = "TrainingDummy"
+        }
     }
 end
 
 itemChecks[2] = function(player)
     local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
 
-    if(hasItem) then
+    if hasItem then
         return nil;
     end
 
     return {
         Body = "Are you sure? There's no turning back.",
-        Item = itemList.GetById(2)
+        Item = itemList.GetById(2),
+        Data = {
+            Tutorial = true,
+            Message = "Train the Seed!",
+            GpsTarget = "TrainingDummy"
+        }
     }
 end
 
 itemChecks[3] = function(player)
     local hasItem = playerDataChecker.HasAnyItem(player, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
     
-    if(hasItem) then
+    if hasItem then
         return nil;
     end
     
     return {
         Body = "Are you sure? There's no turning back.",
-        Item = itemList.GetById(3)
+        Item = itemList.GetById(3),
+        Data = {
+            Tutorial = true,
+            Message = "Train the Seed!",
+            GpsTarget = "TrainingDummy"
+        }
     }
 end
 
@@ -75,18 +90,17 @@ end
 
 for _, itemGiver in pairs(itemGivers) do
     itemGiver.Touched:Connect(function(toucher)
-        local primary = toucher.Parent;
         local player = players:GetPlayerFromCharacter(toucher.Parent);
         
         if player then
-            if(inside[player.UserId]) then
+            if inside[player.UserId] then
                 return;
             end
-            if(RequestInProgress(player)) then
+            if RequestInProgress(player) then
                 return;
             end
             
-            if(playerDebounce[player.UserId]) then
+            if playerDebounce[player.UserId] then
                 return;
             end
             playerDebounce[player.UserId] = true;
@@ -94,8 +108,11 @@ for _, itemGiver in pairs(itemGivers) do
             inside[player.UserId] = true;
             local itemId = itemGiver:GetAttribute("ItemId");
             local itemResponse = GetItemResponse(itemId, player);
-            if(itemResponse ~= nil) then
-                inProgress[player.UserId] = itemId;
+            if itemResponse ~= nil then
+                inProgress[player.UserId] = {
+                    ItemId = itemId,
+                    Data = itemResponse.Data
+                }
                 itemPickupEvent:FireClient(player, itemResponse);
             end
             playerDebounce[player.UserId] = nil;
@@ -112,7 +129,7 @@ for _, itemGiver in pairs(itemGivers) do
             end
         end
 
-        if(spawned[toucherPlayer.UserId]) then 
+        if spawned[toucherPlayer.UserId] then 
             return;
         end
 
@@ -126,16 +143,16 @@ for _, itemGiver in pairs(itemGivers) do
 end
 
 itemApprovePickupEvent.OnServerEvent:Connect(function(player, itemId)
-    local verify = inProgress[player.UserId] == itemId;
+    local data = inProgress[player.UserId].Data;
+    local verify = inProgress[player.UserId].ItemId == itemId;
     inProgress[player.UserId] = nil;
 
-    if(verify) then
-        itemService.GiveItem(player, itemId, true);
+    if verify then
+        itemService.GiveItem(player, itemId, true, data);
     end
 end)
 
 itemDeclinePickupEvent.OnServerEvent:Connect(function(player, itemId)
-    local verify = inProgress[player.UserId] == itemId;
     inProgress[player.UserId] = nil;
 end)
 

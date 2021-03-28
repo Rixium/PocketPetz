@@ -33,6 +33,8 @@ function OnPlayerJoined(player)
 	playerTracker.Login(player);
 	moneyManager.PlayerJoined(player);
 
+	itemService.ClearItems(player);
+	
 	local isFirstTime = playerTracker.FirstTime(player);
 	titleService.UnlockTitle(player, "Noob");
 	titleService.UnlockTitle(player, currentEventTitle);

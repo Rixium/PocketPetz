@@ -173,17 +173,7 @@ function QuickbarMenu.Setup()
     end
     
     if faintedPets == allPets and allPets > 0 then
-        mainGui.ImportantMessage.ImageLabel.TextLabel.Text = "Go to town to heal pets";
-        mainGui.ImportantMessage.Visible = true;
-
-        director.SetGPS(tagged[1]:FindFirstChildWhichIsA("BasePart"));
-
-        local tweenInfo = TweenInfo.new(0.7, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out)
-        local tween = tweenService:Create(mainGui.ImportantMessage.ImageLabel, tweenInfo, {Size=UDim2.new(1, 0, 0.9, 0)})
-        tween:Play()
-    else 
-        mainGui.ImportantMessage.Visible = false;
-        mainGui.ImportantMessage.ImageLabel.Size = UDim2.new(0,0,0,0);
+        director.SetGPS("Go to town to heal pets", tagged[1]:FindFirstChildWhichIsA("BasePart"));
     end
 end
 

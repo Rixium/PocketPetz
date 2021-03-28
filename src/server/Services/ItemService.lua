@@ -100,7 +100,7 @@ function ItemService.GetPlayerItemByGuid(player, guid)
     return nil;
 end
 
-function ItemService.GiveItem(player, itemId, shouldNotify)
+function ItemService.GiveItem(player, itemId, shouldNotify, otherData)
     local itemStore = dataStore2(itemsData, player);
     local items = itemStore:Get({});
 
@@ -121,8 +121,11 @@ function ItemService.GiveItem(player, itemId, shouldNotify)
         local itemData = itemList.GetById(itemId);
         newItem.Data.CurrentHealth = itemData.BaseHealth;
 
-        if(shouldNotify ~= nil and shouldNotify == true) then
-            gotItemEvent:FireClient(player, itemData);
+        if shouldNotify ~= nil and shouldNotify == true then
+            gotItemEvent:FireClient(player, {
+                ItemData = itemData,
+                Data = otherData
+            });
         end
         
         table.insert(items, newItem);

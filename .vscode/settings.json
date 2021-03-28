@@ -10,6 +10,7 @@
         "Enum",
         "UDim2",
         "Random",
-        "script"
+        "script",
+        "wait"
     ]
 }
