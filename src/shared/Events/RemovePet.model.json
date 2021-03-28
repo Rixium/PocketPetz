@@ -1,4 +1,4 @@
 {
     "Name": "RemovePet",
-    "ClassName": "RemoteEvent"
+    "ClassName": "RemoteFunction"
 }

@@ -87,30 +87,27 @@ local function MoveTo(target, targetCFrame, shouldTeleport)
     if(nextPet ~= nil) then return end
     if(petSpawning) then return end
 
-	YPoint = YPoint + Addition
-    if YPoint > YDrift or YPoint < -1 * YDrift then Addition = -1 * Addition end 
-	
-    local X, Z = getXAndZPositions(2, 2);
-    local LookAt = targetCFrame.p;
-    local TargetCFrame = CFrame.new(targetCFrame.p, LookAt)
-                
-    local NewCFrame = activePet.PrimaryPart.CFrame:Lerp(TargetCFrame, .02)
-    NewCFrame = CFrame.new(NewCFrame.p, LookAt);
-    activePet:SetPrimaryPartCFrame(NewCFrame)
+    local model = activePet;
+    local petCframe = activePet.Root.CFrame.p;
 
-    if not animationPlaying then
-        animationPlaying = true;
+    bodyPosition.Position = activePet.Root.CFrame:Lerp(targetCFrame, 0.5).p;
+    bodyGyro.CFrame = CFrame.new(model.Root.CFrame.Position, targetCFrame.Position);
 
-        local animator = activePet:WaitForChild("Humanoid");
-        if animator then
-            track = animator:LoadAnimation(activePet.Animations.Walk)
-            track:Play()
-            setPetAnimation:FireServer(activePet.Animations.Walk);
+    pcall(function()
+        if not animationPlaying then
+            animationPlaying = true;
+    
+            local animator = activePet:WaitForChild("Humanoid");
+            if animator then
+                track = animator:LoadAnimation(activePet.Animations.Walk)
+                track:Play()
+                setPetAnimation:FireServer(activePet.Animations.Walk);
+            end
+    
         end
+    end);
 
-    end
-
-    return (NewCFrame.p - TargetCFrame.p).magnitude > 0.1;
+    return (petCframe - bodyPosition.Position).magnitude > 0.5;
 end
 
 local function AttackTarget()
@@ -229,7 +226,7 @@ local function UpdatePet(delta)
         local moved = false;
 
         if(distance > 4 and distance > 6) then
-            moved = MoveTo(players.LocalPlayer.Character.Head, targetCFrame, true);
+            moved = MoveTo(players.LocalPlayer.Character.RightFoot, targetCFrame, true);
         end
 
         if not moved then
@@ -248,6 +245,13 @@ local function SetupPet(pet, petData)
     activePet = pet;
     
 	physicsService:SetPartCollisionGroup(activePet.PrimaryPart, "Pets")
+
+    pet.PrimaryPart.CanCollide = false;
+    bodyPosition = Instance.new("BodyPosition", pet.Root);
+    bodyPosition.MaxForce = Vector3.new(10000, 10000, 10000);
+    bodyGyro = Instance.new("BodyGyro", pet.Root);
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge);
+    bodyGyro.D = 100;
 
     petSpawning = false;
 end
@@ -303,7 +307,6 @@ function PetManager.SetActivePet(pet, petData)
     petSpawning = true;
 
     if(activePet ~= nil) then
-        removePet:FireServer();
         activePet:Destroy();
         activePet = nil;
     end
@@ -331,6 +334,7 @@ cancelCombatButton.MouseButton1Click:Connect(StopCombat);
 
 petEvolved.OnClientEvent:Connect(function(next)
     replicatedStorage.LevelUp:Play();
+    removePet:InvokeServer();
 
     StopCombat();
 

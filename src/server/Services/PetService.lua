@@ -161,6 +161,7 @@ function PetService.AddExperience(player, guid, experienceAmount)
     local items = itemStore:Get({});
     local resultItem;
     local resultData;
+    local didEvolve = false;
 
     for _, item in ipairs(items) do
         if(item.Id == guid) then
@@ -198,6 +199,8 @@ function PetService.AddExperience(player, guid, experienceAmount)
         
                 item.ItemId = nextPetId;
                 item.Data.CurrentHealth = nextPet.BaseHealth;
+
+                didEvolve = true;
 
                 local toSend = {
                     Current = {

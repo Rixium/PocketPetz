@@ -212,11 +212,13 @@ function ActivePetService.RemovePlayerPet(player)
     local playersPet = activePets[player.UserId];
 
     if(playersPet == nil) then
-        return;
+        return false;
     end
 
     playersPet.PetModel:Destroy();
     activePets[player.UserId] = nil;
+
+	return true;
 end
 
 function ActivePetService.CalculateDamage(level, rarity, c1, c2, handicap, attackPower)
