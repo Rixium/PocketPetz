@@ -25,11 +25,6 @@ The best way to develop would be to create scripts and assets in a separate leve
 There are some good documentation offered by ROJO, but you can see how it is used by the current project structure.
 If you need clarification, don't hesitate to ask the team!
 
-## Administration
-
-As a Developer, you should have access to the top-tier of PocketPetz administration.
-You should have been added as an admin by now, but if not, check with the team!
-
 ## Adding New Monsters
 How exciting! You want to add a new monster to the game. Well, it's a bit of a pain in the ass, but here we go.
 
