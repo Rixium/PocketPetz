@@ -1,9 +1,6 @@
 # PocketPetz
 Welcome, Welcome!
 
-You are now a proud of Developer of PocketPetz.
-It's gonna be tough getting started, as there's lots to learn, but we've got these docs to help you through.
-
 ## Developing the Game
 
 ### Getting Started
